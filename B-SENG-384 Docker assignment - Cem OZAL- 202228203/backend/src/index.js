@@ -28,6 +28,9 @@ pool.connect((err, client, release) => {
   release();
 });
 
+// E-posta doğrulama için basit bir kural (Regex)
+const emailRegex = /\S+@\S+\.\S+/;
+
 // --- API Endpoints ---
 
 // 1. Health Check
@@ -50,12 +53,11 @@ app.get('/api/people', async (req, res) => {
 app.post('/api/people', async (req, res) => {
   const { full_name, email } = req.body;
   
-  // 1. Kural: Boşluk ve Format Kontrolü (Basit Regex)
-  const emailRegex = /\S+@\S+\.\S+/;
+  // ÖDEV KURALI: Backend validation (Ad, e-posta boş mu ve formatı doğru mu?)
   if (!full_name || !email || !emailRegex.test(email)) {
     return res.status(400).json({ error: 'Valid full name and email are required' });
   }
-
+  
   try {
     const result = await pool.query(
       'INSERT INTO people (full_name, email) VALUES ($1, $2) RETURNING *',
@@ -63,9 +65,9 @@ app.post('/api/people', async (req, res) => {
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    if (err.code === '23505') { // Unique constraint violation (Aynı e-posta)
-      // 2. Kural: 400 yerine ödevin istediği 409 kodunu dönüyoruz
-      return res.status(409).json({ error: 'EMAIL_ALREADY_EXISTS' }); 
+    if (err.code === '23505') { // Unique constraint violation
+      // ÖDEV KURALI: Email çakışması 409 dönmeli
+      return res.status(409).json({ error: 'EMAIL_ALREADY_EXISTS' });
     }
     console.error(err);
     res.status(500).json({ error: 'Database error' });
@@ -76,6 +78,12 @@ app.post('/api/people', async (req, res) => {
 app.put('/api/people/:id', async (req, res) => {
   const { id } = req.params;
   const { full_name, email } = req.body;
+
+  // Güncelleme yaparken de bilgilerin doğru formatta olduğunu kontrol ediyoruz
+  if (!full_name || !email || !emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Valid full name and email are required' });
+  }
+
   try {
     const result = await pool.query(
       'UPDATE people SET full_name = $1, email = $2 WHERE id = $3 RETURNING *',
@@ -86,6 +94,10 @@ app.put('/api/people/:id', async (req, res) => {
     }
     res.json(result.rows[0]);
   } catch (err) {
+    if (err.code === '23505') { 
+      // Güncelleme yaparken de başka birinin e-postasıyla çakışırsa 409 dönmeli
+      return res.status(409).json({ error: 'EMAIL_ALREADY_EXISTS' });
+    }
     console.error(err);
     res.status(500).json({ error: 'Database error' });
   }
