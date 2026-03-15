@@ -19,7 +19,7 @@
 1.  **Clone the Repository:**
     ```bash
     git clone https://github.com/cozalss/SENG384-project.git
-    cd SENG384-project
+    cd "SENG384-project/B-SENG-384 Docker assignment - Cem OZAL- 202228203"
     ```
 
 2.  **Environment Configuration:**
