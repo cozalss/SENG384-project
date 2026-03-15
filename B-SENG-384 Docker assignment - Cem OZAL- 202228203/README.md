@@ -61,11 +61,27 @@ The dashboard includes a fully functional CLI where users can interact with the 
 ## 🐳 Docker Orchestration
 This project is engineered to be environment-agnostic. The entire stack is orchestrated using **Docker Compose**, managing volumes, networking, and service interdependencies.
 
-### ⚡ Quick Start (One Command Deployment)
-To launch the complete infrastructure:
-```bash
-docker compose up --build
-```
+### 🛠️ Installation & Setup
+
+Follow these steps to get the project running on your local machine:
+
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/cozalss/SENG384-project.git
+    cd SENG384-project
+    ```
+
+2.  **Environment Configuration:**
+    The project is pre-configured for Docker. If you need to change database credentials, update the `docker-compose.yml` and the `.env` file in the `backend` folder.
+
+3.  **Launch with Docker:**
+    Make sure Docker Desktop is running, then execute:
+    ```bash
+    docker compose up --build
+    ```
+
+4.  **Verify Services:**
+    Once the containers are up, you can access the frontend at `http://localhost:5173`.
 
 ### 🔗 Service Discovery
 | Service | URL | Role |
