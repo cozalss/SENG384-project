@@ -107,6 +107,14 @@ This assignment showcases professional-grade Docker implementation:
 
 ---
 
+## 🎨 Creative Design
+Maintaining the **Cyberpunk / Terminal** aesthetic:
+- **GSAP Animations**: Fluid transitions between registration and database views.
+- **Interactive Terminal UI**: High-fidelity terminal emulator for data entry.
+- **Responsive Table**: Engineered for clarity and functionality across all screens.
+
+---
+
 <p align="center">
   Developed with ❤️ and Cybernetic precision by <b>Cem Özal</b><br>
   <i>SENG-384 Docker Assignment - 202228203</i>
