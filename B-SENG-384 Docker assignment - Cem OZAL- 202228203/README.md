@@ -1,4 +1,4 @@
-# <p align="center">🚀 LexiAI - Personnel Management System (SENG-384)</p>
+# <p align="center">🚀 CemManagement - Personnel Management System (SENG-384)</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
@@ -10,7 +10,35 @@
 ---
 
 ## 🌟 Overview
-**LexiAI** has been refactored into a secure **Personnel Management System** to meet all requirements of the **SENG-384 Docker Assignment**. The platform now features a full CRUD (Create, Read, Update, Delete) lifecycle for managing personnel records, fully integrated with a containerized PostgreSQL database.
+**CemManagement** is a secure, containerized full-stack application developed for the **SENG-384 Docker Assignment**. It provides a professional interface for managing personnel records with a complete CRUD (Create, Read, Update, Delete) lifecycle, fully integrated with a containerized PostgreSQL database.
+
+---
+
+## 📸 Screenshots
+
+### 🖥️ Registration Portal
+<p align="center">
+  <img src="screenshots/form.png" width="800" alt="Registration Form" />
+</p>
+
+### 📊 Personnel Database
+<p align="center">
+  <img src="screenshots/table.png" width="800" alt="People Table" />
+</p>
+
+---
+
+## 🏗️ System Architecture & Requirements Met
+
+### 🛰️ Core Features
+- **Route `/`**: A high-fidelity registration form with real-time validation for adding personnel.
+- **Route `/people`**: A secure database view where authorized users can **List**, **Edit**, and **Delete** records.
+- **Database Initialization**: Uses `db/init.sql` to automatically provision the `people` table (id, full_name, email) on container startup.
+
+### 🐳 Docker Orchestration
+- **Container Networking**: Frontend, Backend, and Database communicate seamlessly within a private Docker bridge network.
+- **Persistence**: Relational data is preserved across container restarts via the `pgdata` named volume.
+- **Health Checks**: The backend implementation includes retry logic and waits for the PostgreSQL service to be `healthy`.
 
 ---
 
@@ -23,52 +51,28 @@
     ```
 
 2.  **Environment Configuration:**
-    Create a `.env` file based on `.env.example`:
+    Create a `.env` file based on the provided example:
     ```bash
     cp .env.example .env
     ```
 
 3.  **Launch with Docker:**
+    Make sure Docker Desktop is running, then execute:
     ```bash
     docker compose up --build
     ```
 
----
-
-## 🏗️ System Architecture & Requirements Met
-
-### 🛰️ Core Features
-- **Route `/`**: A registration form with real-time validation for adding new people.
-- **Route `/people`**: A secure database view where you can **List**, **Edit**, and **Delete** personnel records.
-- **Database Init**: Uses `db/init.sql` to automatically create the `people` table (id, full_name, email) on startup.
-
-### 🐳 Docker Orchestration
-- **Container Networking**: Frontend, Backend, and DB communicate seamlessly within the Docker bridge network.
-- **Persistence**: PostgreSQL data is preserved via a named volume `pgdata`.
-- **Health Checks**: The backend waits for the DB to be `healthy` before starting.
+4.  **Verify Services:**
+    Access the interactive dashboard at `http://localhost:5173`.
 
 ---
 
 ## 📝 Assignment Compliance Checklist
-- [x] **Database Schema**: `people` table with `id`, `full_name`, and `email` (unique).
-- [x] **Backend CRUD**: 
-    - `POST /api/people` (Create)
-    - `GET /api/people` (Read)
-    - `PUT /api/people/:id` (Update)
-    - `DELETE /api/people/:id` (Delete)
-- [x] **Frontend Routes**: 
-    - `/` (Registration Form)
-    - `/people` (People Table)
-- [x] **Database Init**: `init.sql` mounted to `/docker-entrypoint-initdb.d/`.
-- [x] **Environment Variables**: `.env.example` provided and used by backend.
-
----
-
-## 🎨 Creative Design
-Maintaining the **Cyberpunk / Terminal** aesthetic:
-- **GSAP Animations**: Fluid transitions between registration and database views.
-- **Interactive Terminal UI**: High-fidelity terminal emulator for data entry.
-- **Responsive Table**: Engineered for clarity and functionality across all screens.
+- [x] **Database Schema**: `people` table with `id`, `full_name`, and `email` (unique constraint).
+- [x] **Backend CRUD API**: Managed through Express.js with PostgreSQL integration.
+- [x] **React Routing**: Multi-page navigation for registration and data management.
+- [x] **Dockerization**: Independent Dockerfiles for each service.
+- [x] **Orchestration**: Managed via `docker-compose.yml` with health checks.
 
 ---
 
