@@ -88,6 +88,17 @@ This assignment showcases professional-grade Docker implementation:
 ---
 
 ## 📝 Compliance Checklist (SENG-384)
+- [x] **Database Schema**: `people` table with `id`, `full_name`, and `email` (unique).
+- [x] **Backend CRUD**: 
+    - `POST /api/people` (Create)
+    - `GET /api/people` (Read)
+    - `PUT /api/people/:id` (Update)
+    - `DELETE /api/people/:id` (Delete)
+- [x] **Frontend Routes**: 
+    - `/` (Registration Form)
+    - `/people` (People Table)
+- [x] **Database Init**: `init.sql` mounted to `/docker-entrypoint-initdb.d/`.
+- [x] **Environment Variables**: `.env.example` provided and used by backend.
 - [x] **Schema Compliance**: `people` table with `id`, `full_name`, and `email` (unique).
 - [x] **API Standards**: Full RESTful implementation on specialized container endpoints.
 - [x] **Docker Standards**: Independent Dockerfiles with optimized builds.
