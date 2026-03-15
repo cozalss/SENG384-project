@@ -1,82 +1,102 @@
-# <p align="center">🚀 CemManagement - Personnel Management System (SENG-384)</p>
+# <p align="center">🕵️‍♂️ AgentManagement - Personnel Intelligence System</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
   <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" />
   <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Security-Encrypted-red?style=for-the-badge" />
 </p>
 
 ---
 
 ## 🌟 Overview
-**CemManagement** is a secure, containerized full-stack application developed for the **SENG-384 Docker Assignment**. It provides a professional interface for managing personnel records with a complete CRUD (Create, Read, Update, Delete) lifecycle, fully integrated with a containerized PostgreSQL database.
+**AgentManagement** is an ultra-modern, containerized personnel management platform designed for the **SENG-384 Docker Assignment**. Built with a focus on high-fidelity user experience and robust system orchestration, it provides a seamless interface for managing sensitive personnel data through a fully localized micro-services architecture.
 
----
-
-## 📸 Screenshots
-
-### 🖥️ Registration Portal
 <p align="center">
-  <img src="screenshots/form.png" width="800" alt="Registration Form" />
-</p>
-
-### 📊 Personnel Database
-<p align="center">
-  <img src="screenshots/table.png" width="800" alt="People Table" />
+  <img src="screenshots/form.png" width="900" alt="Agent Registration Portal" />
 </p>
 
 ---
 
-## 🏗️ System Architecture & Requirements Met
+## 🏗️ System Architecture & Workflow
+The platform utilizes a state-of-the-art tech stack orchestrated via Docker to ensure 100% environment parity.
 
-### 🛰️ Core Features
-- **Route `/`**: A high-fidelity registration form with real-time validation for adding personnel.
-- **Route `/people`**: A secure database view where authorized users can **List**, **Edit**, and **Delete** records.
-- **Database Initialization**: Uses `db/init.sql` to automatically provision the `people` table (id, full_name, email) on container startup.
+```mermaid
+graph LR
+    User((Client Browser)) -->|Port 5173| Frontend[React / Vite UI]
+    Frontend -->|REST API Port 5000| Backend[Node.js / Express]
+    Backend -->|Connection Port 5432| DB[(Postgres Database)]
+    
+    subgraph "Docker Virtual Network"
+        Frontend
+        Backend
+        DB
+    end
+```
 
-### 🐳 Docker Orchestration
-- **Container Networking**: Frontend, Backend, and Database communicate seamlessly within a private Docker bridge network.
-- **Persistence**: Relational data is preserved across container restarts via the `pgdata` named volume.
-- **Health Checks**: The backend implementation includes retry logic and waits for the PostgreSQL service to be `healthy`.
+### 🛰️ Core Infrastructure
+1.  **Frontend (React 19)**: Features a high-performance Cyberpunk-themed UI, utilizing GSAP for ultra-smooth transitions and a custom interactive terminal for registration validation.
+2.  **Backend (Express API)**: A rigid RESTful gateway implementing logic for the complete CRUD lifecycle, handling direct secure communication with the database layer.
+3.  **Database (PostgreSQL 16)**: Containerized persistence layer with automated schema initialization via `init.sql`.
 
 ---
 
-## 🛠️ Installation & Setup
+## 🛠️ Key Features & Interactive UI
 
-1.  **Clone the Repository:**
+<p align="center">
+  <img src="screenshots/table.png" width="900" alt="Personnel Database View" />
+</p>
+
+### 🛡️ SECURE_REGISTRATION (Route: `/`)
+- **Real-time Validation**: Validates agent data before transmission.
+- **Unique Constraints**: Prevents duplicate entries via database-level email indexing.
+- **Micro-Animations**: Features neon pulse effects and GL-glitch title transitions.
+
+### 📊 DATA_CORE (Route: `/people`)
+- **Full CRUD Support**: Manage agents with **Create, Read, Update, and Delete** capabilities.
+- **Responsive Terminal Table**: A retro-futuristic data grid optimized for massive data clarity.
+- **Database Synchronization**: Real-time updates with persistent storage.
+
+---
+
+## 🐳 Docker Orchestration Details
+
+This assignment showcases professional-grade Docker implementation:
+- **Persistence**: Relational data is mapped to a named volume (`pgdata`), ensuring persistence across container rebuilds.
+- **Networking**: All services reside in a dedicated bridge network, allowing secure internal communication via service names.
+- **Automation**: Database tables are automatically provisioned on the first start using a mounted `init.sql`.
+
+### ⚡ Quick Start Guide
+
+1.  **Preparation:**
     ```bash
     git clone https://github.com/cozalss/SENG384-project.git
     cd SENG384-project
-    ```
-
-2.  **Environment Configuration:**
-    Create a `.env` file based on the provided example:
-    ```bash
     cp .env.example .env
     ```
 
-3.  **Launch with Docker:**
-    Make sure Docker Desktop is running, then execute:
+2.  **Deployment:**
     ```bash
     docker compose up --build
     ```
 
-4.  **Verify Services:**
-    Access the interactive dashboard at `http://localhost:5173`.
+3.  **Access:**
+    - Dashboard: [http://localhost:5173](http://localhost:5173)
+    - API Health: [http://localhost:5000/api/health](http://localhost:5000/api/health)
 
 ---
 
-## 📝 Assignment Compliance Checklist
-- [x] **Database Schema**: `people` table with `id`, `full_name`, and `email` (unique constraint).
-- [x] **Backend CRUD API**: Managed through Express.js with PostgreSQL integration.
-- [x] **React Routing**: Multi-page navigation for registration and data management.
-- [x] **Dockerization**: Independent Dockerfiles for each service.
-- [x] **Orchestration**: Managed via `docker-compose.yml` with health checks.
+## 📝 Compliance Checklist (SENG-384)
+- [x] **Schema Compliance**: `people` table with `id`, `full_name`, and `email` (unique).
+- [x] **API Standards**: Full RESTful implementation on specialized container endpoints.
+- [x] **Docker Standards**: Independent Dockerfiles with optimized builds.
+- [x] **Volume Management**: Persistent PostgreSQL mapping.
+- [x] **Env Validation**: Secure variable management via `.env` integration.
 
 ---
 
 <p align="center">
-  Developed with ❤️ by <b>Cem Özal</b><br>
+  Developed with ❤️ and Cybernetic precision by <b>Cem Özal</b><br>
   <i>SENG-384 Docker Assignment - 202228203</i>
 </p>

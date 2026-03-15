@@ -10,7 +10,7 @@ const Navigation = () => {
   return (
     <nav>
       <div className="logo">
-        <Link to="/" className="title">&lt;CemManagement /&gt;</Link>
+        <Link to="/" className="title">&lt;AgentManagement /&gt;</Link>
       </div>
       <ul className="nav-links">
         <li><Link to="/">/register</Link></li>
