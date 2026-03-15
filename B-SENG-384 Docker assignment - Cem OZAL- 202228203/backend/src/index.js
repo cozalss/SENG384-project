@@ -28,7 +28,7 @@ pool.connect((err, client, release) => {
   release();
 });
 
-// E-posta doğrulama için basit bir kural (Regex)
+// E-posta Regex Doğrulaması (Ödev kuralı)
 const emailRegex = /\S+@\S+\.\S+/;
 
 // --- API Endpoints ---
@@ -49,7 +49,7 @@ app.get('/api/people', async (req, res) => {
   }
 });
 
-// 2.5 GET single person by ID (ÖDEV KURALI)
+// 2.5 GET single person by ID (Ödev Kuralı)
 app.get('/api/people/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -68,7 +68,7 @@ app.get('/api/people/:id', async (req, res) => {
 app.post('/api/people', async (req, res) => {
   const { full_name, email } = req.body;
   
-  // ÖDEV KURALI: Backend validation (Ad, e-posta boş mu ve formatı doğru mu?)
+  // Regex ile format kontrolü (Ödev kuralı)
   if (!full_name || !email || !emailRegex.test(email)) {
     return res.status(400).json({ error: 'Valid full name and email are required' });
   }
@@ -81,7 +81,7 @@ app.post('/api/people', async (req, res) => {
     res.status(201).json(result.rows[0]);
   } catch (err) {
     if (err.code === '23505') { // Unique constraint violation
-      // ÖDEV KURALI: Email çakışması 409 dönmeli
+      // 409 Conflict dönmeli (Ödev kuralı)
       return res.status(409).json({ error: 'EMAIL_ALREADY_EXISTS' });
     }
     console.error(err);
@@ -93,8 +93,8 @@ app.post('/api/people', async (req, res) => {
 app.put('/api/people/:id', async (req, res) => {
   const { id } = req.params;
   const { full_name, email } = req.body;
-
-  // Güncelleme yaparken de bilgilerin doğru formatta olduğunu kontrol ediyoruz
+  
+  // Regex ile format kontrolü (Ödev kuralı)
   if (!full_name || !email || !emailRegex.test(email)) {
     return res.status(400).json({ error: 'Valid full name and email are required' });
   }
@@ -110,7 +110,6 @@ app.put('/api/people/:id', async (req, res) => {
     res.json(result.rows[0]);
   } catch (err) {
     if (err.code === '23505') { 
-      // Güncelleme yaparken de başka birinin e-postasıyla çakışırsa 409 dönmeli
       return res.status(409).json({ error: 'EMAIL_ALREADY_EXISTS' });
     }
     console.error(err);
