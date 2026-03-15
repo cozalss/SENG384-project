@@ -49,6 +49,21 @@ app.get('/api/people', async (req, res) => {
   }
 });
 
+// 2.5 GET single person by ID (ÖDEV KURALI)
+app.get('/api/people/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM people WHERE id = $1', [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Person not found' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 // 3. POST new person
 app.post('/api/people', async (req, res) => {
   const { full_name, email } = req.body;
