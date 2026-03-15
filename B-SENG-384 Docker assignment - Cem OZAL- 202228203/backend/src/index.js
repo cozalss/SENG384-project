@@ -49,9 +49,13 @@ app.get('/api/people', async (req, res) => {
 // 3. POST new person
 app.post('/api/people', async (req, res) => {
   const { full_name, email } = req.body;
-  if (!full_name || !email) {
-    return res.status(400).json({ error: 'Full name and email are required' });
+  
+  // 1. Kural: Boşluk ve Format Kontrolü (Basit Regex)
+  const emailRegex = /\S+@\S+\.\S+/;
+  if (!full_name || !email || !emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Valid full name and email are required' });
   }
+
   try {
     const result = await pool.query(
       'INSERT INTO people (full_name, email) VALUES ($1, $2) RETURNING *',
@@ -59,8 +63,9 @@ app.post('/api/people', async (req, res) => {
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    if (err.code === '23505') { // Unique constraint violation
-      return res.status(400).json({ error: 'Email already exists' });
+    if (err.code === '23505') { // Unique constraint violation (Aynı e-posta)
+      // 2. Kural: 400 yerine ödevin istediği 409 kodunu dönüyoruz
+      return res.status(409).json({ error: 'EMAIL_ALREADY_EXISTS' }); 
     }
     console.error(err);
     res.status(500).json({ error: 'Database error' });
