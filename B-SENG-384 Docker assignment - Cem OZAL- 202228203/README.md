@@ -71,7 +71,7 @@ This assignment showcases professional-grade Docker implementation:
 
 1.  **Preparation:**
     ```bash
-    git clone https://github.com/cozalss/SENG384-project.git
+    git clone https://github.com/cozalss/SENG384-project/tree/main/B-SENG-384%20Docker%20assignment%20-%20Cem%20OZAL-%20202228203
     cd SENG384-project
     cp .env.example .env
     ```
