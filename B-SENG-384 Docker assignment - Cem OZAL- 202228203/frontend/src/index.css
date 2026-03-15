@@ -764,6 +764,95 @@ section {
     }
 }
 
+/* Registration & Table Styles */
+.registration-box {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  color: var(--primary-color);
+  font-family: var(--mono-font);
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+}
+
+.input-group input {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 255, 153, 0.2);
+  padding: 0.8rem;
+  color: #fff;
+  font-family: var(--mono-font);
+  outline: none;
+  transition: all 0.3s;
+}
+
+.input-group input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 10px rgba(0, 255, 153, 0.1);
+}
+
+.status-msg {
+  font-family: var(--mono-font);
+  font-size: 0.8rem;
+  padding: 0.5rem;
+}
+
+.status-msg.success { color: var(--primary-color); }
+.status-msg.error { color: #ff5f56; }
+.status-msg.info { color: #888; }
+
+.action-btn {
+  background: transparent;
+  padding: 4px 12px;
+  font-family: var(--mono-font);
+  font-size: 0.7rem;
+  cursor: pointer;
+  margin: 0 5px;
+  transition: all 0.2s;
+}
+
+.action-btn.edit {
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.action-btn.edit:hover {
+  background: var(--primary-color);
+  color: #000;
+}
+
+.action-btn.delete {
+  border: 1px solid #ff5f56;
+  color: #ff5f56;
+}
+
+.action-btn.delete:hover {
+  background: #ff5f56;
+  color: #fff;
+}
+
+.edit-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.edit-form input {
+  flex: 1;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--primary-color);
+  color: #fff;
+  padding: 5px;
+}
+
 /* --- Certificates --- */
 .certificates-container {
     display: flex;
