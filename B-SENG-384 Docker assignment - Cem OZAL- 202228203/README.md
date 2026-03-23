@@ -14,7 +14,7 @@
 **AgentManagement** is an ultra-modern, containerized personnel management platform designed for the **SENG-384 Docker Assignment**. Built with a focus on high-fidelity user experience and robust system orchestration, it provides a seamless interface for managing sensitive personnel data through a fully localized micro-services architecture.
 
 <p align="center">
-  <img src="screenshots/form.png" width="900" alt="Agent Registration Portal" />
+  <img width="1838" height="857" alt="image" src="https://github.com/user-attachments/assets/12c898f0-b524-47eb-8c3d-294a8dfb9b14" />
 </p>
 
 ---
@@ -45,7 +45,7 @@ graph LR
 ## 🛠️ Key Features & Interactive UI
 
 <p align="center">
-  <img src="screenshots/table.png" width="900" alt="Personnel Database View" />
+  <img width="1700" height="888" alt="image" src="https://github.com/user-attachments/assets/e8fef570-777e-414f-8ca0-f7406a19a19d" />
 </p>
 
 ### 🛡️ SECURE_REGISTRATION (Route: `/`)
