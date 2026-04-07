@@ -6,7 +6,7 @@
 <br/>
 
 <!-- Typing SVG -->
-<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=22&duration=3000&pause=1000&color=818CF8&center=true&vCenter=true&multiline=true&repeat=true&width=750&height=100&lines=🧬+European+HealthTech+Innovation+Platform;🔒+GDPR+Compliant+%7C+NDA+Protected+%7C+.edu+Verified;🚀+React+19+%7C+Firebase+%7C+Three.js+%7C+Framer+Motion" alt="Typing SVG" /></a>
+<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=22&duration=3000&pause=1000&color=818CF8&center=true&vCenter=true&multiline=true&repeat=true&width=750&height=100&lines=%F0%9F%A7%AC+European+HealthTech+Innovation+Platform;%F0%9F%94%92+GDPR+Compliant+%7C+NDA+Protected+%7C+.edu+Verified;%F0%9F%9A%80+React+19+%7C+Firebase+%7C+Three.js+%7C+Framer+Motion" alt="Typing SVG" /></a>
 
 <br/><br/>
 
@@ -472,7 +472,7 @@ flowchart LR
 <tr>
 <td align="center" width="25%">
 <br/>
-<img src="https://ui-avatars.com/api/?name=Cem+Özal&background=6366f1&color=fff&size=120&rounded=true&bold=true&font-size=0.40" width="120px" alt="Cem Özal"/>
+<img src="https://ui-avatars.com/api/?name=Cem+Ozal&background=6366f1&color=fff&size=120&rounded=true&bold=true&font-size=0.40" width="120px" alt="Cem Özal"/>
 <br/><br/>
 <b>Cem Özal</b>
 <br/>
@@ -483,7 +483,7 @@ flowchart LR
 </td>
 <td align="center" width="25%">
 <br/>
-<img src="https://ui-avatars.com/api/?name=Emre+Kurubaş&background=a855f7&color=fff&size=120&rounded=true&bold=true&font-size=0.40" width="120px" alt="Emre Kurubaş"/>
+<img src="https://ui-avatars.com/api/?name=Emre+Kurubas&background=a855f7&color=fff&size=120&rounded=true&bold=true&font-size=0.40" width="120px" alt="Emre Kurubaş"/>
 <br/><br/>
 <b>Emre Kurubaş</b>
 <br/>
@@ -505,7 +505,7 @@ flowchart LR
 </td>
 <td align="center" width="25%">
 <br/>
-<img src="https://ui-avatars.com/api/?name=Sertaç+Ataç&background=06b6d4&color=fff&size=120&rounded=true&bold=true&font-size=0.40" width="120px" alt="Sertaç Ataç"/>
+<img src="https://ui-avatars.com/api/?name=Sertac+Atac&background=06b6d4&color=fff&size=120&rounded=true&bold=true&font-size=0.40" width="120px" alt="Sertaç Ataç"/>
 <br/><br/>
 <b>Sertaç Ataç</b>
 <br/>
