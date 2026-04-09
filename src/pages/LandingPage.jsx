@@ -130,7 +130,7 @@ const LandingPage = () => {
                     border: '1px solid var(--border)'
                 }}>
                     <div className="flex justify-between items-center" style={{ height: isMobile ? '56px' : '64px', padding: isMobile ? '0 16px' : '0 28px' }}>
-                        <div className="flex items-center gap-3" style={{ color: 'white' }}>
+                        <div className="flex items-center gap-3" style={{ color: 'var(--text-main)' }}>
                             <div style={{
                                 background: 'linear-gradient(135deg, var(--primary), var(--accent))',
                                 padding: isMobile ? '6px' : '8px', borderRadius: '12px',
