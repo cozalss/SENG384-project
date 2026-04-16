@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Activity, Mail, User, Briefcase, MapPin, ArrowRight, ArrowLeft, Building, Globe, Shield, CheckCircle2, Lock, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { getUserByEmail, emailExists, addUserToFirestore, hashPassword, addActivityLog } from '../services/firestore';
@@ -156,7 +156,7 @@ const Login = ({ login }) => {
         }
     };
 
-    const inputWrapperStyle = (field) => ({
+    const inputWrapperStyle = () => ({
         position: 'relative',
         transition: 'all 0.3s ease'
     });
@@ -183,7 +183,7 @@ const Login = ({ login }) => {
                     padding: '48px 40px',
                     position: 'relative',
                     zIndex: 1,
-                    boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 0 100px rgba(99, 102, 241, 0.04)',
+                    boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 0 100px rgba(94, 210, 156, 0.04)',
                     transition: 'max-width 0.4s ease',
                     overflow: 'hidden'
                 }}
@@ -203,7 +203,7 @@ const Login = ({ login }) => {
 
                 <div style={{ position: 'relative', zIndex: '1', textAlign: 'center', marginBottom: '40px' }}>
                     <motion.div
-                        animate={{ boxShadow: ['0 0 30px rgba(99,102,241,0.2)', '0 0 50px rgba(168,85,247,0.2)', '0 0 30px rgba(99,102,241,0.2)'] }}
+                        animate={{ boxShadow: ['0 0 30px rgba(94, 210, 156,0.2)', '0 0 50px rgba(34, 211, 238,0.2)', '0 0 30px rgba(94, 210, 156,0.2)'] }}
                         transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                         style={{
                             display: 'inline-flex',
@@ -237,11 +237,11 @@ const Login = ({ login }) => {
                                 cursor: 'pointer', fontWeight: '600', fontSize: '14px',
                                 fontFamily: 'var(--font-body)',
                                 background: mode === m
-                                    ? 'linear-gradient(135deg, var(--primary), rgba(99, 102, 241, 0.8))'
+                                    ? 'linear-gradient(135deg, var(--primary), rgba(94, 210, 156, 0.8))'
                                     : 'transparent',
                                 color: mode === m ? 'white' : 'var(--text-muted)',
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                boxShadow: mode === m ? '0 4px 12px rgba(99, 102, 241, 0.25)' : 'none'
+                                boxShadow: mode === m ? '0 4px 12px rgba(94, 210, 156, 0.25)' : 'none'
                             }}
                         >
                             {m === 'login' ? 'Sign In' : 'Register'}
@@ -274,14 +274,14 @@ const Login = ({ login }) => {
 
                 {verifying && (
                     <div className="animate-fade-in text-center" style={{
-                        background: 'rgba(99, 102, 241, 0.08)',
-                        border: '1px solid rgba(99, 102, 241, 0.15)',
+                        background: 'rgba(94, 210, 156, 0.08)',
+                        border: '1px solid rgba(94, 210, 156, 0.15)',
                         padding: '20px',
                         marginBottom: '24px',
                         borderRadius: 'var(--border-radius-sm)',
                     }}>
                         <div style={{
-                            width: '32px', height: '32px', border: '3px solid rgba(99,102,241,0.2)',
+                            width: '32px', height: '32px', border: '3px solid rgba(94, 210, 156,0.2)',
                             borderTopColor: 'var(--primary)', borderRadius: '50%',
                             animation: 'spin 0.8s linear infinite', margin: '0 auto 12px'
                         }}></div>
@@ -443,7 +443,7 @@ const Login = ({ login }) => {
                         style={{
                             width: '100%', marginTop: '12px', padding: '16px', fontSize: '15px',
                             borderRadius: '12px',
-                            boxShadow: '0 8px 25px rgba(99, 102, 241, 0.25), 0 0 40px rgba(168, 85, 247, 0.08)'
+                            boxShadow: '0 8px 25px rgba(94, 210, 156, 0.25), 0 0 40px rgba(34, 211, 238, 0.08)'
                         }}
                     >
                         {verifying ? 'Verifying...' : mode === 'login' ? 'Sign In' : 'Create Account'}

@@ -147,7 +147,7 @@ const CreatePost = ({ user, addPost }) => {
                 <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '2px', background: 'linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent)' }} />
 
                 <div className="flex items-center gap-4 mb-8" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
-                    <div style={{ background: 'linear-gradient(135deg, var(--primary), var(--accent))', padding: '12px', borderRadius: '16px', boxShadow: '0 6px 20px rgba(99,102,241,0.25)' }}>
+                    <div style={{ background: 'linear-gradient(135deg, var(--primary), var(--accent))', padding: '12px', borderRadius: '16px', boxShadow: '0 6px 20px rgba(94, 210, 156,0.25)' }}>
                         <Edit3 size={24} color="white" />
                     </div>
                     <div>
@@ -223,10 +223,10 @@ const CreatePost = ({ user, addPost }) => {
                                                 onClick={() => setFormData({ ...formData, projectStage: s.value })}
                                                 style={{
                                                     padding: '16px', borderRadius: '14px', cursor: 'pointer',
-                                                    background: formData.projectStage === s.value ? 'rgba(99, 102, 241, 0.08)' : 'var(--background-alt)',
-                                                    border: `1px solid ${formData.projectStage === s.value ? 'rgba(99, 102, 241, 0.3)' : 'rgba(255,255,255,0.06)'}`,
+                                                    background: formData.projectStage === s.value ? 'rgba(94, 210, 156, 0.08)' : 'var(--background-alt)',
+                                                    border: `1px solid ${formData.projectStage === s.value ? 'rgba(94, 210, 156, 0.3)' : 'rgba(255,255,255,0.06)'}`,
                                                     transition: 'all 0.25s',
-                                                    boxShadow: formData.projectStage === s.value ? '0 0 20px rgba(99,102,241,0.08)' : 'none'
+                                                    boxShadow: formData.projectStage === s.value ? '0 0 20px rgba(94, 210, 156,0.08)' : 'none'
                                                 }}
                                             >
                                                 <div style={{ fontSize: '18px', marginBottom: '6px' }}>{s.icon}</div>
@@ -293,8 +293,8 @@ const CreatePost = ({ user, addPost }) => {
                                                 onClick={() => setFormData({ ...formData, confidentiality: opt.value })}
                                                 style={{
                                                     padding: '20px', cursor: 'pointer', borderRadius: '14px',
-                                                    background: formData.confidentiality === opt.value ? 'rgba(99, 102, 241, 0.08)' : 'var(--background-alt)',
-                                                    border: `1px solid ${formData.confidentiality === opt.value ? 'rgba(99, 102, 241, 0.3)' : 'rgba(255,255,255,0.06)'}`,
+                                                    background: formData.confidentiality === opt.value ? 'rgba(94, 210, 156, 0.08)' : 'var(--background-alt)',
+                                                    border: `1px solid ${formData.confidentiality === opt.value ? 'rgba(94, 210, 156, 0.3)' : 'rgba(255,255,255,0.06)'}`,
                                                     transition: 'all 0.25s', textAlign: 'center'
                                                 }}
                                             >
@@ -332,7 +332,7 @@ const CreatePost = ({ user, addPost }) => {
                                 Next Step <ArrowRight size={16} />
                             </button>
                         ) : (
-                            <button id="publish-post-btn" onClick={handleSubmit} className="btn btn-accent" style={{ padding: '14px 32px', borderRadius: '14px', fontSize: '15px', boxShadow: '0 6px 20px rgba(99,102,241,0.25)' }}>
+                            <button id="publish-post-btn" onClick={handleSubmit} className="btn btn-accent" style={{ padding: '14px 32px', borderRadius: '14px', fontSize: '15px', boxShadow: '0 6px 20px rgba(94, 210, 156,0.25)' }}>
                                 <Send size={16} /> Publish Announcement
                             </button>
                         )}

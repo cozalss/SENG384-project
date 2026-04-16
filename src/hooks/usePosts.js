@@ -4,8 +4,7 @@ import {
   subscribeToPostsRT,
   addPostToFirestore,
   updatePostInFirestore,
-  addActivityLog,
-  getUserById // I assume this exists or I'll add it
+  addActivityLog
 } from '../services/firestore';
 import emailjs from '@emailjs/browser';
 
@@ -43,7 +42,7 @@ export function usePosts(user, addNotification) {
       isActive = false;
       if (unsubPosts) unsubPosts();
     };
-  }, []);
+  }, [addNotification]);
 
   // Automatic post expiry check (FR-13)
   useEffect(() => {

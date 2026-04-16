@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserCircle, MapPin, Building, Globe, Mail, Briefcase, Download, Trash2, Activity, Shield, Calendar, CheckCircle2, AlertTriangle, ArrowLeft, Sparkles } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Profile = ({ user, allUsers, updateUser, deleteUser, posts, logout }) => {
+const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
     const navigate = useNavigate();
     const [editMode, setEditMode] = useState(false);
     const [name, setName] = useState(user?.name || '');
@@ -13,15 +13,15 @@ const Profile = ({ user, allUsers, updateUser, deleteUser, posts, logout }) => {
     const [institution, setInstitution] = useState(user?.institution || '');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [trackedUserId, setTrackedUserId] = useState(user?.id);
 
-    useEffect(() => {
-        if (user) {
-            setName(user.name);
-            setCity(user.city);
-            setCountry(user.country);
-            setInstitution(user.institution);
-        }
-    }, [user]);
+    if (user && user.id !== trackedUserId) {
+        setTrackedUserId(user.id);
+        setName(user.name || '');
+        setCity(user.city || '');
+        setCountry(user.country || '');
+        setInstitution(user.institution || '');
+    }
 
     const handleSave = () => {
         if (updateUser) {

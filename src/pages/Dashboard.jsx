@@ -14,7 +14,7 @@ const Dashboard = ({ posts, user, updateUser }) => {
     const [filterStatus, setFilterStatus] = useState('Active');
     const [feedType, setFeedType] = useState('all'); // 'all' or 'saved'
 
-    const savedPostIds = user?.savedPosts || [];
+    const savedPostIds = useMemo(() => user?.savedPosts || [], [user?.savedPosts]);
 
     const toggleBookmark = (e, postId) => {
         e.preventDefault();
@@ -116,7 +116,7 @@ const Dashboard = ({ posts, user, updateUser }) => {
                 <div className="flex gap-4">
                     <Link to="/create-post" id="new-announcement-btn" className="btn btn-accent" style={{
                         padding: '14px 28px', fontSize: '14px', borderRadius: '14px',
-                        boxShadow: '0 6px 20px rgba(99, 102, 241, 0.25)'
+                        boxShadow: '0 6px 20px rgba(94, 210, 156, 0.25)'
                     }}>
                         <Plus size={18} />
                         New Announcement
@@ -145,7 +145,7 @@ const Dashboard = ({ posts, user, updateUser }) => {
                         fontWeight: '600',
                         background: feedType === 'all' ? 'linear-gradient(135deg, var(--primary), var(--accent))' : 'transparent',
                         color: feedType === 'all' ? 'white' : 'var(--text-muted)',
-                        boxShadow: feedType === 'all' ? '0 8px 25px rgba(99, 102, 241, 0.3)' : 'none'
+                        boxShadow: feedType === 'all' ? '0 8px 25px rgba(94, 210, 156, 0.3)' : 'none'
                     }}
                 >
                     <LayoutDashboard size={16} /> All Channels
@@ -163,7 +163,7 @@ const Dashboard = ({ posts, user, updateUser }) => {
                         fontWeight: '600',
                         background: feedType === 'saved' ? 'linear-gradient(135deg, var(--primary), var(--accent))' : 'transparent',
                         color: feedType === 'saved' ? 'white' : 'var(--text-muted)',
-                        boxShadow: feedType === 'saved' ? '0 8px 25px rgba(99, 102, 241, 0.3)' : 'none'
+                        boxShadow: feedType === 'saved' ? '0 8px 25px rgba(94, 210, 156, 0.3)' : 'none'
                     }}
                 >
                     <Bookmark size={16} /> Saved Projects
@@ -260,7 +260,7 @@ const Dashboard = ({ posts, user, updateUser }) => {
                                 transitionSpeed={400}
                                 glareEnable={true}
                                 glareMaxOpacity={0.06}
-                                glareColor="#818cf8"
+                                glareColor="#8be8bc"
                                 glarePosition="all"
                                 glareBorderRadius="16px"
                                 style={{ borderRadius: '16px' }}
@@ -274,7 +274,7 @@ const Dashboard = ({ posts, user, updateUser }) => {
                                 }}
                                     onMouseOver={(e) => {
                                         e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
-                                        e.currentTarget.style.boxShadow = '0 25px 50px rgba(0,0,0,0.4), 0 0 40px rgba(99,102,241,0.04)';
+                                        e.currentTarget.style.boxShadow = '0 25px 50px rgba(0,0,0,0.4), 0 0 40px rgba(94, 210, 156,0.04)';
                                     }}
                                     onMouseOut={(e) => {
                                         e.currentTarget.style.borderColor = 'var(--surface-hover)';
@@ -311,7 +311,7 @@ const Dashboard = ({ posts, user, updateUser }) => {
                                                 padding: '10px',
                                                 borderRadius: '12px',
                                                 border: '1px solid var(--border)',
-                                                background: savedPostIds.includes(post.id) ? 'rgba(99, 102, 241, 0.1)' : 'var(--background-alt)',
+                                                background: savedPostIds.includes(post.id) ? 'rgba(94, 210, 156, 0.1)' : 'var(--background-alt)',
                                                 color: savedPostIds.includes(post.id) ? 'var(--primary-light)' : 'var(--text-muted)',
                                                 transition: 'all 0.3s ease',
                                                 zIndex: 5
@@ -332,7 +332,7 @@ const Dashboard = ({ posts, user, updateUser }) => {
                                     {/* Match explanation */}
                                     {getMatchExplanation(post) && (
                                         <div style={{
-                                            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(168, 85, 247, 0.04))',
+                                            background: 'linear-gradient(135deg, rgba(94, 210, 156, 0.06), rgba(34, 211, 238, 0.04))',
                                             padding: '10px 14px', borderRadius: '10px', marginBottom: '14px',
                                             border: '1px solid var(--border)'
                                         }}>
@@ -378,7 +378,7 @@ const Dashboard = ({ posts, user, updateUser }) => {
 
                                         <div className="flex items-center gap-1" style={{
                                             padding: '8px 14px', fontSize: '12px', fontWeight: '600',
-                                            color: 'var(--primary-light)', background: 'rgba(99, 102, 241, 0.06)',
+                                            color: 'var(--primary-light)', background: 'rgba(94, 210, 156, 0.06)',
                                             borderRadius: '10px', border: '1px solid var(--border)'
                                         }}>
                                             Explore <ArrowUpRight size={13} />

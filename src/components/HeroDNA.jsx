@@ -123,7 +123,6 @@ const HeroDNA = ({ isMobile }) => {
                 const p1 = curve1.getPoint(t);
                 const p2 = curve2.getPoint(t);
                 const mid = p1.clone().add(p2).multiplyScalar(0.5);
-                const dir = p2.clone().sub(p1);
                 const colorPair = basePairColors[(i / basePairInterval) % 2];
 
                 for (let half = 0; half < 2; half++) {
@@ -383,7 +382,7 @@ const HeroDNA = ({ isMobile }) => {
             });
 
             if (hexGroup) {
-                hexGroup.children.forEach((hex, i) => {
+                hexGroup.children.forEach((hex) => {
                     hex.position.z = -30 + Math.sin(elapsed * 0.5 + hex.position.x * 0.2 + hex.position.y * 0.2) * 0.8;
                 });
             }

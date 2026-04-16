@@ -11,9 +11,7 @@ import {
     onSnapshot,
     addDoc,
     serverTimestamp,
-    orderBy,
-    or,
-    and
+    orderBy
 } from "firebase/firestore";
 import { db } from "../firebase";
 

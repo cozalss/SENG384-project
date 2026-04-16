@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Shield, Download, Search, Clock, Users, FileText, Activity, Trash2, Power, Briefcase, Lock } from 'lucide-react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     subscribeToLogsRT, 
@@ -33,7 +34,7 @@ const AdminDashboard = ({ user, posts }) => {
             });
         } catch (err) {
             console.error("Dashboard subscription error:", err);
-            setLoading(false);
+            queueMicrotask(() => setLoading(false));
         }
         return () => {
             if (unsubLogs) unsubLogs();
@@ -148,7 +149,7 @@ const AdminDashboard = ({ user, posts }) => {
                     <motion.div key="overview" initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}}>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '32px' }}>
                             <div className="glass-panel" style={{ padding: '24px', textAlign: 'center' }}>
-                                <Users size={32} color="#818cf8" style={{ margin: '0 auto 12px' }} />
+                                <Users size={32} color="#8be8bc" style={{ margin: '0 auto 12px' }} />
                                 <h3 style={{ fontSize: '32px', fontWeight: '700', margin: '0 0 4px', color: 'white' }}>{users.length}</h3>
                                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, textTransform: 'uppercase' }}>Total Users</p>
                             </div>

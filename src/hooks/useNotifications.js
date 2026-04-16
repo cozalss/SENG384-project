@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   subscribeToNotificationsRT,
   addNotificationToFirestore,
@@ -59,7 +59,7 @@ export function useNotifications() {
     };
   }, []);
 
-  const addNotification = async (notif) => {
+  const addNotification = useCallback(async (notif) => {
     const fullNotif = {
       id: `notif-${Date.now()}`,
       ...notif,
@@ -67,15 +67,15 @@ export function useNotifications() {
       read: false
     };
     await addNotificationToFirestore(fullNotif);
-  };
+  }, []);
 
-  const dismissNotification = async (id) => {
+  const dismissNotification = useCallback(async (id) => {
     await deleteNotificationFromFirestore(id);
-  };
+  }, []);
 
-  const dismissAllNotifications = async () => {
+  const dismissAllNotifications = useCallback(async () => {
     await clearAllNotificationsFromFirestore();
-  };
+  }, []);
 
   return { notifications, addNotification, dismissNotification, dismissAllNotifications };
 }

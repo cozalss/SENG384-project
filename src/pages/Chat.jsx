@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, User, Search, ArrowLeft, MessageSquare, MoreVertical, Sparkles, Check, CheckCheck, Trash2 } from 'lucide-react';
 import { useChat } from '../hooks/useChat';
@@ -93,12 +94,12 @@ const Chat = ({ user }) => {
               <h2>Messages</h2>
               <div className="sidebar-actions">
                 <motion.button 
-                  whileHover={{ scale: 1.1, backgroundColor: 'rgba(99, 102, 241, 0.2)' }}
+                  whileHover={{ scale: 1.1, backgroundColor: 'rgba(94, 210, 156, 0.2)' }}
                   whileTap={{ scale: 0.9 }}
                   className="icon-btn new-chat-btn"
                   onClick={() => setShowUserList(!showUserList)}
                 >
-                  <MessageSquare size={20} color="#6366f1" />
+                  <MessageSquare size={20} color="#5ed29c" />
                 </motion.button>
               </div>
             </div>
@@ -292,7 +293,7 @@ const Chat = ({ user }) => {
                         animate={{ rotate: 360 }}
                         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                       >
-                        <Sparkles size={24} color="#6366f1" />
+                        <Sparkles size={24} color="#5ed29c" />
                       </motion.div>
                       <p>Loading messages...</p>
                     </div>

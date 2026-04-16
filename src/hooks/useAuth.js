@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { addUserToFirestore, updateUserInFirestore, addActivityLog } from '../services/firestore';
+import { updateUserInFirestore, addActivityLog } from '../services/firestore';
 
 export function useAuth() {
   const [user, setUser] = useState(null);

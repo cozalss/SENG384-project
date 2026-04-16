@@ -30,10 +30,10 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
     const getIconBg = (type) => {
         switch (type) {
             case 'interest': return 'rgba(16, 185, 129, 0.08)';
-            case 'meeting-request': return 'rgba(99, 102, 241, 0.08)';
+            case 'meeting-request': return 'rgba(94, 210, 156, 0.08)';
             case 'meeting-accepted': return 'rgba(52, 211, 153, 0.08)';
             case 'meeting-declined': return 'rgba(239, 68, 68, 0.08)';
-            case 'post-closed': return 'rgba(168, 85, 247, 0.08)';
+            case 'post-closed': return 'rgba(34, 211, 238, 0.08)';
             case 'error': return 'rgba(239, 68, 68, 0.08)';
             default: return 'var(--surface)';
         }
@@ -54,8 +54,8 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                 id="notifications-bell"
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
-                    background: isOpen ? 'rgba(99, 102, 241, 0.08)' : 'var(--background-alt)',
-                    border: `1px solid ${isOpen ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255,255,255,0.06)'}`,
+                    background: isOpen ? 'rgba(94, 210, 156, 0.08)' : 'var(--background-alt)',
+                    border: `1px solid ${isOpen ? 'rgba(94, 210, 156, 0.15)' : 'rgba(255,255,255,0.06)'}`,
                     cursor: 'pointer',
                     color: isOpen ? 'var(--primary-light)' : 'var(--text-muted)',
                     padding: '8px',
@@ -69,7 +69,7 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                 onMouseOver={(e) => { e.currentTarget.style.color = 'var(--text-main)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
                 onMouseOut={(e) => {
                     e.currentTarget.style.color = isOpen ? 'var(--primary-light)' : 'var(--text-muted)';
-                    e.currentTarget.style.background = isOpen ? 'rgba(99, 102, 241, 0.08)' : 'var(--background-alt)';
+                    e.currentTarget.style.background = isOpen ? 'rgba(94, 210, 156, 0.08)' : 'var(--background-alt)';
                 }}
             >
                 <Bell size={18} />
@@ -96,7 +96,7 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                                 position: 'absolute', top: 'calc(100% + 12px)', right: 0,
                                 width: '400px', maxHeight: '500px', overflowY: 'auto',
                                 zIndex: 999, padding: 0,
-                                boxShadow: '0 25px 60px rgba(0,0,0,0.6), 0 0 40px rgba(99,102,241,0.04)',
+                                boxShadow: '0 25px 60px rgba(0,0,0,0.6), 0 0 40px rgba(94, 210, 156,0.04)',
                                 border: '1px solid var(--border)',
                                 borderRadius: '16px'
                             }}
@@ -151,12 +151,12 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                                                 padding: '16px 20px',
                                                 borderBottom: '1px solid rgba(255,255,255,0.03)',
                                                 display: 'flex', gap: '14px', alignItems: 'flex-start',
-                                                background: n.read ? 'transparent' : 'rgba(99, 102, 241, 0.02)',
+                                                background: n.read ? 'transparent' : 'rgba(94, 210, 156, 0.02)',
                                                 transition: 'background 0.2s',
                                                 cursor: 'pointer'
                                             }}
                                             onMouseOver={(e) => e.currentTarget.style.background = 'var(--background-alt)'}
-                                            onMouseOut={(e) => e.currentTarget.style.background = n.read ? 'transparent' : 'rgba(99, 102, 241, 0.02)'}
+                                            onMouseOut={(e) => e.currentTarget.style.background = n.read ? 'transparent' : 'rgba(94, 210, 156, 0.02)'}
                                         >
                                             <div style={{
                                                 width: '38px', height: '38px', borderRadius: '12px',
