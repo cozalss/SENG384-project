@@ -212,7 +212,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                                         </div>
                                     </div>
                                 ) : (
-                                    <div style={{ background: 'rgba(168, 85, 247, 0.04)', border: '1px solid rgba(168, 85, 247, 0.12)', padding: '24px', borderRadius: '14px' }}>
+                                    <div style={{ background: 'rgba(34, 211, 238, 0.04)', border: '1px solid rgba(34, 211, 238, 0.12)', padding: '24px', borderRadius: '14px' }}>
                                         <p style={{ fontSize: '15px', lineHeight: '1.85', color: 'var(--text-main)', margin: 0 }}>{post.highLevelIdea}</p>
                                     </div>
                                 )}
@@ -248,9 +248,9 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                         <div className="flex items-center gap-4 mb-6 text-sm">
                             <div style={{
                                 width: '40px', height: '40px', borderRadius: '12px',
-                                background: post.authorRole === 'Engineer' ? 'rgba(16,185,129,0.08)' : 'rgba(99,102,241,0.08)',
+                                background: post.authorRole === 'Engineer' ? 'rgba(16,185,129,0.08)' : 'rgba(94, 210, 156,0.08)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                border: `1px solid ${post.authorRole === 'Engineer' ? 'rgba(16,185,129,0.15)' : 'rgba(99,102,241,0.15)'}`
+                                border: `1px solid ${post.authorRole === 'Engineer' ? 'rgba(16,185,129,0.15)' : 'rgba(94, 210, 156,0.15)'}`
                             }}>
                                 <UserCircle size={22} color={post.authorRole === 'Engineer' ? 'var(--secondary)' : 'var(--primary-light)'} />
                             </div>
@@ -312,7 +312,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                             {/* Step 1: Express Interest */}
                             {canExpressInterest && derivedWorkflowState === 'initial' && (
                                 <div className="flex-col gap-3">
-                                    <button id="express-interest-btn" onClick={() => setShowNda(true)} className="btn btn-accent" style={{ width: '100%', padding: '16px', fontSize: '15px', borderRadius: '14px', boxShadow: '0 6px 20px rgba(99,102,241,0.25)' }}>
+                                    <button id="express-interest-btn" onClick={() => setShowNda(true)} className="btn btn-accent" style={{ width: '100%', padding: '16px', fontSize: '15px', borderRadius: '14px', boxShadow: '0 6px 20px rgba(94, 210, 156,0.25)' }}>
                                         <Send size={18} /> Express Interest
                                     </button>
                                     <p className="text-xs text-muted text-center" style={{ lineHeight: '1.5' }}>
@@ -342,9 +342,9 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
-                                    style={{ background: 'rgba(99, 102, 241, 0.06)', border: '1px solid rgba(99, 102, 241, 0.12)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
+                                    style={{ background: 'rgba(94, 210, 156, 0.06)', border: '1px solid rgba(94, 210, 156, 0.12)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
                                 >
-                                    <Clock color="#818cf8" size={28} style={{ margin: '0 auto 12px' }} />
+                                    <Clock color="#8be8bc" size={28} style={{ margin: '0 auto 12px' }} />
                                     <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--badge-primary-text)', fontWeight: '600' }}>Meeting Request Sent</h3>
                                     <p className="text-muted text-xs mb-4" style={{ lineHeight: '1.6' }}>
                                         Waiting for the author to accept your proposed time slot. You will be notified once confirmed.
@@ -378,10 +378,10 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
-                                    style={{ background: 'rgba(168, 85, 247, 0.06)', border: '1px solid rgba(168, 85, 247, 0.15)', padding: '20px', borderRadius: '14px', textAlign: 'center' }}
+                                    style={{ background: 'rgba(34, 211, 238, 0.06)', border: '1px solid rgba(34, 211, 238, 0.15)', padding: '20px', borderRadius: '14px', textAlign: 'center' }}
                                 >
                                     <div className="flex items-center justify-center gap-2 mb-2">
-                                        <Video color="#c084fc" size={20} />
+                                        <Video color="#67e8f9" size={20} />
                                         <h3 style={{ fontSize: '15px', color: 'var(--badge-accent-text)', margin: 0, fontWeight: '600' }}>Meeting Confirmed</h3>
                                     </div>
                                     <p className="text-muted text-xs mb-4" style={{ margin: 0, lineHeight: '1.6' }}>
@@ -518,11 +518,11 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                                         whileTap={{ scale: 0.98 }}
                                         className="flex items-start gap-4 mb-10"
                                         style={{
-                                            background: acceptedNda ? 'rgba(99, 102, 241, 0.08)' : 'var(--background-alt)',
+                                            background: acceptedNda ? 'rgba(94, 210, 156, 0.08)' : 'var(--background-alt)',
                                             padding: '24px',
                                             borderRadius: '18px',
                                             border: '1px solid',
-                                            borderColor: acceptedNda ? 'rgba(99, 102, 241, 0.3)' : 'rgba(255,255,255,0.06)',
+                                            borderColor: acceptedNda ? 'rgba(94, 210, 156, 0.3)' : 'rgba(255,255,255,0.06)',
                                             cursor: 'pointer',
                                             transition: 'all 0.3s ease'
                                         }}
@@ -535,7 +535,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                                             background: acceptedNda ? 'var(--primary)' : 'transparent',
                                             flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
                                             transition: 'all 0.25s', marginTop: '2px',
-                                            boxShadow: acceptedNda ? '0 0 15px rgba(99, 102, 241, 0.4)' : 'none'
+                                            boxShadow: acceptedNda ? '0 0 15px rgba(94, 210, 156, 0.4)' : 'none'
                                         }}>
                                             {acceptedNda && <CheckCircle2 size={16} color="white" strokeWidth={3} />}
                                         </div>
@@ -567,7 +567,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                                     style={{ maxWidth: '650px', borderRadius: '24px', margin: 'auto' }}
                                 >
                                     <div className="flex items-center gap-4 mb-8" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
-                                        <div style={{ background: 'rgba(99, 102, 241, 0.12)', padding: '12px', borderRadius: '16px', boxShadow: '0 0 20px rgba(99, 102, 241, 0.1)' }}>
+                                        <div style={{ background: 'rgba(94, 210, 156, 0.12)', padding: '12px', borderRadius: '16px', boxShadow: '0 0 20px rgba(94, 210, 156, 0.1)' }}>
                                             <Calendar color="var(--primary-light)" size={32} />
                                         </div>
                                         <div style={{ flex: 1 }}>
@@ -640,7 +640,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                                     style={{ borderRadius: '24px', maxWidth: '600px', margin: 'auto' }}
                                 >
                                     <div className="flex items-center gap-4 mb-8" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
-                                        <div style={{ background: 'rgba(168, 85, 247, 0.12)', padding: '12px', borderRadius: '16px' }}>
+                                        <div style={{ background: 'rgba(34, 211, 238, 0.12)', padding: '12px', borderRadius: '16px' }}>
                                             <Edit3 color="var(--accent-light)" size={32} />
                                         </div>
                                         <div style={{ flex: 1 }}>

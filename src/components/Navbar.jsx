@@ -2,7 +2,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Activity, LogOut, Zap, FileText, LayoutDashboard, UserCircle, Shield, MessageSquare, Bookmark } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Notifications from './Notifications';
-import ThemeToggle from './ThemeToggle';
 
 const Navbar = ({ user, logout, notifications, dismissNotification, dismissAllNotifications }) => {
     const navigate = useNavigate();
@@ -70,7 +69,7 @@ const Navbar = ({ user, logout, notifications, dismissNotification, dismissAllNo
                             background: 'linear-gradient(135deg, var(--primary), var(--accent))',
                             padding: '7px',
                             borderRadius: '10px',
-                            boxShadow: '0 4px 14px rgba(99,102,241,0.3), inset 0 2px 0 rgba(255,255,255,0.3)',
+                            boxShadow: '0 4px 14px rgba(94, 210, 156,0.3), inset 0 2px 0 rgba(255,255,255,0.3)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
@@ -106,7 +105,7 @@ const Navbar = ({ user, logout, notifications, dismissNotification, dismissAllNo
                                         gap: '6px',
                                         padding: '8px 14px',
                                         borderRadius: '8px',
-                                        background: isActive(path) ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.1))' : 'transparent',
+                                        background: isActive(path) ? 'linear-gradient(135deg, rgba(94, 210, 156, 0.15), rgba(34, 211, 238, 0.1))' : 'transparent',
                                         boxShadow: isActive(path) ? 'inset 0 1px 0 rgba(255,255,255,0.05)' : 'none'
                                     }}
                                 >
@@ -116,9 +115,6 @@ const Navbar = ({ user, logout, notifications, dismissNotification, dismissAllNo
                         </div>
 
                         <div style={{ width: '1px', height: '24px', background: 'var(--border)', margin: '0 4px' }}></div>
-
-                        {/* Theme Toggle */}
-                        <ThemeToggle />
 
                         {/* Notifications */}
                         <Notifications
@@ -138,7 +134,7 @@ const Navbar = ({ user, logout, notifications, dismissNotification, dismissAllNo
                                 <div style={{
                                     width: '6px', height: '6px', borderRadius: '50%',
                                     background: user.role === 'Engineer' ? 'var(--primary-light)' : 'var(--secondary)',
-                                    boxShadow: `0 0 8px ${user.role === 'Engineer' ? 'rgba(99,102,241,0.5)' : 'rgba(16,185,129,0.5)'}`
+                                    boxShadow: `0 0 8px ${user.role === 'Engineer' ? 'rgba(94, 210, 156,0.5)' : 'rgba(16,185,129,0.5)'}`
                                 }} />
                                 <span className="text-sm font-medium hide-mobile" style={{ fontSize: '13px' }}>{user.name.split(' ').slice(0, 2).join(' ')}</span>
                             </div>

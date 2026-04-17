@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { WifiOff, AlertTriangle, RefreshCw } from 'lucide-react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 const NetworkStatus = () => {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldAlert, RefreshCcw, Home } from 'lucide-react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
 class GlobalErrorBoundary extends React.Component {

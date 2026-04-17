@@ -65,7 +65,7 @@ const MyPosts = ({ posts, user, updatePostStatus }) => {
                     </h1>
                     <p className="text-muted text-sm">Manage your collaboration requests and track interest.</p>
                 </div>
-                <Link to="/create-post" className="btn btn-accent" style={{ padding: '12px 24px', borderRadius: '14px', boxShadow: '0 6px 20px rgba(99,102,241,0.25)' }}>
+                <Link to="/create-post" className="btn btn-accent" style={{ padding: '12px 24px', borderRadius: '14px', boxShadow: '0 6px 20px rgba(94, 210, 156,0.25)' }}>
                     <Plus size={16} /> New Post
                 </Link>
             </motion.div>
@@ -79,10 +79,10 @@ const MyPosts = ({ posts, user, updatePostStatus }) => {
                 style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px', marginBottom: '32px' }}
             >
                 {[
-                    { label: 'Total', value: stats.total, icon: <FileText size={18} />, color: 'var(--primary-light)', bg: 'rgba(99, 102, 241, 0.06)' },
+                    { label: 'Total', value: stats.total, icon: <FileText size={18} />, color: 'var(--primary-light)', bg: 'rgba(94, 210, 156, 0.06)' },
                     { label: 'Drafts', value: stats.draft, icon: <Archive size={18} />, color: 'var(--badge-warning-text)', bg: 'rgba(245, 158, 11, 0.06)' },
                     { label: 'Active', value: stats.active, icon: <Eye size={18} />, color: 'var(--badge-success-text)', bg: 'rgba(16, 185, 129, 0.06)' },
-                    { label: 'In Meeting', value: stats.meeting, icon: <Clock size={18} />, color: 'var(--accent-light)', bg: 'rgba(168, 85, 247, 0.06)' },
+                    { label: 'In Meeting', value: stats.meeting, icon: <Clock size={18} />, color: 'var(--accent-light)', bg: 'rgba(34, 211, 238, 0.06)' },
                     { label: 'Closed', value: stats.closed, icon: <CheckCircle2 size={18} />, color: 'var(--secondary)', bg: 'rgba(52, 211, 153, 0.06)' }
                 ].map((s, i) => (
                     <motion.div
@@ -114,10 +114,10 @@ const MyPosts = ({ posts, user, updatePostStatus }) => {
                         style={{
                             padding: '8px 18px', fontSize: '13px', borderRadius: '10px', fontWeight: '600',
                             border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)',
-                            background: filterStatus === status ? 'linear-gradient(135deg, var(--primary), rgba(99, 102, 241, 0.8))' : 'transparent',
+                            background: filterStatus === status ? 'linear-gradient(135deg, var(--primary), rgba(94, 210, 156, 0.8))' : 'transparent',
                             color: filterStatus === status ? 'white' : 'var(--text-muted)',
                             transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                            boxShadow: filterStatus === status ? '0 4px 12px rgba(99, 102, 241, 0.25)' : 'none'
+                            boxShadow: filterStatus === status ? '0 4px 12px rgba(94, 210, 156, 0.25)' : 'none'
                         }}
                     >
                         {status === 'CLOSED' ? 'Partner Found' : status}

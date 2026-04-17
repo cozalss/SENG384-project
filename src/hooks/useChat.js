@@ -8,8 +8,7 @@ import {
   getUsers,
   setTypingStatus,
   updateUserStatus,
-  deleteConversation,
-  conversationsRef
+  deleteConversation
 } from '../services/firestore';
 import { onSnapshot, doc } from 'firebase/firestore';
 import { db } from '../firebase';
