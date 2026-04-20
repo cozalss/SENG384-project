@@ -1,18 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
-import { updateUserInFirestore, addActivityLog } from '../services/firestore';
+import { updateUserInFirestore, deleteUserFromFirestore, addActivityLog } from '../services/firestore';
+
+// Synchronous lazy initializer — runs once on first render, before any paint.
+// Avoids the null→user flicker that caused /dashboard → /login → /dashboard
+// redirect bounce on hard refresh.
+const readSavedUser = () => {
+  try {
+    const saved = localStorage.getItem('health_ai_user');
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+};
 
 export function useAuth() {
-  const [user, setUser] = useState(null);
-
-  // Restore user session from localStorage
-  useEffect(() => {
-    const savedSession = localStorage.getItem('health_ai_user');
-    if (savedSession) {
-      setTimeout(() => {
-        setUser(JSON.parse(savedSession));
-      }, 0);
-    }
-  }, []);
+  const [user, setUser] = useState(readSavedUser);
 
   const logout = useCallback(async () => {
     if (user) {
@@ -70,13 +72,48 @@ export function useAuth() {
     });
   };
 
-  const updateUser = async (updatedFields) => {
-    const updatedUser = { ...user, ...updatedFields };
-    setUser(updatedUser);
-    localStorage.setItem('health_ai_user', JSON.stringify(updatedUser));
-    // Update user in Firestore
-    await updateUserInFirestore(user.id, updatedFields);
+  // Accepts BOTH signatures for backwards compatibility:
+  //  updateUser({ name: 'foo' })          → updates current session user
+  //  updateUser(userId, { name: 'foo' })  → legacy shape from Profile
+  const updateUser = async (arg1, arg2) => {
+    let targetId, updatedFields;
+    if (typeof arg1 === 'string') {
+      targetId = arg1;
+      updatedFields = arg2 || {};
+    } else {
+      targetId = user?.id;
+      updatedFields = arg1 || {};
+    }
+    if (!targetId) return;
+    if (targetId === user?.id) {
+      const updatedUser = { ...user, ...updatedFields };
+      setUser(updatedUser);
+      localStorage.setItem('health_ai_user', JSON.stringify(updatedUser));
+    }
+    await updateUserInFirestore(targetId, updatedFields);
   };
 
-  return { user, login, logout, updateUser };
+  const deleteUser = async () => {
+    if (!user) return;
+    try {
+      await addActivityLog({
+        id: `log-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        userId: user.id,
+        userName: user.name,
+        role: user.role,
+        actionType: 'ACCOUNT_DELETE',
+        targetEntity: user.id,
+        result: 'success',
+        details: 'User exercised GDPR Article 17 (Right to Erasure)'
+      });
+      await deleteUserFromFirestore(user.id);
+    } catch (err) {
+      console.error('deleteUser error:', err);
+    }
+    setUser(null);
+    localStorage.removeItem('health_ai_user');
+  };
+
+  return { user, login, logout, updateUser, deleteUser };
 }

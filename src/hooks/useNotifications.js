@@ -34,7 +34,9 @@ const defaultNotifications = [
 ];
 
 export function useNotifications() {
-  const [notifications, setNotifications] = useState(defaultNotifications);
+  // Start empty — default demo data is only a fallback if Firebase fails.
+  // Prevents the visible "fake → real" swap flicker on refresh.
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     let unsubNotifs;

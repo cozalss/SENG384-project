@@ -4,7 +4,7 @@ import { Activity, Mail, User, Briefcase, MapPin, ArrowRight, ArrowLeft, Buildin
 import { getUserByEmail, emailExists, addUserToFirestore, hashPassword, addActivityLog } from '../services/firestore';
 import { sendConfirmationEmail, generateConfirmationCode } from '../services/emailService';
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 
 const Login = ({ login }) => {
     const [mode, setMode] = useState('login');
@@ -196,8 +196,8 @@ const Login = ({ login }) => {
         setVerifying(true);
         try {
             await addUserToFirestore(pendingUser);
-            // eslint-disable-next-line no-unused-vars
-            const { passwordHash: _, ...safeUser } = pendingUser;
+            const { passwordHash: _pw, ...safeUser } = pendingUser;
+            void _pw;
             setVerifying(false);
             login(safeUser);
         } catch (err) {
@@ -266,57 +266,88 @@ const Login = ({ login }) => {
             : '';
 
         return (
-            <div className="flex justify-center items-center" style={{ minHeight: '80vh', position: 'relative' }}>
+            <div className="flex justify-center items-center" style={{ minHeight: '90vh', position: 'relative', padding: '40px 20px' }}>
                 <motion.div
                     initial={{ opacity: 0, y: 30, scale: 0.97 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="glass-panel"
+                    className="editorial-panel"
                     style={{
-                        width: '100%', maxWidth: '460px', padding: '48px 40px',
+                        width: '100%', maxWidth: '480px', padding: '52px 44px 40px',
                         position: 'relative', zIndex: 1,
-                        boxShadow: '0 25px 60px -12px rgba(0,0,0,0.7), inset 0 1px 0 0 rgba(255,255,255,0.06)',
-                        overflow: 'hidden'
+                        boxShadow: '0 40px 90px rgba(0, 0, 0, 0.55), 0 0 120px rgba(94, 210, 156, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
                     }}
                 >
-                    {/* Accent bar */}
+                    {/* Top neon shimmer line */}
                     <div style={{
-                        position: 'absolute', top: 0, left: 0, width: '100%', height: '2px',
-                        background: 'linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent)'
+                        position: 'absolute', top: 0, left: 0, right: 0, height: '1px',
+                        background: 'linear-gradient(90deg, transparent, rgba(94, 210, 156, 0.45), rgba(34, 211, 238, 0.3), transparent)',
+                        pointerEvents: 'none'
+                    }} />
+                    <div style={{
+                        position: 'absolute', inset: 0, pointerEvents: 'none',
+                        background: 'radial-gradient(ellipse 60% 50% at 0% 0%, rgba(94, 210, 156, 0.12), transparent 60%), radial-gradient(ellipse 55% 55% at 100% 100%, rgba(34, 211, 238, 0.10), transparent 60%)'
                     }} />
 
                     {/* Back button */}
-                    <button
+                    <motion.button
+                        whileHover={{ x: -2 }}
                         onClick={() => { setVerificationStep('form'); setError(''); }}
                         className="flex items-center gap-2 text-muted font-medium"
                         style={{
-                            fontSize: '13px', marginBottom: '28px',
+                            fontSize: '12.5px', marginBottom: '28px',
                             background: 'none', border: 'none', cursor: 'pointer',
-                            padding: 0, transition: 'color 0.2s'
+                            padding: 0, transition: 'color 0.2s', position: 'relative', zIndex: 2,
+                            letterSpacing: '0.02em'
                         }}
                     >
                         <ArrowLeft size={14} /> Back to form
-                    </button>
+                    </motion.button>
 
                     {/* Icon + heading */}
-                    <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '34px', position: 'relative', zIndex: 2 }}>
                         <motion.div
-                            animate={{ boxShadow: ['0 0 30px rgba(99,102,241,0.2)', '0 0 50px rgba(168,85,247,0.2)', '0 0 30px rgba(99,102,241,0.2)'] }}
-                            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                            animate={{
+                                boxShadow: [
+                                    '0 0 30px rgba(94, 210, 156, 0.3), 0 12px 28px rgba(94, 210, 156, 0.3)',
+                                    '0 0 60px rgba(34, 211, 238, 0.35), 0 14px 34px rgba(34, 211, 238, 0.3)',
+                                    '0 0 30px rgba(94, 210, 156, 0.3), 0 12px 28px rgba(94, 210, 156, 0.3)'
+                                ]
+                            }}
+                            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+                            whileHover={{ rotate: 6, scale: 1.05 }}
                             style={{
                                 display: 'inline-flex',
                                 background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-                                padding: '14px', borderRadius: '20px', marginBottom: '20px'
+                                padding: '14px', borderRadius: '20px', marginBottom: '22px'
                             }}
                         >
-                            <Mail size={34} color="white" />
+                            <Mail size={30} color="#070b0a" strokeWidth={2.5} />
                         </motion.div>
-                        <h1 style={{ fontSize: '26px', marginBottom: '10px', letterSpacing: '-0.03em', fontFamily: 'var(--font-heading)' }}>
-                            Check Your <span style={{ color: 'var(--primary-light)' }}>Email</span>
+                        <h1 style={{
+                            fontSize: 'clamp(28px, 3.2vw, 36px)',
+                            marginBottom: '10px',
+                            letterSpacing: '-0.035em',
+                            fontFamily: 'var(--font-heading)',
+                            fontWeight: '800',
+                            lineHeight: '1.06'
+                        }}>
+                            Check your <span style={{
+                                background: 'linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 50%, var(--primary-light) 100%)',
+                                backgroundSize: '200% auto',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text',
+                                animation: 'shimmer 5s linear infinite',
+                                fontStyle: 'italic',
+                                display: 'inline-block',
+                                paddingRight: '0.12em',
+                                paddingBottom: '0.03em'
+                            }}>email</span>
                         </h1>
-                        <p className="text-muted" style={{ fontSize: '13.5px', lineHeight: '1.6' }}>
+                        <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', lineHeight: '1.7', letterSpacing: '0.005em' }}>
                             We sent a 6-digit confirmation code to<br />
-                            <strong style={{ color: 'var(--text-primary)' }}>{maskedEmail}</strong>
+                            <strong style={{ color: 'var(--text-main)' }}>{maskedEmail}</strong>
                         </p>
                     </div>
 
@@ -373,44 +404,48 @@ const Login = ({ login }) => {
                                     onKeyDown={e => handleDigitKeyDown(i, e)}
                                     onPaste={handleDigitPaste}
                                     style={{
-                                        width: '52px', height: '62px',
-                                        textAlign: 'center', fontSize: '24px', fontWeight: '700',
+                                        width: '54px', height: '64px',
+                                        textAlign: 'center', fontSize: '26px', fontWeight: '800',
                                         fontFamily: 'var(--font-heading)',
-                                        background: digit ? 'rgba(99,102,241,0.12)' : 'var(--panel-light)',
-                                        border: digit ? '2px solid rgba(99,102,241,0.6)' : '2px solid var(--border)',
+                                        background: digit ? 'rgba(94, 210, 156, 0.12)' : 'rgba(7, 11, 10, 0.5)',
+                                        border: digit ? '2px solid rgba(94, 210, 156, 0.55)' : '2px solid rgba(255,255,255,0.06)',
                                         borderRadius: '14px',
-                                        color: 'var(--text-primary)',
+                                        color: 'var(--text-main)',
                                         outline: 'none',
-                                        transition: 'all 0.2s ease',
-                                        caretColor: 'var(--primary)'
+                                        transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                                        caretColor: 'var(--primary)',
+                                        letterSpacing: '-0.02em'
                                     }}
                                     onFocus={e => {
-                                        e.target.style.borderColor = 'var(--primary)';
-                                        e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.15)';
+                                        e.target.style.borderColor = 'rgba(94, 210, 156, 0.8)';
+                                        e.target.style.boxShadow = '0 0 0 3px rgba(94, 210, 156, 0.14), 0 8px 24px rgba(94, 210, 156, 0.1)';
+                                        e.target.style.transform = 'translateY(-1px)';
                                     }}
                                     onBlur={e => {
-                                        e.target.style.borderColor = digit ? 'rgba(99,102,241,0.6)' : 'var(--border)';
+                                        e.target.style.borderColor = digit ? 'rgba(94, 210, 156, 0.55)' : 'rgba(255,255,255,0.06)';
                                         e.target.style.boxShadow = 'none';
+                                        e.target.style.transform = 'translateY(0)';
                                     }}
                                 />
                             ))}
                         </div>
 
                         {/* Verify button */}
-                        <button
+                        <motion.button
+                            whileHover={{ y: -2 }}
+                            whileTap={{ scale: 0.97 }}
                             id="verify-code-button"
                             type="submit"
-                            className="btn btn-accent"
+                            className="btn-lux btn-announce"
                             disabled={verifying}
                             style={{
-                                width: '100%', padding: '16px', fontSize: '15px',
-                                borderRadius: '12px',
-                                boxShadow: '0 8px 25px rgba(99,102,241,0.25)'
+                                width: '100%', padding: '15px',
+                                fontSize: '14.5px', justifyContent: 'center'
                             }}
                         >
                             {verifying ? 'Verifying…' : 'Verify & Create Account'}
-                            {!verifying && <ArrowRight size={18} style={{ marginLeft: '6px' }} />}
-                        </button>
+                            {!verifying && <ArrowRight size={17} style={{ marginLeft: '2px' }} strokeWidth={2.5} />}
+                        </motion.button>
                     </form>
 
                     {/* Resend section */}
@@ -453,86 +488,140 @@ const Login = ({ login }) => {
 
     // ── STEP 1: Login / Register Form ────────────────────────────────
     return (
-        <div className="flex justify-center items-center" style={{ minHeight: '80vh', position: 'relative' }}>
-
-
+        <div className="flex justify-center items-center" style={{ minHeight: '90vh', position: 'relative', padding: '40px 20px' }}>
 
             <motion.div
                 initial={{ opacity: 0, y: 30, scale: 0.97 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="glass-panel"
+                className="editorial-panel"
                 style={{
                     width: '100%',
-                    maxWidth: mode === 'register' ? '540px' : '480px',
-                    padding: '48px 40px',
+                    maxWidth: mode === 'register' ? '560px' : '480px',
+                    padding: '52px 44px 40px',
                     position: 'relative',
                     zIndex: 1,
-                    boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 0 100px rgba(94, 210, 156, 0.04)',
                     transition: 'max-width 0.4s ease',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    boxShadow: '0 40px 90px rgba(0, 0, 0, 0.55), 0 0 120px rgba(94, 210, 156, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
                 }}
             >
-                {/* Top gradient accent bar */}
+                {/* Top neon shimmer line */}
                 <div style={{
-                    position: 'absolute', top: 0, left: 0, width: '100%', height: '2px',
-                    background: 'linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent)'
+                    position: 'absolute', top: 0, left: 0, right: 0, height: '1px',
+                    background: 'linear-gradient(90deg, transparent, rgba(94, 210, 156, 0.45), rgba(34, 211, 238, 0.3), transparent)',
+                    pointerEvents: 'none'
+                }} />
+                {/* Corner glows */}
+                <div style={{
+                    position: 'absolute', inset: 0, pointerEvents: 'none',
+                    background:
+                        'radial-gradient(ellipse 60% 50% at 0% 0%, rgba(94, 210, 156, 0.12), transparent 60%),' +
+                        'radial-gradient(ellipse 55% 55% at 100% 100%, rgba(34, 211, 238, 0.10), transparent 60%)'
                 }} />
 
                 {/* Back to Landing */}
-                <Link to="/" className="flex items-center gap-2 text-muted font-medium" style={{
-                    fontSize: '13px', marginBottom: '28px', transition: 'color 0.2s'
-                }}>
-                    <ArrowLeft size={14} /> Back to Home
-                </Link>
+                <motion.div whileHover={{ x: -2 }} style={{ position: 'relative', zIndex: 2 }}>
+                    <Link to="/" className="flex items-center gap-2 text-muted font-medium" style={{
+                        fontSize: '12.5px', marginBottom: '28px', transition: 'color 0.2s',
+                        textDecoration: 'none', letterSpacing: '0.02em'
+                    }}>
+                        <ArrowLeft size={14} /> Back to Home
+                    </Link>
+                </motion.div>
 
-                <div style={{ position: 'relative', zIndex: '1', textAlign: 'center', marginBottom: '40px' }}>
+                {/* Logo + Editorial title */}
+                <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', marginBottom: '34px' }}>
                     <motion.div
-                        animate={{ boxShadow: ['0 0 30px rgba(94, 210, 156,0.2)', '0 0 50px rgba(34, 211, 238,0.2)', '0 0 30px rgba(94, 210, 156,0.2)'] }}
-                        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                        animate={{
+                            boxShadow: [
+                                '0 0 30px rgba(94, 210, 156, 0.3), 0 12px 28px rgba(94, 210, 156, 0.3)',
+                                '0 0 60px rgba(34, 211, 238, 0.35), 0 14px 34px rgba(34, 211, 238, 0.3)',
+                                '0 0 30px rgba(94, 210, 156, 0.3), 0 12px 28px rgba(94, 210, 156, 0.3)'
+                            ]
+                        }}
+                        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+                        whileHover={{ rotate: 6, scale: 1.05 }}
                         style={{
                             display: 'inline-flex',
                             background: 'linear-gradient(135deg, var(--primary), var(--accent))',
                             padding: '14px',
                             borderRadius: '20px',
-                            marginBottom: '20px',
+                            marginBottom: '22px'
                         }}
                     >
-                        <Activity size={36} color="white" />
+                        <Activity size={32} color="#070b0a" strokeWidth={2.5} />
                     </motion.div>
-                    <h1 style={{ fontSize: '32px', marginBottom: '10px', letterSpacing: '-0.04em', fontFamily: 'var(--font-heading)' }}>
-                        HEALTH<span style={{ color: 'var(--primary-light)' }}>AI</span>
+                    <h1 style={{
+                        fontSize: 'clamp(30px, 3.5vw, 40px)',
+                        marginBottom: '8px',
+                        letterSpacing: '-0.04em',
+                        fontFamily: 'var(--font-heading)',
+                        fontWeight: '800',
+                        lineHeight: '1.05'
+                    }}>
+                        {mode === 'login' ? (
+                            <>Welcome <span className="accent" style={{
+                                background: 'linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 50%, var(--primary-light) 100%)',
+                                backgroundSize: '200% auto',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text',
+                                animation: 'shimmer 5s linear infinite',
+                                fontStyle: 'italic',
+                                display: 'inline-block',
+                                paddingRight: '0.12em',
+                                paddingBottom: '0.03em'
+                            }}>back</span></>
+                        ) : (
+                            <>Join the <span className="accent" style={{
+                                background: 'linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 50%, var(--primary-light) 100%)',
+                                backgroundSize: '200% auto',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text',
+                                animation: 'shimmer 5s linear infinite',
+                                fontStyle: 'italic',
+                                display: 'inline-block',
+                                paddingRight: '0.12em',
+                                paddingBottom: '0.03em'
+                            }}>Network</span></>
+                        )}
                     </h1>
-                    <p className="text-muted font-medium" style={{ fontSize: '14px' }}>
+                    <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', letterSpacing: '0.01em' }}>
                         {mode === 'login' ? 'Secure Platform Access' : 'Create Your Account'}
                     </p>
                 </div>
 
-                {/* Mode Switcher */}
-                <div className="flex gap-1 mb-6" style={{
-                    background: 'var(--panel-light)', padding: '4px', borderRadius: '14px',
-                    border: '1px solid var(--border)'
-                }}>
-                    {['login', 'register'].map(m => (
-                        <button
-                            key={m}
-                            onClick={() => { setMode(m); setError(''); }}
-                            style={{
-                                flex: 1, padding: '10px', borderRadius: '10px', border: 'none',
-                                cursor: 'pointer', fontWeight: '600', fontSize: '14px',
-                                fontFamily: 'var(--font-body)',
-                                background: mode === m
-                                    ? 'linear-gradient(135deg, var(--primary), rgba(94, 210, 156, 0.8))'
-                                    : 'transparent',
-                                color: mode === m ? 'white' : 'var(--text-muted)',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                boxShadow: mode === m ? '0 4px 12px rgba(94, 210, 156, 0.25)' : 'none'
-                            }}
-                        >
-                            {m === 'login' ? 'Sign In' : 'Register'}
-                        </button>
-                    ))}
-                </div>
+                {/* Mode Switcher — animated layoutId pill */}
+                <LayoutGroup>
+                    <div className="segmented-control" style={{
+                        marginBottom: '22px', display: 'flex', width: '100%', position: 'relative', zIndex: 2
+                    }}>
+                        {['login', 'register'].map(m => (
+                            <button
+                                key={m}
+                                onClick={() => { setMode(m); setError(''); }}
+                                className={`segmented-tab ${mode === m ? 'active' : ''}`}
+                                style={{ flex: 1, justifyContent: 'center', padding: '11px 22px' }}
+                            >
+                                {mode === m && (
+                                    <motion.span
+                                        layoutId="login-pill"
+                                        style={{
+                                            position: 'absolute', inset: 0,
+                                            background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+                                            borderRadius: '10px', zIndex: -1,
+                                            boxShadow: '0 8px 22px rgba(94, 210, 156, 0.32)'
+                                        }}
+                                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                                    />
+                                )}
+                                {m === 'login' ? 'Sign In' : 'Register'}
+                            </button>
+                        ))}
+                    </div>
+                </LayoutGroup>
 
                 <AnimatePresence mode="wait">
                     {error && (
@@ -542,15 +631,16 @@ const Login = ({ login }) => {
                             animate={{ opacity: 1, y: 0, height: 'auto' }}
                             exit={{ opacity: 0, y: -8, height: 0 }}
                             style={{
-                                background: 'rgba(239, 68, 68, 0.08)',
-                                border: '1px solid rgba(239, 68, 68, 0.15)',
-                                borderLeft: '3px solid var(--error)',
-                                padding: '14px 18px',
-                                color: 'var(--badge-error-text)',
-                                fontSize: '13px',
-                                marginBottom: '24px',
-                                borderRadius: 'var(--border-radius-sm)',
-                                lineHeight: '1.5'
+                                background: 'rgba(239, 68, 68, 0.06)',
+                                border: '1px solid rgba(239, 68, 68, 0.22)',
+                                padding: '13px 16px',
+                                color: '#fca5a5',
+                                fontSize: '12.5px',
+                                marginBottom: '20px',
+                                borderRadius: '12px',
+                                lineHeight: '1.55',
+                                letterSpacing: '0.005em',
+                                position: 'relative', zIndex: 2
                             }}>
                             {error}
                         </motion.div>
@@ -559,20 +649,21 @@ const Login = ({ login }) => {
 
                 {verifying && (
                     <div className="animate-fade-in text-center" style={{
-                        background: 'rgba(94, 210, 156, 0.08)',
-                        border: '1px solid rgba(94, 210, 156, 0.15)',
-                        padding: '20px',
-                        marginBottom: '24px',
-                        borderRadius: 'var(--border-radius-sm)',
+                        background: 'rgba(94, 210, 156, 0.06)',
+                        border: '1px solid rgba(94, 210, 156, 0.2)',
+                        padding: '18px',
+                        marginBottom: '20px',
+                        borderRadius: '14px',
+                        position: 'relative', zIndex: 2
                     }}>
                         <div style={{
-                            width: '32px', height: '32px', border: '3px solid rgba(94, 210, 156,0.2)',
+                            width: '28px', height: '28px', border: '2.5px solid rgba(94, 210, 156, 0.2)',
                             borderTopColor: 'var(--primary)', borderRadius: '50%',
-                            animation: 'spin 0.8s linear infinite', margin: '0 auto 12px'
+                            animation: 'spin 0.8s linear infinite', margin: '0 auto 10px'
                         }}></div>
                         <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
-                        <p className="text-sm font-medium" style={{ color: 'var(--badge-primary-text)' }}>
-                            {mode === 'login' ? 'Verifying credentials...' : 'Sending confirmation email…'}
+                        <p style={{ color: '#8be8bc', fontSize: '13px', fontWeight: '600', letterSpacing: '0.01em' }}>
+                            {mode === 'login' ? 'Verifying credentials…' : 'Sending confirmation email…'}
                         </p>
                     </div>
                 )}
@@ -586,7 +677,7 @@ const Login = ({ login }) => {
                             id="email-input"
                             type="email"
                             placeholder="Institutional Email (.edu required)"
-                            className="input-field"
+                            className="input-lux"
                             style={{ paddingLeft: '44px' }}
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -603,7 +694,7 @@ const Login = ({ login }) => {
                             id="password-input"
                             type={showPassword ? 'text' : 'password'}
                             placeholder="Password"
-                            className="input-field"
+                            className="input-lux"
                             style={{ paddingLeft: '44px', paddingRight: '44px' }}
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -641,7 +732,7 @@ const Login = ({ login }) => {
                                         id="name-input"
                                         type="text"
                                         placeholder="Full Name w/ Title (e.g. Dr. John Doe)"
-                                        className="input-field"
+                                        className="input-lux"
                                         style={{ paddingLeft: '44px' }}
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -655,7 +746,7 @@ const Login = ({ login }) => {
                                     <Briefcase size={18} style={iconStyle('role')} />
                                     <select
                                         id="role-select"
-                                        className="input-field"
+                                        className="input-lux"
                                         style={{ paddingLeft: '44px', appearance: 'none', cursor: 'pointer', fontWeight: '500' }}
                                         value={formData.role}
                                         onChange={(e) => setFormData({ ...formData, role: e.target.value })}
@@ -674,7 +765,7 @@ const Login = ({ login }) => {
                                         id="institution-input"
                                         type="text"
                                         placeholder="Institution (e.g. University of Zurich)"
-                                        className="input-field"
+                                        className="input-lux"
                                         style={{ paddingLeft: '44px' }}
                                         value={formData.institution}
                                         onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
@@ -691,7 +782,7 @@ const Login = ({ login }) => {
                                             id="country-input"
                                             type="text"
                                             placeholder="Country"
-                                            className="input-field"
+                                            className="input-lux"
                                             style={{ paddingLeft: '44px' }}
                                             value={formData.country}
                                             onChange={(e) => setFormData({ ...formData, country: e.target.value })}
@@ -706,7 +797,7 @@ const Login = ({ login }) => {
                                             id="city-input"
                                             type="text"
                                             placeholder="City"
-                                            className="input-field"
+                                            className="input-lux"
                                             style={{ paddingLeft: '44px' }}
                                             value={formData.city}
                                             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
@@ -720,20 +811,21 @@ const Login = ({ login }) => {
                         )}
                     </AnimatePresence>
 
-                    <button
+                    <motion.button
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.97 }}
                         id="submit-button"
                         type="submit"
-                        className="btn btn-accent"
+                        className="btn-lux btn-announce"
                         disabled={verifying}
                         style={{
-                            width: '100%', marginTop: '12px', padding: '16px', fontSize: '15px',
-                            borderRadius: '12px',
-                            boxShadow: '0 8px 25px rgba(94, 210, 156, 0.25), 0 0 40px rgba(34, 211, 238, 0.08)'
+                            width: '100%', marginTop: '12px', padding: '15px',
+                            fontSize: '14.5px', justifyContent: 'center'
                         }}
                     >
-                        {verifying ? 'Sending code...' : mode === 'login' ? 'Sign In' : 'Create Account'}
-                        {!verifying && <ArrowRight size={18} style={{ marginLeft: '4px' }} />}
-                    </button>
+                        {verifying ? 'Sending code…' : mode === 'login' ? 'Sign In' : 'Create Account'}
+                        {!verifying && <ArrowRight size={17} style={{ marginLeft: '2px' }} strokeWidth={2.5} />}
+                    </motion.button>
                 </form>
 
                 {/* VISUAL HALF */}

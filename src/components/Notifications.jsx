@@ -50,31 +50,34 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
 
     return (
         <div style={{ position: 'relative' }}>
-            <button
+            <motion.button
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
                 id="notifications-bell"
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
-                    background: isOpen ? 'rgba(94, 210, 156, 0.08)' : 'var(--background-alt)',
-                    border: `1px solid ${isOpen ? 'rgba(94, 210, 156, 0.15)' : 'rgba(255,255,255,0.06)'}`,
+                    background: isOpen ? 'rgba(94, 210, 156, 0.1)' : 'rgba(7, 11, 10, 0.55)',
+                    border: `1px solid ${isOpen ? 'rgba(94, 210, 156, 0.28)' : 'rgba(255,255,255,0.05)'}`,
                     cursor: 'pointer',
-                    color: isOpen ? 'var(--primary-light)' : 'var(--text-muted)',
-                    padding: '8px',
-                    borderRadius: '10px',
-                    transition: 'all 0.25s',
+                    color: isOpen ? '#8be8bc' : 'var(--text-muted)',
+                    padding: '9px',
+                    borderRadius: '11px',
+                    transition: 'background 0.25s, border-color 0.25s, color 0.25s',
                     position: 'relative',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}
-                onMouseOver={(e) => { e.currentTarget.style.color = 'var(--text-main)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+                onMouseOver={(e) => { e.currentTarget.style.color = '#8be8bc'; e.currentTarget.style.background = 'rgba(94, 210, 156, 0.08)'; e.currentTarget.style.borderColor = 'rgba(94, 210, 156, 0.22)'; }}
                 onMouseOut={(e) => {
-                    e.currentTarget.style.color = isOpen ? 'var(--primary-light)' : 'var(--text-muted)';
-                    e.currentTarget.style.background = isOpen ? 'rgba(94, 210, 156, 0.08)' : 'var(--background-alt)';
+                    e.currentTarget.style.color = isOpen ? '#8be8bc' : 'var(--text-muted)';
+                    e.currentTarget.style.background = isOpen ? 'rgba(94, 210, 156, 0.1)' : 'rgba(7, 11, 10, 0.55)';
+                    e.currentTarget.style.borderColor = isOpen ? 'rgba(94, 210, 156, 0.28)' : 'rgba(255,255,255,0.05)';
                 }}
             >
-                <Bell size={18} />
+                <Bell size={17} />
                 {unread > 0 && <span className="notification-badge">{unread}</span>}
-            </button>
+            </motion.button>
 
             <AnimatePresence>
                 {isOpen && (
@@ -87,49 +90,47 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
 
                         {/* Dropdown */}
                         <motion.div
-                            initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                            initial={{ opacity: 0, y: 10, scale: 0.96 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                            className="glass-panel"
+                            exit={{ opacity: 0, y: 10, scale: 0.96 }}
+                            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                            className="editorial-panel"
                             style={{
-                                position: 'absolute', top: 'calc(100% + 12px)', right: 0,
-                                width: '400px', maxHeight: '500px', overflowY: 'auto',
+                                position: 'absolute', top: 'calc(100% + 14px)', right: 0,
+                                width: '420px', maxHeight: '520px', overflowY: 'auto',
                                 zIndex: 999, padding: 0,
-                                boxShadow: '0 25px 60px rgba(0,0,0,0.6), 0 0 40px rgba(94, 210, 156,0.04)',
-                                border: '1px solid var(--border)',
-                                borderRadius: '16px'
+                                boxShadow: '0 30px 70px rgba(0,0,0,0.6), 0 0 60px rgba(94, 210, 156, 0.08)'
                             }}
                         >
                             {/* Header */}
                             <div className="flex justify-between items-center" style={{
-                                padding: '20px 20px 16px',
-                                borderBottom: '1px solid var(--border)',
-                                background: 'var(--panel-light)'
+                                padding: '20px 22px 16px',
+                                borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                                background: 'rgba(7, 11, 10, 0.5)'
                             }}>
                                 <div className="flex items-center gap-3">
-                                    <h3 style={{ fontSize: '16px', fontWeight: '700', fontFamily: 'var(--font-heading)' }}>Notifications</h3>
+                                    <h3 style={{ fontSize: '15px', fontWeight: '700', fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}>Notifications</h3>
                                     {unread > 0 && (
-                                        <span style={{
-                                            background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-                                            color: 'white', fontSize: '10px', fontWeight: '700',
-                                            padding: '2px 8px', borderRadius: '999px'
-                                        }}>
+                                        <span className="pill pill-neon" style={{ fontSize: '9.5px', padding: '3px 9px' }}>
                                             {unread} new
                                         </span>
                                     )}
                                 </div>
                                 {notifications.length > 0 && (
-                                    <button
+                                    <motion.button
+                                        whileHover={{ scale: 1.04 }}
+                                        whileTap={{ scale: 0.96 }}
                                         onClick={() => { onDismissAll?.(); }}
                                         style={{
                                             background: 'none', border: 'none', cursor: 'pointer',
-                                            color: 'var(--primary-light)', fontSize: '12px', fontWeight: '600',
-                                            fontFamily: 'var(--font-body)', transition: 'opacity 0.2s'
+                                            color: '#8be8bc', fontSize: '12px', fontWeight: '600',
+                                            fontFamily: 'var(--font-body)',
+                                            letterSpacing: '0.01em',
+                                            transition: 'opacity 0.2s'
                                         }}
                                     >
                                         Clear All
-                                    </button>
+                                    </motion.button>
                                 )}
                             </div>
 

@@ -14,7 +14,11 @@ if (import.meta.env.VITE_EMAILJS_PUBLIC_KEY) {
 }
 
 export function usePosts(user, addNotification) {
-  const [posts, setPosts] = useState(mockPosts);
+  // Start empty — mock data is only a fallback if Firebase init fails.
+  // Previously we initialized with mockPosts which caused a visible "3 posts
+  // then drops to 1" flicker on refresh as Firebase delivered the real list.
+  const [posts, setPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
 
   useEffect(() => {
     let unsubPosts;
@@ -24,6 +28,7 @@ export function usePosts(user, addNotification) {
       unsubPosts = subscribeToPostsRT((firestorePosts) => {
         if (!isActive) return;
         setPosts(firestorePosts);
+        setPostsLoading(false);
       });
     } catch (error) {
       console.error('Firebase init error for posts:', error);
@@ -35,7 +40,10 @@ export function usePosts(user, addNotification) {
             message: 'Unable to sync with live records. You are viewing cached/mock data.'
           });
         }
-        setTimeout(() => setPosts(mockPosts), 0);
+        setTimeout(() => {
+          setPosts(mockPosts);
+          setPostsLoading(false);
+        }, 0);
       }
     }
     return () => {
@@ -262,5 +270,5 @@ export function usePosts(user, addNotification) {
     });
   };
 
-  return { posts, addPost, updatePost, updatePostStatus, addInterest, addMeetingRequest, respondToMeeting };
+  return { posts, postsLoading, addPost, updatePost, updatePostStatus, addInterest, addMeetingRequest, respondToMeeting };
 }

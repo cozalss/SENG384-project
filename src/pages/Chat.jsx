@@ -86,7 +86,7 @@ const Chat = ({ user }) => {
 
   return (
     <div className="chat-page-container">
-      <div className="chat-layout glass-panel">
+      <div className="chat-layout">
         {/* SIDEBAR */}
         <div className={`chat-sidebar ${activeRecipient ? 'mobile-hidden' : ''}`}>
           <div className="sidebar-header">

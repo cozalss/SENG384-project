@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Shield, Download, Search, Clock, Users, FileText, Activity, Trash2, Power, Briefcase, Lock } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    subscribeToLogsRT, 
-    subscribeToUsersRT, 
-    updateUserInFirestore, 
-    deletePostFromFirestore 
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import {
+    subscribeToLogsRT,
+    subscribeToUsersRT,
+    updateUserInFirestore,
+    deletePostFromFirestore
 } from '../services/firestore';
+import { useAnimReady } from '../hooks/useAnimReady';
+import { useToast } from '../hooks/useToast';
 
 const AdminDashboard = ({ user, posts }) => {
+    const animReady = useAnimReady();
+    const toast = useToast();
     const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'users', 'posts', 'logs'
     const [logs, setLogs] = useState([]);
     const [users, setUsers] = useState([]);
@@ -87,83 +91,99 @@ const AdminDashboard = ({ user, posts }) => {
         const newStatus = targetUser.status === 'frozen' ? 'active' : 'frozen';
         if (window.confirm(`Are you sure you want to ${newStatus === 'frozen' ? 'freeze' : 'unfreeze'} ${targetUser.name}?`)) {
             await updateUserInFirestore(targetUser.id, { status: newStatus });
+            toast.success(
+                `${targetUser.name} → ${newStatus === 'frozen' ? 'frozen' : 'active'}`,
+                { title: newStatus === 'frozen' ? 'User frozen' : 'User unfrozen' }
+            );
         }
     };
 
     const handleDeletePost = async (post) => {
         if (window.confirm(`WARNING: Deleting post "${post.title}". This cannot be undone. Proceed?`)) {
             await deletePostFromFirestore(post.id);
+            toast.success(`"${post.title}" removed from the network.`, { title: 'Post deleted' });
         }
     };
 
     return (
         <div className="animate-fade-in" style={{ paddingBottom: '80px', maxWidth: '1200px', margin: '0 auto' }}>
-            
-            {/* Header */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                style={{
-                    background: 'rgba(239, 68, 68, 0.05)', padding: '28px 32px',
-                    borderRadius: 'var(--border-radius-lg)', border: '1px solid rgba(239, 68, 68, 0.15)',
-                    position: 'relative', overflow: 'hidden', marginBottom: '24px'
-                }}>
-                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '3px', background: 'linear-gradient(90deg, transparent, var(--error), var(--primary), transparent)' }} />
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4">
-                        <div style={{ background: 'rgba(239,68,68,0.1)', padding: '14px', borderRadius: '16px' }}>
-                            <Shield size={28} color="var(--error)" />
-                        </div>
-                        <div>
-                            <h1 style={{ fontSize: '32px', marginBottom: '4px', letterSpacing: '-0.04em', fontFamily: 'var(--font-heading)' }}>
-                                System <span style={{ color: 'var(--error)' }}>Admin</span>
-                            </h1>
-                            <p className="text-muted" style={{ fontSize: '15px' }}>Global oversight and management console.</p>
-                        </div>
+
+            {/* Editorial header */}
+            <motion.section
+                initial={animReady ? {  opacity: 0, y: 24  } : false}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="editorial-header"
+            >
+                <div className="editorial-header-inner">
+                    <div>
+                        <span className="editorial-eyebrow" style={{ background: 'rgba(239, 68, 68, 0.06)', borderColor: 'rgba(239, 68, 68, 0.22)', color: '#fca5a5' }}>
+                            <Shield size={11} /> System Admin
+                        </span>
+                        <h1 className="editorial-display">
+                            Admin <span className="accent">Console</span>
+                        </h1>
+                        <p className="editorial-subtitle">
+                            Global oversight — users, announcements, and audit trail in a single editorial cockpit.
+                        </p>
                     </div>
                 </div>
-            </motion.div>
+            </motion.section>
 
-            {/* Tabs */}
-            <div className="flex gap-2 mb-6" style={{ background: 'var(--panel-light)', padding: '6px', borderRadius: '14px', border: '1px solid var(--border)' }}>
-                {[
-                    { id: 'overview', label: 'Overview', icon: <Activity size={16} /> },
-                    { id: 'users', label: 'Users', icon: <Users size={16} /> },
-                    { id: 'posts', label: 'Announcements', icon: <FileText size={16} /> },
-                    { id: 'logs', label: 'Audit Logs', icon: <Clock size={16} /> },
-                ].map(tab => (
-                    <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                        style={{
-                            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                            padding: '12px', borderRadius: '10px', border: 'none', cursor: 'pointer',
-                            fontSize: '14px', fontWeight: '600', transition: 'all 0.2s',
-                            background: activeTab === tab.id ? 'rgba(239, 68, 68, 0.15)' : 'transparent',
-                            color: activeTab === tab.id ? '#fca5a5' : 'var(--text-muted)'
-                        }}>
-                        {tab.icon} {tab.label}
-                    </button>
-                ))}
-            </div>
+            {/* Tabs — animated pill */}
+            <LayoutGroup>
+                <div className="segmented-control" style={{ marginBottom: '24px', display: 'flex', flexWrap: 'wrap', width: '100%', justifyContent: 'space-evenly' }}>
+                    {[
+                        { id: 'overview', label: 'Overview', icon: <Activity size={14} /> },
+                        { id: 'users', label: 'Users', icon: <Users size={14} /> },
+                        { id: 'posts', label: 'Announcements', icon: <FileText size={14} /> },
+                        { id: 'logs', label: 'Audit Logs', icon: <Clock size={14} /> }
+                    ].map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`segmented-tab ${activeTab === tab.id ? 'active' : ''}`}
+                            style={{ flex: 1, justifyContent: 'center' }}
+                        >
+                            {activeTab === tab.id && (
+                                <motion.span
+                                    layoutId="admin-pill"
+                                    style={{
+                                        position: 'absolute', inset: 0,
+                                        background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+                                        borderRadius: '10px', zIndex: -1,
+                                        boxShadow: '0 8px 22px rgba(94, 210, 156, 0.3)'
+                                    }}
+                                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                                />
+                            )}
+                            {tab.icon} {tab.label}
+                        </button>
+                    ))}
+                </div>
+            </LayoutGroup>
 
             <AnimatePresence mode="wait">
                 {/* 1. OVERVIEW */}
                 {activeTab === 'overview' && (
-                    <motion.div key="overview" initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}}>
+                    <motion.div key="overview" initial={animReady ? { opacity:0, y:10 } : false} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}}>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '32px' }}>
-                            <div className="glass-panel" style={{ padding: '24px', textAlign: 'center' }}>
+                            <div className="editorial-panel" style={{ padding: '24px', textAlign: 'center' }}>
                                 <Users size={32} color="#8be8bc" style={{ margin: '0 auto 12px' }} />
                                 <h3 style={{ fontSize: '32px', fontWeight: '700', margin: '0 0 4px', color: 'white' }}>{users.length}</h3>
                                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, textTransform: 'uppercase' }}>Total Users</p>
                             </div>
-                            <div className="glass-panel" style={{ padding: '24px', textAlign: 'center' }}>
+                            <div className="editorial-panel" style={{ padding: '24px', textAlign: 'center' }}>
                                 <FileText size={32} color="#34d399" style={{ margin: '0 auto 12px' }} />
                                 <h3 style={{ fontSize: '32px', fontWeight: '700', margin: '0 0 4px', color: 'white' }}>{posts?.length || 0}</h3>
                                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, textTransform: 'uppercase' }}>Total Announcements</p>
                             </div>
-                            <div className="glass-panel" style={{ padding: '24px', textAlign: 'center' }}>
+                            <div className="editorial-panel" style={{ padding: '24px', textAlign: 'center' }}>
                                 <Activity size={32} color="#fcd34d" style={{ margin: '0 auto 12px' }} />
                                 <h3 style={{ fontSize: '32px', fontWeight: '700', margin: '0 0 4px', color: 'white' }}>{posts?.filter(p => p.status === 'Active')?.length || 0}</h3>
                                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, textTransform: 'uppercase' }}>Active Projects</p>
                             </div>
-                            <div className="glass-panel" style={{ padding: '24px', textAlign: 'center' }}>
+                            <div className="editorial-panel" style={{ padding: '24px', textAlign: 'center' }}>
                                 <Shield size={32} color="#fca5a5" style={{ margin: '0 auto 12px' }} />
                                 <h3 style={{ fontSize: '32px', fontWeight: '700', margin: '0 0 4px', color: 'white' }}>{logs.length}</h3>
                                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, textTransform: 'uppercase' }}>Monitored Events</p>
@@ -174,7 +194,7 @@ const AdminDashboard = ({ user, posts }) => {
 
                 {/* 2. USERS MANAGEMENT */}
                 {activeTab === 'users' && (
-                    <motion.div key="users" initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}} className="glass-panel" style={{ padding: '0', overflow: 'hidden' }}>
+                    <motion.div key="users" initial={animReady ? { opacity:0, y:10 } : false} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}} className="editorial-panel" style={{ padding: '0', overflow: 'hidden' }}>
                         <div style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                                 <thead>
@@ -222,7 +242,7 @@ const AdminDashboard = ({ user, posts }) => {
 
                 {/* 3. POSTS MANAGEMENT */}
                 {activeTab === 'posts' && (
-                    <motion.div key="posts" initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}} className="glass-panel" style={{ padding: '0', overflow: 'hidden' }}>
+                    <motion.div key="posts" initial={animReady ? { opacity:0, y:10 } : false} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}} className="editorial-panel" style={{ padding: '0', overflow: 'hidden' }}>
                         <div style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                                 <thead>
@@ -268,33 +288,32 @@ const AdminDashboard = ({ user, posts }) => {
 
                 {/* 4. AUDIT LOGS */}
                 {activeTab === 'logs' && (
-                    <motion.div key="logs" initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}}>
-                        <div className="glass-panel" style={{ padding: '20px', marginBottom: '20px' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '16px' }} className="items-center">
-                                <div style={{ position: 'relative' }}>
-                                    <Search size={18} style={{ position: 'absolute', top: '50%', left: '16px', transform: 'translateY(-50%)', color: 'var(--text-subtle)' }} />
-                                    <input type="text" placeholder="Search events..." className="input-field" style={{ paddingLeft: '48px', background: 'rgba(0,0,0,0.2)' }}
-                                        value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                    <motion.div key="logs" initial={animReady ? { opacity:0, y:10 } : false} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}}>
+                        <div className="editorial-panel" style={{ padding: '20px', marginBottom: '20px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '12px' }} className="items-center">
+                                <div className="portal-search" style={{ padding: '11px 16px' }}>
+                                    <Search size={16} color="var(--text-subtle)" />
+                                    <input type="text" placeholder="Search events…" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                                 </div>
-                                <select className="input-field" style={{ width: '160px', background: 'rgba(0,0,0,0.2)' }} value={filterRole} onChange={e => setFilterRole(e.target.value)}>
-                                    <option value="All">All Roles</option>
-                                    <option value="Admin">Admin</option>
-                                    <option value="Engineer">Engineer</option>
-                                    <option value="Healthcare Professional">Healthcare</option>
+                                <select className="filter-chip" style={{ width: '150px' }} value={filterRole} onChange={e => setFilterRole(e.target.value)}>
+                                    <option value="All" style={{ background: '#0a1210' }}>All Roles</option>
+                                    <option value="Admin" style={{ background: '#0a1210' }}>Admin</option>
+                                    <option value="Engineer" style={{ background: '#0a1210' }}>Engineer</option>
+                                    <option value="Healthcare Professional" style={{ background: '#0a1210' }}>Healthcare</option>
                                 </select>
-                                <select className="input-field" style={{ width: '160px', background: 'rgba(0,0,0,0.2)' }} value={filterAction} onChange={e => setFilterAction(e.target.value)}>
-                                    <option value="All">All Actions</option>
-                                    <option value="LOGIN">Logins</option>
-                                    <option value="POST">Posts</option>
-                                    <option value="MEETING">Meetings</option>
+                                <select className="filter-chip" style={{ width: '150px' }} value={filterAction} onChange={e => setFilterAction(e.target.value)}>
+                                    <option value="All" style={{ background: '#0a1210' }}>All Actions</option>
+                                    <option value="LOGIN" style={{ background: '#0a1210' }}>Logins</option>
+                                    <option value="POST" style={{ background: '#0a1210' }}>Posts</option>
+                                    <option value="MEETING" style={{ background: '#0a1210' }}>Meetings</option>
                                 </select>
-                                <button onClick={exportToCSV} className="btn btn-secondary" style={{ padding: '12px 20px', display: 'flex', gap: '8px' }}>
-                                    <Download size={16} /> Export CSV
-                                </button>
+                                <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }} onClick={exportToCSV} className="btn-lux-ghost" style={{ padding: '11px 16px', fontSize: '12.5px' }}>
+                                    <Download size={14} /> Export CSV
+                                </motion.button>
                             </div>
                         </div>
 
-                        <div className="glass-panel" style={{ padding: '0', overflow: 'hidden' }}>
+                        <div className="editorial-panel" style={{ padding: '0', overflow: 'hidden' }}>
                             {loading ? (
                                 <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading audit records...</div>
                             ) : filteredLogs.length === 0 ? (

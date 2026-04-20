@@ -5,7 +5,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, Briefcase, Calendar, CheckCircle2, ShieldAlert, Send, Video, LockKeyhole, FileText, UserCircle, Clock, X, Edit3, MessageSquare, Sparkles, ArrowUpRight } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAnimReady } from '../hooks/useAnimReady';
+import ReadingProgress from '../components/ReadingProgress';
+import { useToast } from '../hooks/useToast';
 const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingRequest, addInterest, respondToMeeting }) => {
+    const animReady = useAnimReady();
+    const toast = useToast();
     const { id } = useParams();
     const navigate = useNavigate();
     const post = posts.find((p) => p.id === id);
@@ -37,7 +42,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
         return (
             <div className="flex justify-center items-center" style={{ minHeight: '60vh' }}>
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={animReady ? {  opacity: 0, scale: 0.95  } : false}
                     animate={{ opacity: 1, scale: 1 }}
                     className="glass-panel"
                     style={{ padding: '64px', textAlign: 'center', width: '100%', maxWidth: '500px' }}
@@ -68,6 +73,9 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                     timestamp: new Date().toISOString()
                 });
             }
+            toast.success('The author has been notified of your interest.', {
+                title: 'Interest sent'
+            });
         }
     };
 
@@ -104,17 +112,19 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                 status: 'pending',
                 timestamp: new Date().toISOString()
             });
+            toast.success(`Proposed: ${selectedSlot.label}. Waiting for author confirmation.`, {
+                title: 'Meeting request sent'
+            });
         }
         setShowMeetingModal(false);
     };
 
-    const getStatusBadge = () => {
-        switch (post.status) {
-            case 'Active': return 'badge-primary';
-            case 'Meeting Scheduled': return 'badge-accent';
-            case 'CLOSED': return 'badge-success';
-            default: return 'badge-primary';
-        }
+    const handleRespondMeeting = (meetingId, decision) => {
+        respondToMeeting(post.id, meetingId, decision);
+        toast.success(
+            decision === 'accepted' ? 'Meeting confirmed — notify the other side externally.' : 'Meeting declined.',
+            { title: decision === 'accepted' ? 'Accepted' : 'Declined' }
+        );
     };
 
     const accentGradient = post.authorRole === 'Engineer'
@@ -122,172 +132,208 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
         : 'linear-gradient(135deg, var(--secondary), #34d399)';
 
     return (
-        <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '80px' }}>
+        <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', paddingBottom: '80px' }}>
+            <ReadingProgress />
 
             <motion.button
-                initial={{ opacity: 0, x: -10 }}
+                initial={animReady ? {  opacity: 0, x: -10  } : false}
                 animate={{ opacity: 1, x: 0 }}
+                whileHover={{ x: -2 }}
                 onClick={() => navigate('/dashboard')}
-                className="flex items-center gap-2 text-muted mb-8 font-medium"
-                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, transition: 'color 0.2s' }}
-                onMouseOver={(e) => e.target.style.color = 'var(--text-main)'}
+                className="flex items-center gap-2 text-muted mb-6 font-medium"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, transition: 'color 0.2s', fontSize: '13px', letterSpacing: '0.02em' }}
+                onMouseOver={(e) => e.target.style.color = '#8be8bc'}
                 onMouseOut={(e) => e.target.style.color = 'var(--text-muted)'}
             >
-                <ArrowLeft size={16} /> Return to Network
+                <ArrowLeft size={15} /> Return to Network
             </motion.button>
 
             <div className="post-detail-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) 1fr', gap: '24px', alignItems: 'start' }}>
 
                 {/* Main Content Pane */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={animReady ? {  opacity: 0, y: 20  } : false}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="glass-panel"
-                    style={{ position: 'relative', overflow: 'hidden', padding: '0' }}
+                    className="editorial-panel"
+                    style={{ padding: '40px 44px 36px' }}
                 >
-                    {/* Top accent */}
-                    <div style={{ height: '3px', width: '100%', background: accentGradient }} />
-
-                    <div style={{ padding: '36px 40px 32px' }}>
-                        <div className="flex gap-2 items-center mb-6 flex-wrap">
-                            <span className={`badge ${getStatusBadge()}`} style={{ padding: '7px 14px', fontSize: '11px' }}>
-                                <span className={`status-dot ${post.status === 'Active' ? 'status-dot-active' : post.status === 'Meeting Scheduled' ? 'status-dot-meeting' : 'status-dot-closed'}`}></span>
-                                {post.status === 'CLOSED' ? 'Partner Found' : post.status}
+                    <div className="flex gap-2 items-center mb-5" style={{ flexWrap: 'wrap' }}>
+                        <span className={`pill ${post.status === 'CLOSED' ? 'pill-neon' : post.status === 'Meeting Scheduled' ? 'pill-cyan' : 'pill-neon'}`}>
+                            {post.status === 'CLOSED' ? 'Partner Found' : post.status}
+                        </span>
+                        <span className="pill pill-dim">{post.domain}</span>
+                        <span className="pill pill-cyan">{post.authorRole}</span>
+                        {isConfidential && (
+                            <span className="pill pill-amber" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                <LockKeyhole size={10} /> Confidential
                             </span>
-                            <span className="badge badge-warning text-sm" style={{ textTransform: 'none', padding: '7px 14px', fontSize: '11px' }}>
-                                {post.domain}
-                            </span>
-                            <span className={`badge ${post.authorRole === 'Engineer' ? 'badge-primary' : 'badge-success'}`} style={{ padding: '7px 14px', fontSize: '11px' }}>
-                                {post.authorRole}
-                            </span>
-                            {isConfidential && (
-                                <span className="badge badge-error flex items-center gap-1" style={{ padding: '7px 14px', fontSize: '11px' }}>
-                                    <LockKeyhole size={11} /> Confidential
-                                </span>
-                            )}
-                        </div>
-
-                        <h1 style={{ fontSize: '32px', lineHeight: '1.25', marginBottom: '24px', letterSpacing: '-0.03em', fontFamily: 'var(--font-heading)' }}>{post.title}</h1>
-
-                        <div className="flex items-center gap-4 text-muted font-medium text-sm flex-wrap" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '28px' }}>
-                            {[
-                                { icon: <Briefcase size={14} />, text: `Stage: ${post.projectStage}`, capitalize: true },
-                                { icon: <MapPin size={14} />, text: `${post.city}, ${post.country}` },
-                                { icon: <Calendar size={14} />, text: `Posted: ${new Date(post.createdAt).toLocaleDateString()}` }
-                            ].map((item, i) => (
-                                <div key={i} className="flex items-center gap-2" style={{
-                                    background: 'var(--panel-light)', padding: '6px 14px', borderRadius: '10px',
-                                    fontSize: '13px', textTransform: item.capitalize ? 'capitalize' : 'none'
-                                }}>
-                                    {item.icon} {item.text}
-                                </div>
-                            ))}
-                            {post.expiryDate && (
-                                <div className="flex items-center gap-2" style={{ background: 'rgba(245, 158, 11, 0.06)', padding: '6px 14px', borderRadius: '10px', color: 'var(--badge-warning-text)', fontSize: '13px' }}>
-                                    <Clock size={14} /> Expires: {new Date(post.expiryDate).toLocaleDateString()}
-                                </div>
-                            )}
-                        </div>
-
-                        <section style={{ marginTop: '36px' }}>
-                            <h3 style={{ fontSize: '18px', marginBottom: '16px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '10px', fontFamily: 'var(--font-heading)' }}>
-                                <span style={{ color: 'var(--primary-light)', fontSize: '14px', fontWeight: '800' }}>//</span> Executive Overview
-                            </h3>
-                            <p style={{ fontSize: '16px', lineHeight: '1.85', color: 'var(--text-main)' }}>{post.explanation}</p>
-                        </section>
-
-                        {post.highLevelIdea && (
-                            <section style={{ marginTop: '40px' }}>
-                                <h3 style={{ fontSize: '18px', marginBottom: '16px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '10px', fontFamily: 'var(--font-heading)' }}>
-                                    <span style={{ color: 'var(--accent-light)', fontSize: '14px', fontWeight: '800' }}>//</span> Technical Blueprint
-                                </h3>
-
-                                {isConfidential && !isAuthor ? (
-                                    <div style={{ background: 'rgba(245, 158, 11, 0.04)', padding: '24px', borderRadius: '14px', borderLeft: '3px solid #f59e0b', border: '1px solid rgba(245, 158, 11, 0.08)', display: 'flex', gap: '16px' }}>
-                                        <LockKeyhole size={24} color="#fcd34d" style={{ flexShrink: 0, marginTop: '2px' }} />
-                                        <div>
-                                            <h4 style={{ color: 'var(--badge-warning-text)', fontSize: '15px', marginBottom: '4px', fontWeight: '600' }}>Information Restricted</h4>
-                                            <p style={{ color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.65', margin: 0 }}>This section is locked under NDA protocol. Express interest, sign the non-disclosure terms, and schedule a meeting to review details.</p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div style={{ background: 'rgba(34, 211, 238, 0.04)', border: '1px solid rgba(34, 211, 238, 0.12)', padding: '24px', borderRadius: '14px' }}>
-                                        <p style={{ fontSize: '15px', lineHeight: '1.85', color: 'var(--text-main)', margin: 0 }}>{post.highLevelIdea}</p>
-                                    </div>
-                                )}
-                            </section>
                         )}
-
-                        {/* Expertise Needed Section */}
-                        <section style={{ marginTop: '40px', marginBottom: '28px' }}>
-                            <h3 style={{ fontSize: '18px', marginBottom: '16px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '10px', fontFamily: 'var(--font-heading)' }}>
-                                <span style={{ color: 'var(--badge-success-text)', fontSize: '14px', fontWeight: '800' }}>//</span> Required Expertise
-                            </h3>
-                            <div style={{ background: 'rgba(16, 185, 129, 0.04)', border: '1px solid rgba(16, 185, 129, 0.1)', padding: '24px', borderRadius: '14px' }}>
-                                <p style={{ fontSize: '15px', lineHeight: '1.85', color: 'var(--text-main)', margin: 0 }}>{post.expertiseNeeded}</p>
-                            </div>
-                        </section>
                     </div>
+
+                    <h1 style={{
+                        fontSize: 'clamp(28px, 3.6vw, 44px)',
+                        lineHeight: '1.08',
+                        marginBottom: '24px',
+                        letterSpacing: '-0.035em',
+                        fontFamily: 'var(--font-heading)',
+                        fontWeight: '800'
+                    }}>
+                        {post.title}
+                    </h1>
+
+                    <div className="flex items-center gap-2 flex-wrap" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '28px' }}>
+                        {[
+                            { icon: <Briefcase size={12} />, text: `${post.projectStage}`, capitalize: true },
+                            { icon: <MapPin size={12} />, text: `${post.city}, ${post.country}` },
+                            { icon: <Calendar size={12} />, text: `${new Date(post.createdAt).toLocaleDateString()}` }
+                        ].map((item, i) => (
+                            <div key={i} className="flex items-center gap-1.5" style={{
+                                background: 'rgba(7, 11, 10, 0.5)',
+                                border: '1px solid rgba(255,255,255,0.05)',
+                                padding: '6px 12px', borderRadius: '9px',
+                                fontSize: '11.5px', color: 'var(--text-muted)',
+                                textTransform: item.capitalize ? 'capitalize' : 'none',
+                                letterSpacing: '0.01em', fontWeight: '500'
+                            }}>
+                                {item.icon} {item.text}
+                            </div>
+                        ))}
+                        {post.expiryDate && (
+                            <div className="flex items-center gap-1.5" style={{
+                                background: 'rgba(245, 158, 11, 0.06)',
+                                border: '1px solid rgba(245, 158, 11, 0.18)',
+                                padding: '6px 12px', borderRadius: '9px',
+                                color: '#fcd34d', fontSize: '11.5px', fontWeight: '500'
+                            }}>
+                                <Clock size={12} /> Expires: {new Date(post.expiryDate).toLocaleDateString()}
+                            </div>
+                        )}
+                    </div>
+
+                    <section style={{ marginTop: '32px' }}>
+                        <span className="editorial-eyebrow" style={{ marginBottom: '14px' }}>
+                            <Sparkles size={11} /> Executive Overview
+                        </span>
+                        <p style={{ fontSize: '16px', lineHeight: '1.85', color: 'var(--text-main)', letterSpacing: '-0.005em' }}>
+                            {post.explanation}
+                        </p>
+                    </section>
+
+                    {post.highLevelIdea && (
+                        <section style={{ marginTop: '36px' }}>
+                            <span className="editorial-eyebrow cyan" style={{ marginBottom: '14px' }}>
+                                <FileText size={11} /> Technical Blueprint
+                            </span>
+
+                            {isConfidential && !isAuthor ? (
+                                <div style={{
+                                    background: 'rgba(245, 158, 11, 0.04)',
+                                    padding: '20px 22px', borderRadius: '16px',
+                                    border: '1px solid rgba(245, 158, 11, 0.18)',
+                                    display: 'flex', gap: '16px'
+                                }}>
+                                    <LockKeyhole size={20} color="#fcd34d" style={{ flexShrink: 0, marginTop: '2px' }} />
+                                    <div>
+                                        <h4 style={{ color: '#fcd34d', fontSize: '14px', marginBottom: '4px', fontWeight: '700', letterSpacing: '-0.01em' }}>Information Restricted</h4>
+                                        <p style={{ color: 'var(--text-muted)', fontSize: '13.5px', lineHeight: '1.7', margin: 0 }}>
+                                            This section is locked under NDA protocol. Express interest, sign the non-disclosure terms, and schedule a meeting to review details.
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div style={{
+                                    background: 'rgba(34, 211, 238, 0.04)',
+                                    border: '1px solid rgba(34, 211, 238, 0.14)',
+                                    padding: '22px 24px', borderRadius: '16px'
+                                }}>
+                                    <p style={{ fontSize: '15px', lineHeight: '1.85', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.005em' }}>
+                                        {post.highLevelIdea}
+                                    </p>
+                                </div>
+                            )}
+                        </section>
+                    )}
+
+                    {/* Expertise Needed Section */}
+                    <section style={{ marginTop: '36px', marginBottom: '4px' }}>
+                        <span className="editorial-eyebrow" style={{ marginBottom: '14px' }}>
+                            <CheckCircle2 size={11} /> Required Expertise
+                        </span>
+                        <div style={{
+                            background: 'rgba(94, 210, 156, 0.04)',
+                            border: '1px solid rgba(94, 210, 156, 0.14)',
+                            padding: '22px 24px', borderRadius: '16px'
+                        }}>
+                            <p style={{ fontSize: '15px', lineHeight: '1.85', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.005em' }}>
+                                {post.expertiseNeeded}
+                            </p>
+                        </div>
+                    </section>
                 </motion.div>
 
                 {/* Sidebar / Interaction Panel */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={animReady ? {  opacity: 0, y: 20  } : false}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.1 }}
-                        className="glass-panel"
-                        style={{ padding: '28px' }}
+                        className="editorial-panel"
+                        style={{ padding: '28px 30px' }}
                     >
-                        <h3 style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-subtle)', borderBottom: '1px solid var(--border)', paddingBottom: '14px', marginBottom: '20px' }}>
-                            Target Counterparty
-                        </h3>
+                        <span className="editorial-eyebrow cyan" style={{ marginBottom: '18px' }}>
+                            <UserCircle size={11} /> Target Counterparty
+                        </span>
 
-                        <div className="flex items-center gap-4 mb-6 text-sm">
+                        <div className="flex items-center gap-3 mb-5">
                             <div style={{
-                                width: '40px', height: '40px', borderRadius: '12px',
-                                background: post.authorRole === 'Engineer' ? 'rgba(16,185,129,0.08)' : 'rgba(94, 210, 156,0.08)',
+                                width: '42px', height: '42px', borderRadius: '13px',
+                                background: 'rgba(34, 211, 238, 0.1)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                border: `1px solid ${post.authorRole === 'Engineer' ? 'rgba(16,185,129,0.15)' : 'rgba(94, 210, 156,0.15)'}`
+                                border: '1px solid rgba(34, 211, 238, 0.25)',
+                                flexShrink: 0
                             }}>
-                                <UserCircle size={22} color={post.authorRole === 'Engineer' ? 'var(--secondary)' : 'var(--primary-light)'} />
+                                <UserCircle size={22} color="#67e8f9" />
                             </div>
-                            <div>
-                                <span className="text-muted block font-medium" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Required Role</span>
-                                <span style={{ fontWeight: '700', fontSize: '14px', color: post.authorRole === 'Engineer' ? '#6ee7b7' : '#a5b4fc' }}>
+                            <div style={{ minWidth: 0 }}>
+                                <span className="input-lux-label" style={{ marginBottom: '3px' }}>Required Role</span>
+                                <span style={{ fontWeight: '700', fontSize: '14px', color: '#67e8f9', letterSpacing: '-0.01em' }}>
                                     {post.authorRole === 'Engineer' ? 'Healthcare Professional' : 'Engineering Expert'}
                                 </span>
                             </div>
                         </div>
 
-                        <div style={{ background: 'var(--panel-light)', borderRadius: '12px', padding: '16px', border: '1px solid var(--border)' }}>
-                            <div className="mb-4">
-                                <span className="text-xs text-muted block mb-1 font-semibold" style={{ textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.06em' }}>Collaboration Type</span>
-                                <span className="font-semibold text-sm" style={{ textTransform: 'capitalize' }}>{post.commitmentLevel}</span>
+                        <div style={{
+                            background: 'rgba(7, 11, 10, 0.5)',
+                            borderRadius: '14px', padding: '18px',
+                            border: '1px solid rgba(255,255,255,0.05)'
+                        }}>
+                            <div className="mb-3">
+                                <span className="input-lux-label" style={{ marginBottom: '4px' }}>Collaboration Type</span>
+                                <span className="font-semibold" style={{ textTransform: 'capitalize', fontSize: '13.5px', color: 'var(--text-main)', letterSpacing: '-0.01em' }}>{post.commitmentLevel}</span>
                             </div>
                             <div>
-                                <span className="text-xs text-muted block mb-1 font-semibold" style={{ textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.06em' }}>Data Sharing Level</span>
-                                <span className="font-semibold text-sm" style={{ color: isConfidential ? '#fca5a5' : '#6ee7b7' }}>
+                                <span className="input-lux-label" style={{ marginBottom: '4px' }}>Data Sharing Level</span>
+                                <span className="font-semibold" style={{ fontSize: '13.5px', color: isConfidential ? '#fca5a5' : '#8be8bc', letterSpacing: '-0.01em' }}>
                                     {isConfidential ? 'NDA Required' : 'Public Information'}
                                 </span>
                             </div>
                         </div>
 
                         {/* Workflow Action Container */}
-                        <div style={{ marginTop: '24px', borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
+                        <div style={{ marginTop: '24px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px' }}>
 
                             {/* Author actions */}
                             {isAuthor && post.status !== 'CLOSED' && (
                                 <div className="flex-col gap-3">
-                                    <p className="text-xs text-muted text-center" style={{ lineHeight: '1.6' }}>You can close this announcement when a partner is found.</p>
-                                    <button onClick={() => updatePostStatus(post.id, 'CLOSED')} className="btn btn-success" style={{ width: '100%', padding: '12px', borderRadius: '12px' }}>
-                                        <CheckCircle2 size={16} /> Partner Found (Close)
-                                    </button>
-                                    <button onClick={() => { setEditTitle(post.title); setEditDescription(post.explanation); setShowEditModal(true); }} className="btn btn-secondary" style={{ width: '100%', padding: '12px', borderRadius: '12px' }}>
-                                        <Edit3 size={16} /> Edit Announcement
-                                    </button>
+                                    <p className="text-xs text-muted text-center" style={{ lineHeight: '1.6' }}>Close this announcement when a partner is found.</p>
+                                    <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }} onClick={() => { updatePostStatus(post.id, 'CLOSED'); toast.success('Announcement closed — partner found.', { title: 'Closed' }); }} className="btn-lux" style={{ width: '100%', padding: '13px', justifyContent: 'center' }}>
+                                        <CheckCircle2 size={15} /> Partner Found (Close)
+                                    </motion.button>
+                                    <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }} onClick={() => { setEditTitle(post.title); setEditDescription(post.explanation); setShowEditModal(true); }} className="btn-lux-ghost" style={{ width: '100%', padding: '13px', justifyContent: 'center' }}>
+                                        <Edit3 size={15} /> Edit Announcement
+                                    </motion.button>
                                     
                                     {post.meetings && post.meetings.filter(m => m.status === 'pending').length > 0 && (
                                         <div style={{ marginTop: '16px' }}>
@@ -299,8 +345,8 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                                                         <span style={{ color: 'var(--badge-primary-text)', fontSize: '13px' }}>📅 {m.slot?.label}</span>
                                                     </div>
                                                     <div className="flex gap-2">
-                                                        <button onClick={() => respondToMeeting(post.id, m.id, 'accepted')} className="btn btn-success" style={{ padding: '8px 12px', fontSize: '12px', flex: 1 }}>Accept</button>
-                                                        <button onClick={() => respondToMeeting(post.id, m.id, 'declined')} className="btn btn-secondary" style={{ padding: '8px 12px', fontSize: '12px', flex: 1, color: 'var(--badge-error-text)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>Decline</button>
+                                                        <button onClick={() => handleRespondMeeting(m.id, 'accepted')} className="btn btn-success" style={{ padding: '8px 12px', fontSize: '12px', flex: 1 }}>Accept</button>
+                                                        <button onClick={() => handleRespondMeeting(m.id, 'declined')} className="btn btn-secondary" style={{ padding: '8px 12px', fontSize: '12px', flex: 1, color: 'var(--badge-error-text)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>Decline</button>
                                                     </div>
                                                 </div>
                                             ))}
@@ -312,9 +358,9 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                             {/* Step 1: Express Interest */}
                             {canExpressInterest && derivedWorkflowState === 'initial' && (
                                 <div className="flex-col gap-3">
-                                    <button id="express-interest-btn" onClick={() => setShowNda(true)} className="btn btn-accent" style={{ width: '100%', padding: '16px', fontSize: '15px', borderRadius: '14px', boxShadow: '0 6px 20px rgba(94, 210, 156,0.25)' }}>
-                                        <Send size={18} /> Express Interest
-                                    </button>
+                                    <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }} id="express-interest-btn" onClick={() => setShowNda(true)} className="btn-lux btn-announce" style={{ width: '100%', padding: '15px', fontSize: '14px', justifyContent: 'center' }}>
+                                        <Send size={17} /> Express Interest
+                                    </motion.button>
                                     <p className="text-xs text-muted text-center" style={{ lineHeight: '1.5' }}>
                                         NDA acceptance required before contact
                                     </p>
@@ -324,7 +370,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                             {/* Step 2: Interest Sent */}
                             {derivedWorkflowState === 'interested' && (
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    initial={animReady ? {  opacity: 0, scale: 0.95  } : false}
                                     animate={{ opacity: 1, scale: 1 }}
                                     style={{ background: 'rgba(16, 185, 129, 0.06)', border: '1px solid rgba(16, 185, 129, 0.12)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
                                 >
@@ -340,7 +386,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                             {/* Step 3: Meeting Requested */}
                             {derivedWorkflowState === 'meeting-requested' && (
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    initial={animReady ? {  opacity: 0, scale: 0.95  } : false}
                                     animate={{ opacity: 1, scale: 1 }}
                                     style={{ background: 'rgba(94, 210, 156, 0.06)', border: '1px solid rgba(94, 210, 156, 0.12)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
                                 >
@@ -358,7 +404,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                             {/* Meeting Declined */}
                             {derivedWorkflowState === 'declined' && (
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    initial={animReady ? {  opacity: 0, scale: 0.95  } : false}
                                     animate={{ opacity: 1, scale: 1 }}
                                     style={{ background: 'rgba(239, 68, 68, 0.06)', border: '1px solid rgba(239, 68, 68, 0.15)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
                                 >
@@ -376,7 +422,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                             {/* Step 4: Meeting confirmed */}
                             {derivedWorkflowState === 'scheduled' && (
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    initial={animReady ? {  opacity: 0, scale: 0.95  } : false}
                                     animate={{ opacity: 1, scale: 1 }}
                                     style={{ background: 'rgba(34, 211, 238, 0.06)', border: '1px solid rgba(34, 211, 238, 0.15)', padding: '20px', borderRadius: '14px', textAlign: 'center' }}
                                 >
@@ -411,49 +457,56 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
 
                     {/* Author Info Card */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={animReady ? {  opacity: 0, y: 20  } : false}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
-                        className="glass-panel"
-                        style={{ padding: '24px' }}
+                        className="editorial-panel"
+                        style={{ padding: '24px 26px' }}
                     >
-                        <h4 style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '16px' }}>Posted By</h4>
-                        <div className="flex items-center gap-4">
-                            <div style={{
-                                width: '44px', height: '44px', borderRadius: '14px',
-                                background: accentGradient,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '18px', fontWeight: '700', color: 'white',
-                                boxShadow: '0 6px 16px rgba(0,0,0,0.3)'
-                            }}>
+                        <span className="editorial-eyebrow" style={{ marginBottom: '14px' }}>
+                            <UserCircle size={11} /> Posted By
+                        </span>
+                        <div className="flex items-center gap-3">
+                            <motion.div
+                                whileHover={{ scale: 1.06, rotate: 4 }}
+                                style={{
+                                    width: '42px', height: '42px', borderRadius: '13px',
+                                    background: accentGradient,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: '17px', fontWeight: '800', color: '#070b0a',
+                                    boxShadow: '0 8px 22px rgba(94, 210, 156, 0.3)'
+                                }}
+                            >
                                 {post.authorName.charAt(0)}
-                            </div>
-                            <div>
-                                <div style={{ fontSize: '15px', fontWeight: '600' }}>{post.authorName}</div>
-                                <div style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>{post.authorRole}</div>
+                            </motion.div>
+                            <div style={{ minWidth: 0 }}>
+                                <div style={{ fontSize: '14px', fontWeight: '600', letterSpacing: '-0.01em' }}>{post.authorName}</div>
+                                <div style={{ fontSize: '11.5px', color: 'var(--text-subtle)', letterSpacing: '0.02em' }}>{post.authorRole}</div>
                             </div>
                             {!isAuthor && (
-                                <button 
+                                <motion.button
+                                    whileHover={{ scale: 1.04, y: -1 }}
+                                    whileTap={{ scale: 0.96 }}
                                     onClick={() => navigate('/chat', { state: { recipient: { id: post.authorId, name: post.authorName, role: post.authorRole } } })}
                                     style={{
                                         marginLeft: 'auto',
-                                        background: 'var(--panel-lighter)',
-                                        border: '1px solid var(--border)',
-                                        color: '#fff',
-                                        padding: '8px 12px',
+                                        background: 'rgba(94, 210, 156, 0.08)',
+                                        border: '1px solid rgba(94, 210, 156, 0.22)',
+                                        color: '#8be8bc',
+                                        padding: '8px 13px',
                                         borderRadius: '10px',
                                         cursor: 'pointer',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '6px',
-                                        fontSize: '13px',
-                                        transition: 'all 0.2s'
+                                        gap: '5px',
+                                        fontSize: '12px',
+                                        fontWeight: '600',
+                                        letterSpacing: '0.02em',
+                                        transition: 'background 0.2s, border-color 0.2s'
                                     }}
-                                    onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'; e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'; }}
-                                    onMouseOut={(e) => { e.currentTarget.style.background = 'var(--surface-hover)'; e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'; }}
                                 >
-                                    <MessageSquare size={14} /> Message
-                                </button>
+                                    <MessageSquare size={13} /> Message
+                                </motion.button>
                             )}
                         </div>
                     </motion.div>
@@ -470,7 +523,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                         {showNda && (
                             <div className="modal-overlay">
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                                    initial={animReady ? {  opacity: 0, scale: 0.92, y: 20  } : false}
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.92, y: 20 }}
                                     className="glass-panel modal-content"
@@ -560,7 +613,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                         {showMeetingModal && (
                             <div className="modal-overlay">
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                                    initial={animReady ? {  opacity: 0, scale: 0.92, y: 20  } : false}
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.92, y: 20 }}
                                     className="glass-panel modal-content"
@@ -633,7 +686,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                         {showEditModal && (
                             <div className="modal-overlay">
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                                    initial={animReady ? {  opacity: 0, scale: 0.92, y: 20  } : false}
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.92, y: 20 }}
                                     className="glass-panel modal-content"
@@ -653,7 +706,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
 
                                     {editSaved && (
                                         <motion.div
-                                            initial={{ opacity: 0, y: -8 }}
+                                            initial={animReady ? {  opacity: 0, y: -8  } : false}
                                             animate={{ opacity: 1, y: 0 }}
                                             style={{
                                                 background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)',

@@ -7,6 +7,12 @@
     <meta name="description" content="HEALTH AI — European HealthTech Co-Creation & Innovation Platform. Connect healthcare professionals with engineers for structured, GDPR-compliant collaboration." />
     <meta name="keywords" content="health tech, innovation, co-creation, medical, engineering, collaboration, GDPR" />
     <title>HEALTH AI — Co-Creation & Innovation Platform</title>
+    <script>
+      // Snap the first paint: suppress CSS animations/transitions until React
+      // mounts and lifts this class. Prevents the "big whole-page fade-in"
+      // that happens on hard refresh.
+      document.documentElement.classList.add('no-anim-initial');
+    </script>
   </head>
   <body>
     <div id="root"></div>

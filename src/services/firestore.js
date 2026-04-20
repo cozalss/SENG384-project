@@ -86,6 +86,15 @@ export const addUserToFirestore = async (user) => {
     return user;
 };
 
+export const deleteUserFromFirestore = async (userId) => {
+    try {
+        await deleteDoc(doc(db, "users", userId));
+    } catch (err) {
+        console.error("Error deleting user:", err);
+        throw err;
+    }
+};
+
 export const updateUserInFirestore = async (userId, updatedFields) => {
     const docRef = doc(db, "users", userId);
     await updateDoc(docRef, updatedFields);
