@@ -42,7 +42,7 @@ const Login = ({ login }) => {
         const parts = email.split('@');
         if (parts.length !== 2) return false;
         const domain = parts[1];
-        return domain.includes('.edu');
+        return /\.edu(\.[a-z]{2})?$/i.test(domain);
     };
 
     const isPersonalEmail = (email) => {
@@ -57,14 +57,16 @@ const Login = ({ login }) => {
 
         const normalizedEmail = formData.email ? formData.email.trim().toLowerCase() : '';
 
-        if (isPersonalEmail(normalizedEmail)) {
-            setError('Personal email providers (Gmail, Yahoo, Outlook, etc.) are not permitted. Only institutional .edu addresses are accepted.');
-            return;
-        }
+        if (mode === 'register') {
+            if (isPersonalEmail(normalizedEmail)) {
+                setError('Personal email providers (Gmail, Yahoo, Outlook, etc.) are not permitted. Only institutional .edu addresses are accepted.');
+                return;
+            }
 
-        if (!validateEduEmail(normalizedEmail)) {
-            setError('Registration requires a verified institutional .edu email address.');
-            return;
+            if (!validateEduEmail(normalizedEmail)) {
+                setError('Registration requires a verified institutional .edu email address.');
+                return;
+            }
         }
 
         if (!normalizedEmail || !formData.password) {
