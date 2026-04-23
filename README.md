@@ -34,6 +34,16 @@
 
 <br/>
 
+<!-- 🔥 LIVE SITE CTA — tek tıkla kutucuk -->
+<a href="https://de27omk8jz7if.cloudfront.net/" target="_blank" rel="noopener noreferrer">
+  <img src="https://img.shields.io/badge/%F0%9F%9A%80%20%20LAUNCH%20LIVE%20APP-%20Open%20HEALTH%20AI%20%E2%86%92-22d3ee?style=for-the-badge&labelColor=0b1220&logo=googlechrome&logoColor=white" height="56" alt="Launch HEALTH AI — Live Site" />
+</a>
+
+<br/>
+<sub>🔗 <a href="https://de27omk8jz7if.cloudfront.net/"><code>de27omk8jz7if.cloudfront.net</code></a> &nbsp;·&nbsp; <i>deployed on AWS S3 + CloudFront</i></sub>
+
+<br/><br/>
+
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%"/>
 </div>
 
