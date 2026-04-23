@@ -11,7 +11,11 @@ import {
     onSnapshot,
     addDoc,
     serverTimestamp,
-    orderBy
+    orderBy,
+    arrayUnion,
+    arrayRemove,
+    runTransaction,
+    increment,
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -59,6 +63,81 @@ export const subscribeToPostsRT = (callback) => {
     return onSnapshot(postsRef, (snapshot) => {
         const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         callback(posts);
+    });
+};
+
+// ==================== POST INTERESTS (subcollection) ====================
+// Stored under /posts/{postId}/interests/{interestId}. Prevents the post
+// document from growing past the 1MB limit on popular posts and allows
+// atomic counter updates.
+
+export const addInterestToSubcol = async (postId, interest) => {
+    const postDocRef = doc(db, "posts", postId);
+    const interestsSub = collection(postDocRef, "interests");
+    const interestId = interest.id || `int-${interest.userId}-${Date.now()}`;
+    const interestDocRef = doc(interestsSub, interestId);
+
+    const payload = {
+        ...interest,
+        id: interestId,
+        createdAt: serverTimestamp(),
+    };
+
+    await runTransaction(db, async (tx) => {
+        tx.set(interestDocRef, payload);
+        tx.update(postDocRef, { interestCount: increment(1) });
+    });
+
+    return { ...payload, createdAt: new Date().toISOString() };
+};
+
+export const subscribeToPostInterests = (postId, callback) => {
+    const interestsSub = collection(db, "posts", postId, "interests");
+    return onSnapshot(interestsSub, (snap) => {
+        const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        callback(items);
+    }, (err) => {
+        console.error(`Interest subscription error (${postId}):`, err);
+    });
+};
+
+// ==================== POST MEETINGS (subcollection) ====================
+
+export const addMeetingToSubcol = async (postId, meeting) => {
+    const postDocRef = doc(db, "posts", postId);
+    const meetingsSub = collection(postDocRef, "meetings");
+    const meetingId = meeting.id || `meet-${meeting.proposedBy}-${Date.now()}`;
+    const meetingDocRef = doc(meetingsSub, meetingId);
+
+    const payload = {
+        ...meeting,
+        id: meetingId,
+        createdAt: serverTimestamp(),
+    };
+
+    await runTransaction(db, async (tx) => {
+        tx.set(meetingDocRef, payload);
+        tx.update(postDocRef, {
+            meetingCount: increment(1),
+            status: "Meeting Scheduled",
+        });
+    });
+
+    return { ...payload, createdAt: new Date().toISOString() };
+};
+
+export const updateMeetingStatus = async (postId, meetingId, newStatus) => {
+    const meetingDocRef = doc(db, "posts", postId, "meetings", meetingId);
+    await updateDoc(meetingDocRef, { status: newStatus });
+};
+
+export const subscribeToPostMeetings = (postId, callback) => {
+    const meetingsSub = collection(db, "posts", postId, "meetings");
+    return onSnapshot(meetingsSub, (snap) => {
+        const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        callback(items);
+    }, (err) => {
+        console.error(`Meeting subscription error (${postId}):`, err);
     });
 };
 
@@ -330,5 +409,8 @@ export const deleteConversation = async (convoId) => {
     const convoDocRef = doc(db, "conversations", convoId);
     await deleteDoc(convoDocRef);
 };
+
+export { arrayUnion, arrayRemove };
+
 
 

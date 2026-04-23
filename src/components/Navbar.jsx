@@ -66,7 +66,7 @@ const Navbar = ({ user, logout, notifications, dismissNotification, dismissAllNo
                                 style={{
                                     background: 'linear-gradient(135deg, var(--primary), var(--accent))',
                                     padding: '7px', borderRadius: '11px',
-                                    boxShadow: '0 6px 18px rgba(94, 210, 156, 0.4), inset 0 1px 0 rgba(255,255,255,0.25)',
+                                    boxShadow: '0 6px 18px rgba(96, 165, 250, 0.4), inset 0 1px 0 rgba(255,255,255,0.25)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center'
                                 }}
                             >
@@ -120,7 +120,7 @@ const Navbar = ({ user, logout, notifications, dismissNotification, dismissAllNo
                                                         position: 'absolute', inset: 0,
                                                         background: 'linear-gradient(135deg, var(--primary), var(--accent))',
                                                         borderRadius: '9px', zIndex: -1,
-                                                        boxShadow: '0 6px 18px rgba(94, 210, 156, 0.35)'
+                                                        boxShadow: '0 6px 18px rgba(96, 165, 250, 0.35)'
                                                     }}
                                                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                                                 />

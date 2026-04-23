@@ -18,8 +18,8 @@ export const mockPosts = [
         createdAt: "2026-02-20T10:00:00Z",
         expiryDate: "2026-06-20T10:00:00Z",
         highLevelIdea: "We use a novel transformer architecture on 12-lead ECG data. Need clinical insights to avoid false positives.",
-        interests: [],
-        meetings: []
+        interestCount: 0,
+        meetingCount: 0
     },
     {
         id: "post-2",
@@ -40,8 +40,8 @@ export const mockPosts = [
         createdAt: "2026-02-25T14:30:00Z",
         expiryDate: "2026-08-25T14:30:00Z",
         highLevelIdea: "Details discussed in meeting only.",
-        interests: [],
-        meetings: []
+        interestCount: 0,
+        meetingCount: 0
     },
     {
         id: "post-3",
@@ -62,8 +62,8 @@ export const mockPosts = [
         createdAt: "2026-01-15T09:12:00Z",
         expiryDate: "2026-05-15T09:12:00Z",
         highLevelIdea: "Details discussed in meeting only.",
-        interests: [],
-        meetings: []
+        interestCount: 0,
+        meetingCount: 0
     },
     {
         id: "post-4",
@@ -84,8 +84,8 @@ export const mockPosts = [
         createdAt: "2026-02-18T08:00:00Z",
         expiryDate: "2026-07-18T08:00:00Z",
         highLevelIdea: "Transformer-based model fine-tuned on MIMIC-CXR dataset with custom attention heads for structured reporting.",
-        interests: [],
-        meetings: []
+        interestCount: 0,
+        meetingCount: 0
     },
     {
         id: "post-5",
@@ -106,8 +106,8 @@ export const mockPosts = [
         createdAt: "2026-02-26T11:00:00Z",
         expiryDate: "2026-09-26T11:00:00Z",
         highLevelIdea: "Open architecture approach — simulation engine takes genotype + vitals as input, outputs personalized loading dose suggestions.",
-        interests: [],
-        meetings: []
+        interestCount: 0,
+        meetingCount: 0
     },
     {
         id: "post-6",
@@ -128,8 +128,8 @@ export const mockPosts = [
         createdAt: "2026-02-22T09:00:00Z",
         expiryDate: "2026-06-22T09:00:00Z",
         highLevelIdea: "Details discussed in meeting only.",
-        interests: [],
-        meetings: []
+        interestCount: 0,
+        meetingCount: 0
     }
 ];
 

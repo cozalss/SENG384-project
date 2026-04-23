@@ -112,7 +112,7 @@ const ShortcutsModal = () => {
                             zIndex: 9999,
                             overflow: 'hidden',
                             padding: 0,
-                            boxShadow: '0 50px 120px rgba(0, 0, 0, 0.6), 0 0 100px rgba(94, 210, 156, 0.14)'
+                            boxShadow: '0 50px 120px rgba(0, 0, 0, 0.6), 0 0 100px rgba(96, 165, 250, 0.14)'
                         }}
                     >
                         <div style={{
@@ -123,7 +123,7 @@ const ShortcutsModal = () => {
                             background: 'rgba(7, 11, 10, 0.4)'
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <Keyboard size={17} color="#8be8bc" />
+                                <Keyboard size={17} color="#93c5fd" />
                                 <h3 style={{
                                     fontSize: '15px', fontWeight: '700',
                                     letterSpacing: '-0.01em', fontFamily: 'var(--font-heading)'

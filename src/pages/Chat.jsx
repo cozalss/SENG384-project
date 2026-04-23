@@ -94,12 +94,12 @@ const Chat = ({ user }) => {
               <h2>Messages</h2>
               <div className="sidebar-actions">
                 <motion.button 
-                  whileHover={{ scale: 1.1, backgroundColor: 'rgba(94, 210, 156, 0.2)' }}
+                  whileHover={{ scale: 1.1, backgroundColor: 'rgba(96, 165, 250, 0.2)' }}
                   whileTap={{ scale: 0.9 }}
                   className="icon-btn new-chat-btn"
                   onClick={() => setShowUserList(!showUserList)}
                 >
-                  <MessageSquare size={20} color="#5ed29c" />
+                  <MessageSquare size={20} color="#60a5fa" />
                 </motion.button>
               </div>
             </div>
@@ -293,7 +293,7 @@ const Chat = ({ user }) => {
                         animate={{ rotate: 360 }}
                         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                       >
-                        <Sparkles size={24} color="#5ed29c" />
+                        <Sparkles size={24} color="#60a5fa" />
                       </motion.div>
                       <p>Loading messages...</p>
                     </div>

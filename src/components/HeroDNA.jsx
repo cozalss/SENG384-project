@@ -342,8 +342,24 @@ const HeroDNA = ({ isMobile }) => {
         // ─── ANIMATION ───
         const clock = new THREE.Clock();
         let animationFrameId;
+        let paused = typeof document !== 'undefined' && document.hidden;
+
+        const handleVisibility = () => {
+            const shouldPause = document.hidden;
+            if (shouldPause === paused) return;
+            paused = shouldPause;
+            if (paused) {
+                cancelAnimationFrame(animationFrameId);
+                clock.stop();
+            } else {
+                clock.start();
+                animate();
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibility);
 
         const animate = () => {
+            if (paused) return;
             animationFrameId = requestAnimationFrame(animate);
             const elapsed = clock.getElapsedTime();
 
@@ -408,6 +424,7 @@ const HeroDNA = ({ isMobile }) => {
 
         return () => {
             cancelAnimationFrame(animationFrameId);
+            document.removeEventListener('visibilitychange', handleVisibility);
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('resize', handleResize);

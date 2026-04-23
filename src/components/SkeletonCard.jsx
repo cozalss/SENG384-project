@@ -7,7 +7,7 @@ const bar = (w = '100%', h = 12) => ({
     height: h,
     borderRadius: '6px',
     background: 'rgba(255, 255, 255, 0.04)',
-    backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(94, 210, 156, 0.06) 50%, rgba(255,255,255,0.02) 100%)',
+    backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(96, 165, 250, 0.06) 50%, rgba(255,255,255,0.02) 100%)',
     backgroundSize: '200% 100%',
     ...pulse
 });
@@ -30,7 +30,7 @@ const SkeletonCard = () => {
                 borderRadius: '18px',
                 minHeight: '160px',
                 background: 'rgba(255, 255, 255, 0.02)',
-                backgroundImage: 'linear-gradient(135deg, rgba(94, 210, 156, 0.06), rgba(34, 211, 238, 0.03))',
+                backgroundImage: 'linear-gradient(135deg, rgba(96, 165, 250, 0.06), rgba(34, 211, 238, 0.03))',
                 ...pulse
             }} />
 

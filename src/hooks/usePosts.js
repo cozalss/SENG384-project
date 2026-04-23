@@ -4,7 +4,10 @@ import {
   subscribeToPostsRT,
   addPostToFirestore,
   updatePostInFirestore,
-  addActivityLog
+  addActivityLog,
+  addInterestToSubcol,
+  addMeetingToSubcol,
+  updateMeetingStatus,
 } from '../services/firestore';
 import emailjs from '@emailjs/browser';
 
@@ -52,20 +55,30 @@ export function usePosts(user, addNotification) {
     };
   }, [addNotification]);
 
-  // Automatic post expiry check (FR-13)
+  // Automatic post expiry check (FR-13).
+  // Runs when the realtime post list arrives, and afterwards every 5 minutes
+  // to pick up posts that have crossed their expiry while the tab stayed open.
+  // (Previously ran every 60s on every posts-array change, which fired far
+  // more Firestore writes than needed — see audit.)
   useEffect(() => {
+    let cancelled = false;
     const checkExpiry = () => {
-      const now = new Date();
+      if (cancelled) return;
+      const now = Date.now();
       posts.forEach(p => {
-        if (p.status === 'Active' && p.expiryDate && new Date(p.expiryDate) < now) {
+        if (p.status === 'Active' && p.expiryDate && new Date(p.expiryDate).getTime() < now) {
           updatePostInFirestore(p.id, { status: 'Expired' });
         }
       });
     };
     checkExpiry();
-    const interval = setInterval(checkExpiry, 60000);
-    return () => clearInterval(interval);
-  }, [posts]);
+    const interval = setInterval(checkExpiry, 5 * 60 * 1000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [posts.length]);
 
   const addPost = async (newPost, isDraft = false) => {
     if (!user) return;
@@ -79,8 +92,11 @@ export function usePosts(user, addNotification) {
       authorName: user.name,
       authorRole: user.role,
       authorEmail: user.email,
-      interests: [],
-      meetings: []
+      // Denormalized counters — actual entries live in /posts/{postId}/interests
+      // and /posts/{postId}/meetings subcollections. Keeps the parent doc small
+      // and avoids the 1MB Firestore document limit on popular posts.
+      interestCount: 0,
+      meetingCount: 0,
     };
 
     await addPostToFirestore(postWithId);
@@ -157,11 +173,9 @@ export function usePosts(user, addNotification) {
   const addInterest = async (postId, interest) => {
     if (!user) return;
     const post = posts.find(p => p.id === postId);
-    if (post) {
-      await updatePostInFirestore(postId, {
-        interests: [...(post.interests || []), interest]
-      });
-    }
+    if (!post) return;
+
+    await addInterestToSubcol(postId, interest);
 
     addNotification({
       type: 'interest',
@@ -191,11 +205,7 @@ export function usePosts(user, addNotification) {
     const authorName = post.authorName;
     const postTitle = post.title;
 
-    const meetingWithId = { ...meeting, id: `meet-${Date.now()}` };
-    await updatePostInFirestore(postId, {
-      meetings: [...(post.meetings || []), meetingWithId],
-      status: 'Meeting Scheduled'
-    });
+    await addMeetingToSubcol(postId, meeting);
 
     // EmailJS Integration
     if (authorEmail && import.meta.env.VITE_EMAILJS_SERVICE_ID) {
@@ -204,7 +214,7 @@ export function usePosts(user, addNotification) {
           project_title: postTitle,
           to_name: authorName,
           from_name: user.name,
-          name: user.name, // Added for completeness
+          name: user.name,
           to_email: authorEmail,
           from_email: user.email,
           meeting_slot: meeting.slot?.label || 'Not specified'
@@ -244,12 +254,8 @@ export function usePosts(user, addNotification) {
     if (!user) return;
     const post = posts.find(p => p.id === postId);
     if (!post) return;
-    
-    const updatedMeetings = (post.meetings || []).map(m => 
-      m.id === meetingId ? { ...m, status } : m
-    );
 
-    await updatePostInFirestore(postId, { meetings: updatedMeetings });
+    await updateMeetingStatus(postId, meetingId, status);
 
     addNotification({
       type: status === 'accepted' ? 'meeting-accepted' : 'meeting-declined',

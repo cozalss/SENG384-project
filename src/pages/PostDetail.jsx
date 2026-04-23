@@ -1,13 +1,42 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Briefcase, Calendar, CheckCircle2, ShieldAlert, Send, Video, LockKeyhole, FileText, UserCircle, Clock, X, Edit3, MessageSquare, Sparkles, ArrowUpRight } from 'lucide-react';
+import {
+    ArrowLeft, MapPin, Briefcase, Calendar, CheckCircle2,
+    LockKeyhole, FileText, Clock, Sparkles,
+} from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useAnimReady } from '../hooks/useAnimReady';
-import ReadingProgress from '../components/ReadingProgress';
 import { useToast } from '../hooks/useToast';
+import { usePostEngagement } from '../hooks/usePostEngagement';
+
+import NDAModal from './PostDetailParts/NDAModal';
+import MeetingSlotsModal from './PostDetailParts/MeetingSlotsModal';
+import EditPostModal from './PostDetailParts/EditPostModal';
+import AuthorCard from './PostDetailParts/AuthorCard';
+import WorkflowActionPanel from './PostDetailParts/WorkflowActionPanel';
+
+const generateTimeSlots = () => {
+    const slots = [];
+    const now = new Date();
+    for (let d = 1; d <= 5; d++) {
+        const date = new Date(now);
+        date.setDate(date.getDate() + d);
+        if (date.getDay() === 0 || date.getDay() === 6) continue;
+        for (const hour of [10, 14, 16]) {
+            const slotDate = new Date(date);
+            slotDate.setHours(hour, 0, 0, 0);
+            slots.push({
+                id: `slot-${d}-${hour}`,
+                date: slotDate,
+                label: `${slotDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at ${hour}:00`,
+            });
+        }
+    }
+    return slots;
+};
+
 const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingRequest, addInterest, respondToMeeting }) => {
     const animReady = useAnimReady();
     const toast = useToast();
@@ -26,8 +55,20 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
     const [editDescription, setEditDescription] = useState('');
     const [editSaved, setEditSaved] = useState(false);
 
-    const myInterest = post?.interests?.find(i => i.userId === user?.id);
-    const myMeeting = post?.meetings?.find(m => m.proposedBy === user?.id);
+    const isAuthor = user?.id === post?.authorId;
+    // Subcollection-backed real-time engagement. Falls back to legacy arrays
+    // if a post still has the old inline shape (mock data, pre-migration rows).
+    const { interests: liveInterests, meetings: liveMeetings } = usePostEngagement(post?.id);
+    const legacyInterests = Array.isArray(post?.interests) ? post.interests : [];
+    const legacyMeetings = Array.isArray(post?.meetings) ? post.meetings : [];
+    const interests = liveInterests.length ? liveInterests : legacyInterests;
+    const meetings = liveMeetings.length ? liveMeetings : legacyMeetings;
+
+    const myInterest = interests.find(i => i && i.userId === user?.id);
+    const myMeeting = meetings.find(m => m && (
+        m.proposedBy === user?.id ||
+        (isAuthor && m.status === 'accepted')
+    ));
 
     let derivedWorkflowState = 'initial';
     if (myMeeting) {
@@ -42,7 +83,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
         return (
             <div className="flex justify-center items-center" style={{ minHeight: '60vh' }}>
                 <motion.div
-                    initial={animReady ? {  opacity: 0, scale: 0.95  } : false}
+                    initial={animReady ? { opacity: 0, scale: 0.95 } : false}
                     animate={{ opacity: 1, scale: 1 }}
                     className="glass-panel"
                     style={{ padding: '64px', textAlign: 'center', width: '100%', maxWidth: '500px' }}
@@ -58,44 +99,22 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
         );
     }
 
-    const isAuthor = user?.id === post.authorId;
     const canExpressInterest = !isAuthor && user?.role !== post.authorRole && post.status === 'Active';
     const isConfidential = post.confidentiality === 'meeting-only';
+    const pendingMeetings = meetings.filter(m => m && m.status === 'pending');
 
     const submitInterest = () => {
-        if (acceptedNda) {
-            setShowNda(false);
-            if (addInterest) {
-                addInterest(post.id, {
-                    userId: user?.id,
-                    userName: user?.name,
-                    message: interestMessage || 'Interested in your project.',
-                    timestamp: new Date().toISOString()
-                });
-            }
-            toast.success('The author has been notified of your interest.', {
-                title: 'Interest sent'
+        if (!acceptedNda) return;
+        setShowNda(false);
+        if (addInterest) {
+            addInterest(post.id, {
+                userId: user?.id,
+                userName: user?.name,
+                message: interestMessage || 'Interested in your project.',
+                timestamp: new Date().toISOString(),
             });
         }
-    };
-
-    const generateTimeSlots = () => {
-        const slots = [];
-        const now = new Date();
-        for (let d = 1; d <= 5; d++) {
-            const date = new Date(now);
-            date.setDate(date.getDate() + d);
-            if (date.getDay() === 0 || date.getDay() === 6) continue;
-            for (const hour of [10, 14, 16]) {
-                date.setHours(hour, 0, 0, 0);
-                slots.push({
-                    id: `slot-${d}-${hour}`,
-                    date: new Date(date),
-                    label: `${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at ${hour}:00`
-                });
-            }
-        }
-        return slots;
+        toast.success('The author has been notified of your interest.', { title: 'Interest sent' });
     };
 
     const handleProposeMeeting = () => {
@@ -110,10 +129,10 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                 proposedByName: user?.name,
                 slot: selectedSlot,
                 status: 'pending',
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
             });
             toast.success(`Proposed: ${selectedSlot.label}. Waiting for author confirmation.`, {
-                title: 'Meeting request sent'
+                title: 'Meeting request sent',
             });
         }
         setShowMeetingModal(false);
@@ -127,32 +146,46 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
         );
     };
 
+    const handleClosePost = () => {
+        updatePostStatus(post.id, 'CLOSED');
+        toast.success('Announcement closed — partner found.', { title: 'Closed' });
+    };
+
+    const handleOpenEdit = () => {
+        setEditTitle(post.title);
+        setEditDescription(post.explanation);
+        setShowEditModal(true);
+    };
+
+    const handleSaveEdit = () => {
+        if (updatePost) {
+            updatePost(post.id, { title: editTitle, explanation: editDescription });
+        }
+        setEditSaved(true);
+    };
+
     const accentGradient = post.authorRole === 'Engineer'
         ? 'linear-gradient(135deg, var(--primary), var(--accent))'
         : 'linear-gradient(135deg, var(--secondary), #34d399)';
 
     return (
         <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', paddingBottom: '80px' }}>
-            <ReadingProgress />
-
             <motion.button
-                initial={animReady ? {  opacity: 0, x: -10  } : false}
+                initial={animReady ? { opacity: 0, x: -10 } : false}
                 animate={{ opacity: 1, x: 0 }}
                 whileHover={{ x: -2 }}
                 onClick={() => navigate('/dashboard')}
                 className="flex items-center gap-2 text-muted mb-6 font-medium"
                 style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, transition: 'color 0.2s', fontSize: '13px', letterSpacing: '0.02em' }}
-                onMouseOver={(e) => e.target.style.color = '#8be8bc'}
+                onMouseOver={(e) => e.target.style.color = '#93c5fd'}
                 onMouseOut={(e) => e.target.style.color = 'var(--text-muted)'}
             >
                 <ArrowLeft size={15} /> Return to Network
             </motion.button>
 
             <div className="post-detail-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) 1fr', gap: '24px', alignItems: 'start' }}>
-
-                {/* Main Content Pane */}
                 <motion.div
-                    initial={animReady ? {  opacity: 0, y: 20  } : false}
+                    initial={animReady ? { opacity: 0, y: 20 } : false}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                     className="editorial-panel"
@@ -160,10 +193,10 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                 >
                     <div className="flex gap-2 items-center mb-5" style={{ flexWrap: 'wrap' }}>
                         <span className={`pill ${post.status === 'CLOSED' ? 'pill-neon' : post.status === 'Meeting Scheduled' ? 'pill-cyan' : 'pill-neon'}`}>
-                            {post.status === 'CLOSED' ? 'Partner Found' : post.status}
+                            {post.status === 'CLOSED' ? 'Partner Found' : (post.status || 'Active')}
                         </span>
-                        <span className="pill pill-dim">{post.domain}</span>
-                        <span className="pill pill-cyan">{post.authorRole}</span>
+                        {post.domain && <span className="pill pill-dim">{post.domain}</span>}
+                        {post.authorRole && <span className="pill pill-cyan">{post.authorRole}</span>}
                         {isConfidential && (
                             <span className="pill pill-amber" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                                 <LockKeyhole size={10} /> Confidential
@@ -177,24 +210,27 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                         marginBottom: '24px',
                         letterSpacing: '-0.035em',
                         fontFamily: 'var(--font-heading)',
-                        fontWeight: '800'
+                        fontWeight: '800',
                     }}>
-                        {post.title}
+                        {post.title || 'Untitled announcement'}
                     </h1>
 
                     <div className="flex items-center gap-2 flex-wrap" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '28px' }}>
                         {[
-                            { icon: <Briefcase size={12} />, text: `${post.projectStage}`, capitalize: true },
-                            { icon: <MapPin size={12} />, text: `${post.city}, ${post.country}` },
-                            { icon: <Calendar size={12} />, text: `${new Date(post.createdAt).toLocaleDateString()}` }
-                        ].map((item, i) => (
+                            post.projectStage && { icon: <Briefcase size={12} />, text: post.projectStage, capitalize: true },
+                            (post.city || post.country) && { icon: <MapPin size={12} />, text: [post.city, post.country].filter(Boolean).join(', ') },
+                            post.createdAt && { icon: <Calendar size={12} />, text: (() => {
+                                const d = new Date(post.createdAt);
+                                return isNaN(d.getTime()) ? '—' : d.toLocaleDateString();
+                            })() },
+                        ].filter(Boolean).map((item, i) => (
                             <div key={i} className="flex items-center gap-1.5" style={{
                                 background: 'rgba(7, 11, 10, 0.5)',
                                 border: '1px solid rgba(255,255,255,0.05)',
                                 padding: '6px 12px', borderRadius: '9px',
                                 fontSize: '11.5px', color: 'var(--text-muted)',
                                 textTransform: item.capitalize ? 'capitalize' : 'none',
-                                letterSpacing: '0.01em', fontWeight: '500'
+                                letterSpacing: '0.01em', fontWeight: '500',
                             }}>
                                 {item.icon} {item.text}
                             </div>
@@ -204,7 +240,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                                 background: 'rgba(245, 158, 11, 0.06)',
                                 border: '1px solid rgba(245, 158, 11, 0.18)',
                                 padding: '6px 12px', borderRadius: '9px',
-                                color: '#fcd34d', fontSize: '11.5px', fontWeight: '500'
+                                color: '#fcd34d', fontSize: '11.5px', fontWeight: '500',
                             }}>
                                 <Clock size={12} /> Expires: {new Date(post.expiryDate).toLocaleDateString()}
                             </div>
@@ -231,7 +267,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                                     background: 'rgba(245, 158, 11, 0.04)',
                                     padding: '20px 22px', borderRadius: '16px',
                                     border: '1px solid rgba(245, 158, 11, 0.18)',
-                                    display: 'flex', gap: '16px'
+                                    display: 'flex', gap: '16px',
                                 }}>
                                     <LockKeyhole size={20} color="#fcd34d" style={{ flexShrink: 0, marginTop: '2px' }} />
                                     <div>
@@ -245,7 +281,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                                 <div style={{
                                     background: 'rgba(34, 211, 238, 0.04)',
                                     border: '1px solid rgba(34, 211, 238, 0.14)',
-                                    padding: '22px 24px', borderRadius: '16px'
+                                    padding: '22px 24px', borderRadius: '16px',
                                 }}>
                                     <p style={{ fontSize: '15px', lineHeight: '1.85', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.005em' }}>
                                         {post.highLevelIdea}
@@ -255,15 +291,14 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                         </section>
                     )}
 
-                    {/* Expertise Needed Section */}
                     <section style={{ marginTop: '36px', marginBottom: '4px' }}>
                         <span className="editorial-eyebrow" style={{ marginBottom: '14px' }}>
                             <CheckCircle2 size={11} /> Required Expertise
                         </span>
                         <div style={{
-                            background: 'rgba(94, 210, 156, 0.04)',
-                            border: '1px solid rgba(94, 210, 156, 0.14)',
-                            padding: '22px 24px', borderRadius: '16px'
+                            background: 'rgba(96, 165, 250, 0.04)',
+                            border: '1px solid rgba(96, 165, 250, 0.14)',
+                            padding: '22px 24px', borderRadius: '16px',
                         }}>
                             <p style={{ fontSize: '15px', lineHeight: '1.85', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.005em' }}>
                                 {post.expertiseNeeded}
@@ -272,484 +307,60 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                     </section>
                 </motion.div>
 
-                {/* Sidebar / Interaction Panel */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <WorkflowActionPanel
+                        post={post}
+                        isAuthor={isAuthor}
+                        isConfidential={isConfidential}
+                        canExpressInterest={canExpressInterest}
+                        derivedWorkflowState={derivedWorkflowState}
+                        myMeeting={myMeeting}
+                        selectedSlot={selectedSlot}
+                        pendingMeetings={pendingMeetings}
+                        onClosePost={handleClosePost}
+                        onOpenEdit={handleOpenEdit}
+                        onRespondMeeting={handleRespondMeeting}
+                        onOpenNda={() => setShowNda(true)}
+                        onProposeMeeting={handleProposeMeeting}
+                    />
 
-                    <motion.div
-                        initial={animReady ? {  opacity: 0, y: 20  } : false}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.1 }}
-                        className="editorial-panel"
-                        style={{ padding: '28px 30px' }}
-                    >
-                        <span className="editorial-eyebrow cyan" style={{ marginBottom: '18px' }}>
-                            <UserCircle size={11} /> Target Counterparty
-                        </span>
-
-                        <div className="flex items-center gap-3 mb-5">
-                            <div style={{
-                                width: '42px', height: '42px', borderRadius: '13px',
-                                background: 'rgba(34, 211, 238, 0.1)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                border: '1px solid rgba(34, 211, 238, 0.25)',
-                                flexShrink: 0
-                            }}>
-                                <UserCircle size={22} color="#67e8f9" />
-                            </div>
-                            <div style={{ minWidth: 0 }}>
-                                <span className="input-lux-label" style={{ marginBottom: '3px' }}>Required Role</span>
-                                <span style={{ fontWeight: '700', fontSize: '14px', color: '#67e8f9', letterSpacing: '-0.01em' }}>
-                                    {post.authorRole === 'Engineer' ? 'Healthcare Professional' : 'Engineering Expert'}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div style={{
-                            background: 'rgba(7, 11, 10, 0.5)',
-                            borderRadius: '14px', padding: '18px',
-                            border: '1px solid rgba(255,255,255,0.05)'
-                        }}>
-                            <div className="mb-3">
-                                <span className="input-lux-label" style={{ marginBottom: '4px' }}>Collaboration Type</span>
-                                <span className="font-semibold" style={{ textTransform: 'capitalize', fontSize: '13.5px', color: 'var(--text-main)', letterSpacing: '-0.01em' }}>{post.commitmentLevel}</span>
-                            </div>
-                            <div>
-                                <span className="input-lux-label" style={{ marginBottom: '4px' }}>Data Sharing Level</span>
-                                <span className="font-semibold" style={{ fontSize: '13.5px', color: isConfidential ? '#fca5a5' : '#8be8bc', letterSpacing: '-0.01em' }}>
-                                    {isConfidential ? 'NDA Required' : 'Public Information'}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Workflow Action Container */}
-                        <div style={{ marginTop: '24px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px' }}>
-
-                            {/* Author actions */}
-                            {isAuthor && post.status !== 'CLOSED' && (
-                                <div className="flex-col gap-3">
-                                    <p className="text-xs text-muted text-center" style={{ lineHeight: '1.6' }}>Close this announcement when a partner is found.</p>
-                                    <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }} onClick={() => { updatePostStatus(post.id, 'CLOSED'); toast.success('Announcement closed — partner found.', { title: 'Closed' }); }} className="btn-lux" style={{ width: '100%', padding: '13px', justifyContent: 'center' }}>
-                                        <CheckCircle2 size={15} /> Partner Found (Close)
-                                    </motion.button>
-                                    <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }} onClick={() => { setEditTitle(post.title); setEditDescription(post.explanation); setShowEditModal(true); }} className="btn-lux-ghost" style={{ width: '100%', padding: '13px', justifyContent: 'center' }}>
-                                        <Edit3 size={15} /> Edit Announcement
-                                    </motion.button>
-                                    
-                                    {post.meetings && post.meetings.filter(m => m.status === 'pending').length > 0 && (
-                                        <div style={{ marginTop: '16px' }}>
-                                            <h4 style={{ fontSize: '13px', color: 'var(--text-main)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pending Requests</h4>
-                                            {post.meetings.filter(m => m.status === 'pending').map(m => (
-                                                <div key={m.id} style={{ background: 'var(--panel-lighter)', padding: '16px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border)' }}>
-                                                    <div style={{ fontSize: '14px', marginBottom: '12px', lineHeight: '1.4' }}>
-                                                        <strong style={{ color: 'var(--primary-light)' }}>{m.proposedByName}</strong> requested meeting slot:<br/>
-                                                        <span style={{ color: 'var(--badge-primary-text)', fontSize: '13px' }}>📅 {m.slot?.label}</span>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <button onClick={() => handleRespondMeeting(m.id, 'accepted')} className="btn btn-success" style={{ padding: '8px 12px', fontSize: '12px', flex: 1 }}>Accept</button>
-                                                        <button onClick={() => handleRespondMeeting(m.id, 'declined')} className="btn btn-secondary" style={{ padding: '8px 12px', fontSize: '12px', flex: 1, color: 'var(--badge-error-text)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>Decline</button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* Step 1: Express Interest */}
-                            {canExpressInterest && derivedWorkflowState === 'initial' && (
-                                <div className="flex-col gap-3">
-                                    <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }} id="express-interest-btn" onClick={() => setShowNda(true)} className="btn-lux btn-announce" style={{ width: '100%', padding: '15px', fontSize: '14px', justifyContent: 'center' }}>
-                                        <Send size={17} /> Express Interest
-                                    </motion.button>
-                                    <p className="text-xs text-muted text-center" style={{ lineHeight: '1.5' }}>
-                                        NDA acceptance required before contact
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Step 2: Interest Sent */}
-                            {derivedWorkflowState === 'interested' && (
-                                <motion.div
-                                    initial={animReady ? {  opacity: 0, scale: 0.95  } : false}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    style={{ background: 'rgba(16, 185, 129, 0.06)', border: '1px solid rgba(16, 185, 129, 0.12)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
-                                >
-                                    <CheckCircle2 color="#34d399" size={28} style={{ margin: '0 auto 12px' }} />
-                                    <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--badge-success-text)', fontWeight: '600' }}>Interest Expressed</h3>
-                                    <p className="text-muted text-xs mb-4" style={{ lineHeight: '1.6' }}>The author has been notified. Propose available time slots for an external meeting.</p>
-                                    <button onClick={handleProposeMeeting} className="btn btn-primary" style={{ width: '100%', fontSize: '14px', padding: '12px', borderRadius: '12px' }}>
-                                        <Calendar size={16} /> Propose Meeting Times
-                                    </button>
-                                </motion.div>
-                            )}
-
-                            {/* Step 3: Meeting Requested */}
-                            {derivedWorkflowState === 'meeting-requested' && (
-                                <motion.div
-                                    initial={animReady ? {  opacity: 0, scale: 0.95  } : false}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    style={{ background: 'rgba(94, 210, 156, 0.06)', border: '1px solid rgba(94, 210, 156, 0.12)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
-                                >
-                                    <Clock color="#8be8bc" size={28} style={{ margin: '0 auto 12px' }} />
-                                    <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--badge-primary-text)', fontWeight: '600' }}>Meeting Request Sent</h3>
-                                    <p className="text-muted text-xs mb-4" style={{ lineHeight: '1.6' }}>
-                                        Waiting for the author to accept your proposed time slot. You will be notified once confirmed.
-                                    </p>
-                                    <div style={{ background: 'var(--panel-base)', padding: '12px', borderRadius: '10px', fontSize: '13px', color: 'var(--badge-primary-text)', marginBottom: '12px' }}>
-                                        📅 {myMeeting?.slot?.label || selectedSlot?.label || 'Slot selected'}
-                                    </div>
-                                </motion.div>
-                            )}
-                            
-                            {/* Meeting Declined */}
-                            {derivedWorkflowState === 'declined' && (
-                                <motion.div
-                                    initial={animReady ? {  opacity: 0, scale: 0.95  } : false}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    style={{ background: 'rgba(239, 68, 68, 0.06)', border: '1px solid rgba(239, 68, 68, 0.15)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
-                                >
-                                    <X color="#fca5a5" size={28} style={{ margin: '0 auto 12px' }} />
-                                    <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--badge-error-text)', fontWeight: '600' }}>Meeting Declined</h3>
-                                    <p className="text-muted text-xs mb-4" style={{ lineHeight: '1.6' }}>
-                                        The author has declined your proposed meeting time. 
-                                    </p>
-                                    <button onClick={handleProposeMeeting} className="btn btn-primary" style={{ width: '100%', fontSize: '14px', padding: '12px', borderRadius: '12px' }}>
-                                        <Calendar size={16} /> Propose New Time
-                                    </button>
-                                </motion.div>
-                            )}
-
-                            {/* Step 4: Meeting confirmed */}
-                            {derivedWorkflowState === 'scheduled' && (
-                                <motion.div
-                                    initial={animReady ? {  opacity: 0, scale: 0.95  } : false}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    style={{ background: 'rgba(34, 211, 238, 0.06)', border: '1px solid rgba(34, 211, 238, 0.15)', padding: '20px', borderRadius: '14px', textAlign: 'center' }}
-                                >
-                                    <div className="flex items-center justify-center gap-2 mb-2">
-                                        <Video color="#67e8f9" size={20} />
-                                        <h3 style={{ fontSize: '15px', color: 'var(--badge-accent-text)', margin: 0, fontWeight: '600' }}>Meeting Confirmed</h3>
-                                    </div>
-                                    <p className="text-muted text-xs mb-4" style={{ margin: 0, lineHeight: '1.6' }}>
-                                        Meet externally via Zoom/Teams. No recordings stored on platform.
-                                    </p>
-                                    <div style={{ background: 'var(--panel-base)', padding: '12px', borderRadius: '10px', fontSize: '13px', color: 'var(--badge-accent-text)', marginBottom: '12px' }}>
-                                        📅 {myMeeting?.slot?.label || selectedSlot?.label || 'Confirmed slot'}
-                                    </div>
-                                    <a href="https://zoom.us" target="_blank" rel="noreferrer" className="btn btn-accent" style={{ width: '100%', fontSize: '14px', padding: '12px', textDecoration: 'none', borderRadius: '12px' }}>
-                                        <Video size={16} /> Open External Meeting
-                                    </a>
-                                </motion.div>
-                            )}
-
-                            {post.status === 'CLOSED' && (
-                                <div style={{ background: 'var(--panel-light)', padding: '20px', borderRadius: '14px', textAlign: 'center', border: '1px solid var(--border)' }}>
-                                    <div className="flex items-center justify-center gap-2 mb-2">
-                                        <CheckCircle2 size={18} color="var(--secondary)" />
-                                        <h3 style={{ fontSize: '15px', margin: 0, fontWeight: '600', color: 'var(--badge-success-text)' }}>Partner Found</h3>
-                                    </div>
-                                    <p className="text-muted text-xs" style={{ margin: 0 }}>This announcement has been closed successfully.</p>
-                                </div>
-                            )}
-                        </div>
-
-                    </motion.div>
-
-                    {/* Author Info Card */}
-                    <motion.div
-                        initial={animReady ? {  opacity: 0, y: 20  } : false}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                        className="editorial-panel"
-                        style={{ padding: '24px 26px' }}
-                    >
-                        <span className="editorial-eyebrow" style={{ marginBottom: '14px' }}>
-                            <UserCircle size={11} /> Posted By
-                        </span>
-                        <div className="flex items-center gap-3">
-                            <motion.div
-                                whileHover={{ scale: 1.06, rotate: 4 }}
-                                style={{
-                                    width: '42px', height: '42px', borderRadius: '13px',
-                                    background: accentGradient,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: '17px', fontWeight: '800', color: '#070b0a',
-                                    boxShadow: '0 8px 22px rgba(94, 210, 156, 0.3)'
-                                }}
-                            >
-                                {post.authorName.charAt(0)}
-                            </motion.div>
-                            <div style={{ minWidth: 0 }}>
-                                <div style={{ fontSize: '14px', fontWeight: '600', letterSpacing: '-0.01em' }}>{post.authorName}</div>
-                                <div style={{ fontSize: '11.5px', color: 'var(--text-subtle)', letterSpacing: '0.02em' }}>{post.authorRole}</div>
-                            </div>
-                            {!isAuthor && (
-                                <motion.button
-                                    whileHover={{ scale: 1.04, y: -1 }}
-                                    whileTap={{ scale: 0.96 }}
-                                    onClick={() => navigate('/chat', { state: { recipient: { id: post.authorId, name: post.authorName, role: post.authorRole } } })}
-                                    style={{
-                                        marginLeft: 'auto',
-                                        background: 'rgba(94, 210, 156, 0.08)',
-                                        border: '1px solid rgba(94, 210, 156, 0.22)',
-                                        color: '#8be8bc',
-                                        padding: '8px 13px',
-                                        borderRadius: '10px',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '5px',
-                                        fontSize: '12px',
-                                        fontWeight: '600',
-                                        letterSpacing: '0.02em',
-                                        transition: 'background 0.2s, border-color 0.2s'
-                                    }}
-                                >
-                                    <MessageSquare size={13} /> Message
-                                </motion.button>
-                            )}
-                        </div>
-                    </motion.div>
+                    <AuthorCard post={post} isAuthor={isAuthor} accentGradient={accentGradient} />
                 </div>
             </div>
 
-
-
-            {/* Portal-rendered Modals to escape PageTransition transform/filter constraints */}
             {typeof document !== 'undefined' && createPortal(
                 <>
-                    {/* NDA Modal */}
-                    <AnimatePresence>
-                        {showNda && (
-                            <div className="modal-overlay">
-                                <motion.div
-                                    initial={animReady ? {  opacity: 0, scale: 0.92, y: 20  } : false}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.92, y: 20 }}
-                                    className="glass-panel modal-content"
-                                    style={{ borderRadius: '24px', maxWidth: '580px', margin: 'auto' }}
-                                >
-                                    <div className="flex items-center gap-4 mb-8" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
-                                        <div style={{ background: 'rgba(239, 68, 68, 0.12)', padding: '12px', borderRadius: '16px', boxShadow: '0 0 20px rgba(239, 68, 68, 0.1)' }}>
-                                            <ShieldAlert color="var(--error)" size={32} />
-                                        </div>
-                                        <div style={{ flex: 1 }}>
-                                            <h2 style={{ fontSize: '22px', fontWeight: '800', margin: 0, letterSpacing: '-0.02em', fontFamily: 'var(--font-heading)' }}>Non-Disclosure Agreement</h2>
-                                            <div style={{ fontSize: '13px', color: 'var(--text-subtle)', marginTop: '4px' }}>Standard IP Protection Protocol</div>
-                                        </div>
-                                        <button onClick={() => setShowNda(false)} className="btn-icon">
-                                            <X size={20} />
-                                        </button>
-                                    </div>
-
-                                    <div style={{
-                                        background: 'var(--panel-light)',
-                                        padding: '20px',
-                                        borderRadius: '16px',
-                                        border: '1px solid var(--border)',
-                                        marginBottom: '28px'
-                                    }}>
-                                        <p style={{ fontSize: '15px', color: 'var(--text-main)', lineHeight: '1.75', margin: 0 }}>
-                                            By proceeding, you agree to protect all intellectual property, conceptual schematics, and clinical methodologies shared during the collaboration process. No data extraction is authorized prior to formal documentation.
-                                        </p>
-                                    </div>
-
-                                    <div className="flex-col gap-3 mb-8">
-                                        <label className="text-sm font-semibold flex items-center gap-2 mb-1" style={{ color: 'var(--text-muted)' }}>
-                                            <MessageSquare size={14} /> Short Message (Optional)
-                                        </label>
-                                        <textarea
-                                            className="input-field"
-                                            style={{ minHeight: '100px', resize: 'vertical', borderRadius: '16px' }}
-                                            placeholder="Introduce yourself and explain why this project interests you..."
-                                            value={interestMessage}
-                                            onChange={(e) => setInterestMessage(e.target.value)}
-                                        />
-                                    </div>
-
-                                    <motion.div
-                                        whileTap={{ scale: 0.98 }}
-                                        className="flex items-start gap-4 mb-10"
-                                        style={{
-                                            background: acceptedNda ? 'rgba(94, 210, 156, 0.08)' : 'var(--background-alt)',
-                                            padding: '24px',
-                                            borderRadius: '18px',
-                                            border: '1px solid',
-                                            borderColor: acceptedNda ? 'rgba(94, 210, 156, 0.3)' : 'rgba(255,255,255,0.06)',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.3s ease'
-                                        }}
-                                        onClick={() => setAcceptedNda(!acceptedNda)}
-                                    >
-                                        <div style={{
-                                            width: '26px', height: '26px', borderRadius: '8px',
-                                            border: '2px solid',
-                                            borderColor: acceptedNda ? 'var(--primary)' : 'var(--text-subtle)',
-                                            background: acceptedNda ? 'var(--primary)' : 'transparent',
-                                            flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            transition: 'all 0.25s', marginTop: '2px',
-                                            boxShadow: acceptedNda ? '0 0 15px rgba(94, 210, 156, 0.4)' : 'none'
-                                        }}>
-                                            {acceptedNda && <CheckCircle2 size={16} color="white" strokeWidth={3} />}
-                                        </div>
-                                        <div style={{ fontSize: '14px', color: acceptedNda ? 'var(--text-main)' : 'var(--text-muted)', userSelect: 'none', lineHeight: '1.6', fontWeight: acceptedNda ? '600' : '400' }}>
-                                            I accept the Non-Disclosure Agreement and understand that all shared information is confidential.
-                                        </div>
-                                    </motion.div>
-
-                                    <div className="flex justify-end gap-4">
-                                        <button className="btn btn-secondary" onClick={() => setShowNda(false)} style={{ padding: '14px 28px', borderRadius: '14px' }}>Cancel</button>
-                                        <button className="btn btn-accent" disabled={!acceptedNda} onClick={submitInterest} style={{ padding: '14px 36px', borderRadius: '14px' }}>
-                                            Accept & Express Interest <Send size={18} />
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* Meeting Time Slot Modal */}
-                    <AnimatePresence>
-                        {showMeetingModal && (
-                            <div className="modal-overlay">
-                                <motion.div
-                                    initial={animReady ? {  opacity: 0, scale: 0.92, y: 20  } : false}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.92, y: 20 }}
-                                    className="glass-panel modal-content"
-                                    style={{ maxWidth: '650px', borderRadius: '24px', margin: 'auto' }}
-                                >
-                                    <div className="flex items-center gap-4 mb-8" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
-                                        <div style={{ background: 'rgba(94, 210, 156, 0.12)', padding: '12px', borderRadius: '16px', boxShadow: '0 0 20px rgba(94, 210, 156, 0.1)' }}>
-                                            <Calendar color="var(--primary-light)" size={32} />
-                                        </div>
-                                        <div style={{ flex: 1 }}>
-                                            <h2 style={{ fontSize: '22px', fontWeight: '800', margin: 0, fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}>Propose Meeting Times</h2>
-                                            <div style={{ fontSize: '13px', color: 'var(--text-subtle)', marginTop: '4px' }}>Select a preferred slot for external collaboration</div>
-                                        </div>
-                                        <button onClick={() => setShowMeetingModal(false)} className="btn-icon">
-                                            <X size={20} />
-                                        </button>
-                                    </div>
-
-                                    <div style={{
-                                        background: 'rgba(16, 185, 129, 0.05)',
-                                        padding: '16px 20px',
-                                        borderRadius: '14px',
-                                        border: '1px solid rgba(16, 185, 129, 0.12)',
-                                        marginBottom: '32px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '12px'
-                                    }}>
-                                        <Video size={18} color="var(--secondary)" />
-                                        <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: 0, lineHeight: '1.5' }}>
-                                            Meetings take place via Zoom / Teams. No data is stored on platform.
-                                        </p>
-                                    </div>
-
-                                    <div style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-                                        gap: '12px',
-                                        marginBottom: '40px',
-                                        padding: '4px'
-                                    }}>
-                                        {proposedSlots.map(slot => (
-                                            <motion.div
-                                                key={slot.id}
-                                                whileHover={{ y: -4, scale: 1.02 }}
-                                                whileTap={{ scale: 0.98 }}
-                                                className={`time-slot ${selectedSlot?.id === slot.id ? 'time-slot-selected' : ''}`}
-                                                style={{ padding: '16px', height: 'auto', display: 'flex', flexDirection: 'column', gap: '4px' }}
-                                                onClick={() => setSelectedSlot(slot)}
-                                            >
-                                                <div style={{ fontSize: '13px', fontWeight: '700' }}>{slot.label.split(' at ')[0]}</div>
-                                                <div style={{ fontSize: '11px', opacity: 0.7 }}>{slot.label.split(' at ')[1]}</div>
-                                            </motion.div>
-                                        ))}
-                                    </div>
-
-                                    <div className="flex justify-end gap-4">
-                                        <button className="btn btn-secondary" onClick={() => setShowMeetingModal(false)} style={{ padding: '14px 28px', borderRadius: '14px' }}>Cancel</button>
-                                        <button className="btn btn-accent" disabled={!selectedSlot} onClick={handleSendMeetingRequest} style={{ padding: '14px 36px', borderRadius: '14px' }}>
-                                            <Send size={18} /> Send Meeting Request
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* Edit Modal */}
-                    <AnimatePresence>
-                        {showEditModal && (
-                            <div className="modal-overlay">
-                                <motion.div
-                                    initial={animReady ? {  opacity: 0, scale: 0.92, y: 20  } : false}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.92, y: 20 }}
-                                    className="glass-panel modal-content"
-                                    style={{ borderRadius: '24px', maxWidth: '600px', margin: 'auto' }}
-                                >
-                                    <div className="flex items-center gap-4 mb-8" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
-                                        <div style={{ background: 'rgba(34, 211, 238, 0.12)', padding: '12px', borderRadius: '16px' }}>
-                                            <Edit3 color="var(--accent-light)" size={32} />
-                                        </div>
-                                        <div style={{ flex: 1 }}>
-                                            <h2 style={{ fontSize: '22px', fontWeight: '800', margin: 0, fontFamily: 'var(--font-heading)' }}>Edit Announcement</h2>
-                                        </div>
-                                        <button onClick={() => { setShowEditModal(false); setEditSaved(false); }} className="btn-icon">
-                                            <X size={20} />
-                                        </button>
-                                    </div>
-
-                                    {editSaved && (
-                                        <motion.div
-                                            initial={animReady ? {  opacity: 0, y: -8  } : false}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            style={{
-                                                background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)',
-                                                borderLeft: '4px solid var(--secondary)', padding: '16px 20px', marginBottom: '28px',
-                                                borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '12px'
-                                            }}>
-                                            <CheckCircle2 size={20} color="#34d399" />
-                                            <span style={{ fontSize: '15px', color: 'var(--badge-success-text)', fontWeight: '600' }}>Announcement updated successfully</span>
-                                        </motion.div>
-                                    )}
-
-                                    <div className="flex-col gap-6 mb-10">
-                                        <div className="flex-col gap-2">
-                                            <label className="text-sm font-semibold color-muted">Protocol Title</label>
-                                            <input type="text" className="input-field" style={{ borderRadius: '16px' }} value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
-                                        </div>
-                                        <div className="flex-col gap-2">
-                                            <label className="text-sm font-semibold color-muted">Clinical Context</label>
-                                            <textarea className="input-field" style={{ minHeight: '140px', borderRadius: '16px' }} value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex justify-end gap-4">
-                                        <button className="btn btn-secondary" onClick={() => { setShowEditModal(false); setEditSaved(false); }} style={{ padding: '14px 28px', borderRadius: '14px' }}>Cancel</button>
-                                        <button className="btn btn-accent" onClick={() => {
-                                            if (updatePost) {
-                                                updatePost(post.id, { title: editTitle, explanation: editDescription });
-                                            }
-                                            setEditSaved(true);
-                                            setTimeout(() => { setShowEditModal(false); setEditSaved(false); }, 1200);
-                                        }} style={{ padding: '14px 28px', borderRadius: '14px' }}>
-                                            <CheckCircle2 size={18} /> Save Changes
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        )}
-                    </AnimatePresence>
-                </>
-                , document.body
+                    <NDAModal
+                        open={showNda}
+                        onClose={() => setShowNda(false)}
+                        acceptedNda={acceptedNda}
+                        onToggleNda={() => setAcceptedNda(!acceptedNda)}
+                        interestMessage={interestMessage}
+                        onChangeMessage={setInterestMessage}
+                        onSubmit={submitInterest}
+                    />
+                    <MeetingSlotsModal
+                        open={showMeetingModal}
+                        onClose={() => setShowMeetingModal(false)}
+                        slots={proposedSlots}
+                        selectedSlot={selectedSlot}
+                        onSelectSlot={setSelectedSlot}
+                        onSend={handleSendMeetingRequest}
+                    />
+                    <EditPostModal
+                        open={showEditModal}
+                        onClose={() => setShowEditModal(false)}
+                        title={editTitle}
+                        description={editDescription}
+                        onChangeTitle={setEditTitle}
+                        onChangeDescription={setEditDescription}
+                        onSave={handleSaveEdit}
+                        saved={editSaved}
+                        onResetSaved={() => setEditSaved(false)}
+                    />
+                </>,
+                document.body
             )}
-
-
         </div>
     );
 };

@@ -30,7 +30,7 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
     const getIconBg = (type) => {
         switch (type) {
             case 'interest': return 'rgba(16, 185, 129, 0.08)';
-            case 'meeting-request': return 'rgba(94, 210, 156, 0.08)';
+            case 'meeting-request': return 'rgba(96, 165, 250, 0.08)';
             case 'meeting-accepted': return 'rgba(52, 211, 153, 0.08)';
             case 'meeting-declined': return 'rgba(239, 68, 68, 0.08)';
             case 'post-closed': return 'rgba(34, 211, 238, 0.08)';
@@ -54,12 +54,15 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.92 }}
                 id="notifications-bell"
+                aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
+                aria-expanded={isOpen}
+                aria-haspopup="menu"
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
-                    background: isOpen ? 'rgba(94, 210, 156, 0.1)' : 'rgba(7, 11, 10, 0.55)',
-                    border: `1px solid ${isOpen ? 'rgba(94, 210, 156, 0.28)' : 'rgba(255,255,255,0.05)'}`,
+                    background: isOpen ? 'rgba(96, 165, 250, 0.1)' : 'rgba(7, 11, 10, 0.55)',
+                    border: `1px solid ${isOpen ? 'rgba(96, 165, 250, 0.28)' : 'rgba(255,255,255,0.05)'}`,
                     cursor: 'pointer',
-                    color: isOpen ? '#8be8bc' : 'var(--text-muted)',
+                    color: isOpen ? '#93c5fd' : 'var(--text-muted)',
                     padding: '9px',
                     borderRadius: '11px',
                     transition: 'background 0.25s, border-color 0.25s, color 0.25s',
@@ -68,11 +71,11 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}
-                onMouseOver={(e) => { e.currentTarget.style.color = '#8be8bc'; e.currentTarget.style.background = 'rgba(94, 210, 156, 0.08)'; e.currentTarget.style.borderColor = 'rgba(94, 210, 156, 0.22)'; }}
+                onMouseOver={(e) => { e.currentTarget.style.color = '#93c5fd'; e.currentTarget.style.background = 'rgba(96, 165, 250, 0.08)'; e.currentTarget.style.borderColor = 'rgba(96, 165, 250, 0.22)'; }}
                 onMouseOut={(e) => {
-                    e.currentTarget.style.color = isOpen ? '#8be8bc' : 'var(--text-muted)';
-                    e.currentTarget.style.background = isOpen ? 'rgba(94, 210, 156, 0.1)' : 'rgba(7, 11, 10, 0.55)';
-                    e.currentTarget.style.borderColor = isOpen ? 'rgba(94, 210, 156, 0.28)' : 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.color = isOpen ? '#93c5fd' : 'var(--text-muted)';
+                    e.currentTarget.style.background = isOpen ? 'rgba(96, 165, 250, 0.1)' : 'rgba(7, 11, 10, 0.55)';
+                    e.currentTarget.style.borderColor = isOpen ? 'rgba(96, 165, 250, 0.28)' : 'rgba(255,255,255,0.05)';
                 }}
             >
                 <Bell size={17} />
@@ -99,7 +102,7 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                                 position: 'absolute', top: 'calc(100% + 14px)', right: 0,
                                 width: '420px', maxHeight: '520px', overflowY: 'auto',
                                 zIndex: 999, padding: 0,
-                                boxShadow: '0 30px 70px rgba(0,0,0,0.6), 0 0 60px rgba(94, 210, 156, 0.08)'
+                                boxShadow: '0 30px 70px rgba(0,0,0,0.6), 0 0 60px rgba(96, 165, 250, 0.08)'
                             }}
                         >
                             {/* Header */}
@@ -123,7 +126,7 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                                         onClick={() => { onDismissAll?.(); }}
                                         style={{
                                             background: 'none', border: 'none', cursor: 'pointer',
-                                            color: '#8be8bc', fontSize: '12px', fontWeight: '600',
+                                            color: '#93c5fd', fontSize: '12px', fontWeight: '600',
                                             fontFamily: 'var(--font-body)',
                                             letterSpacing: '0.01em',
                                             transition: 'opacity 0.2s'
@@ -152,12 +155,12 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                                                 padding: '16px 20px',
                                                 borderBottom: '1px solid rgba(255,255,255,0.03)',
                                                 display: 'flex', gap: '14px', alignItems: 'flex-start',
-                                                background: n.read ? 'transparent' : 'rgba(94, 210, 156, 0.02)',
+                                                background: n.read ? 'transparent' : 'rgba(96, 165, 250, 0.02)',
                                                 transition: 'background 0.2s',
                                                 cursor: 'pointer'
                                             }}
                                             onMouseOver={(e) => e.currentTarget.style.background = 'var(--background-alt)'}
-                                            onMouseOut={(e) => e.currentTarget.style.background = n.read ? 'transparent' : 'rgba(94, 210, 156, 0.02)'}
+                                            onMouseOut={(e) => e.currentTarget.style.background = n.read ? 'transparent' : 'rgba(96, 165, 250, 0.02)'}
                                         >
                                             <div style={{
                                                 width: '38px', height: '38px', borderRadius: '12px',

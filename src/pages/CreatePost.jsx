@@ -29,7 +29,7 @@ const CreatePost = ({ user, addPost }) => {
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState('');
 
-    const domains = ['Telemedicine', 'AI Diagnostics', 'Wearable Tech', 'Genomics', 'Mental Health Tech', 'Surgical Robotics', 'Drug Discovery', 'Health Data Analytics'];
+    const domains = ['Telemedicine', 'AI Diagnostics', 'Wearable Tech', 'Genomics', 'Mental Health Tech', 'Surgical Robotics', 'Drug Discovery', 'Health Data Analytics', 'Others'];
 
     const stages = [
         { value: 'idea', label: 'Idea Stage', icon: '💡', desc: 'Conceptual — no implementation yet' },
@@ -102,7 +102,7 @@ const CreatePost = ({ user, addPost }) => {
                             background: 'linear-gradient(135deg, var(--primary), var(--accent))',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             margin: '0 auto 26px',
-                            boxShadow: '0 18px 44px rgba(94, 210, 156, 0.4)'
+                            boxShadow: '0 18px 44px rgba(96, 165, 250, 0.4)'
                         }}
                     >
                         <CheckCircle2 size={36} color="#070b0a" strokeWidth={2.5} />
@@ -215,7 +215,7 @@ const CreatePost = ({ user, addPost }) => {
                         transition={{ duration: 0.25 }}
                     >
                         {step === 1 && (
-                            <div className="flex-col gap-4">
+                            <div className="flex-col" style={{ gap: '32px', paddingTop: '12px' }}>
                                 <div className="flex-col gap-2">
                                     <label className="input-lux-label flex items-center gap-2" style={{ display: 'inline-flex' }}><FileText size={14} /> Title *</label>
                                     <input id="post-title-input" type="text" className="input-lux" placeholder="e.g. ML-Based ECG Anomaly Detection for Rural Clinics" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
@@ -237,10 +237,10 @@ const CreatePost = ({ user, addPost }) => {
                                                 onClick={() => setFormData({ ...formData, projectStage: s.value })}
                                                 style={{
                                                     padding: '16px', borderRadius: '14px', cursor: 'pointer',
-                                                    background: formData.projectStage === s.value ? 'rgba(94, 210, 156, 0.08)' : 'var(--background-alt)',
-                                                    border: `1px solid ${formData.projectStage === s.value ? 'rgba(94, 210, 156, 0.3)' : 'rgba(255,255,255,0.06)'}`,
+                                                    background: formData.projectStage === s.value ? 'rgba(96, 165, 250, 0.08)' : 'var(--background-alt)',
+                                                    border: `1px solid ${formData.projectStage === s.value ? 'rgba(96, 165, 250, 0.3)' : 'rgba(255,255,255,0.06)'}`,
                                                     transition: 'all 0.25s',
-                                                    boxShadow: formData.projectStage === s.value ? '0 0 20px rgba(94, 210, 156,0.08)' : 'none'
+                                                    boxShadow: formData.projectStage === s.value ? '0 0 20px rgba(96, 165, 250,0.08)' : 'none'
                                                 }}
                                             >
                                                 <div style={{ fontSize: '18px', marginBottom: '6px' }}>{s.icon}</div>
@@ -259,7 +259,7 @@ const CreatePost = ({ user, addPost }) => {
                         )}
 
                         {step === 2 && (
-                            <div className="flex-col gap-4">
+                            <div className="flex-col" style={{ gap: '32px', paddingTop: '12px' }}>
                                 <div className="flex-col gap-2">
                                     <label className="input-lux-label flex items-center gap-2" style={{ display: 'inline-flex' }}><Sparkles size={14} /> Technical Blueprint / High-Level Idea</label>
                                     <p className="text-xs text-muted mb-1" style={{ lineHeight: '1.5' }}>Optional. If confidentiality is set to "meeting-only", this will be hidden until NDA is signed.</p>
@@ -283,7 +283,7 @@ const CreatePost = ({ user, addPost }) => {
                         )}
 
                         {step === 3 && (
-                            <div className="flex-col gap-4">
+                            <div className="flex-col" style={{ gap: '32px', paddingTop: '12px' }}>
                                 <div className="create-post-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                     <div className="flex-col gap-2">
                                         <label className="input-lux-label flex items-center gap-2" style={{ display: 'inline-flex' }}><Globe size={14} /> Country</label>
@@ -307,8 +307,8 @@ const CreatePost = ({ user, addPost }) => {
                                                 onClick={() => setFormData({ ...formData, confidentiality: opt.value })}
                                                 style={{
                                                     padding: '20px', cursor: 'pointer', borderRadius: '14px',
-                                                    background: formData.confidentiality === opt.value ? 'rgba(94, 210, 156, 0.08)' : 'var(--background-alt)',
-                                                    border: `1px solid ${formData.confidentiality === opt.value ? 'rgba(94, 210, 156, 0.3)' : 'rgba(255,255,255,0.06)'}`,
+                                                    background: formData.confidentiality === opt.value ? 'rgba(96, 165, 250, 0.08)' : 'var(--background-alt)',
+                                                    border: `1px solid ${formData.confidentiality === opt.value ? 'rgba(96, 165, 250, 0.3)' : 'rgba(255,255,255,0.06)'}`,
                                                     transition: 'all 0.25s', textAlign: 'center'
                                                 }}
                                             >

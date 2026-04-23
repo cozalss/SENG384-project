@@ -25,24 +25,29 @@ const AdminDashboard = ({ user, posts }) => {
     const [filterAction, setFilterAction] = useState('All');
 
     useEffect(() => {
+        let cancelled = false;
         let unsubLogs;
         let unsubUsers;
         try {
             unsubLogs = subscribeToLogsRT((data) => {
+                if (cancelled) return;
                 data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 setLogs(data);
                 setLoading(false);
             });
             unsubUsers = subscribeToUsersRT((data) => {
+                if (cancelled) return;
                 setUsers(data);
             });
         } catch (err) {
             console.error("Dashboard subscription error:", err);
-            queueMicrotask(() => setLoading(false));
+            setLoading(false);
+            return () => { cancelled = true; };
         }
         return () => {
-            if (unsubLogs) unsubLogs();
-            if (unsubUsers) unsubUsers();
+            cancelled = true;
+            if (typeof unsubLogs === 'function') unsubLogs();
+            if (typeof unsubUsers === 'function') unsubUsers();
         };
     }, []);
 
@@ -152,7 +157,7 @@ const AdminDashboard = ({ user, posts }) => {
                                         position: 'absolute', inset: 0,
                                         background: 'linear-gradient(135deg, var(--primary), var(--accent))',
                                         borderRadius: '10px', zIndex: -1,
-                                        boxShadow: '0 8px 22px rgba(94, 210, 156, 0.3)'
+                                        boxShadow: '0 8px 22px rgba(96, 165, 250, 0.3)'
                                     }}
                                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                                 />
@@ -169,7 +174,7 @@ const AdminDashboard = ({ user, posts }) => {
                     <motion.div key="overview" initial={animReady ? { opacity:0, y:10 } : false} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}}>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '32px' }}>
                             <div className="editorial-panel" style={{ padding: '24px', textAlign: 'center' }}>
-                                <Users size={32} color="#8be8bc" style={{ margin: '0 auto 12px' }} />
+                                <Users size={32} color="#93c5fd" style={{ margin: '0 auto 12px' }} />
                                 <h3 style={{ fontSize: '32px', fontWeight: '700', margin: '0 0 4px', color: 'white' }}>{users.length}</h3>
                                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, textTransform: 'uppercase' }}>Total Users</p>
                             </div>

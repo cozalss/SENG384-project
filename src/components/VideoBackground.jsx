@@ -1,7 +1,6 @@
-import { useEffect, useRef } from 'react';
-import Hls from 'hls.js';
+import { useRef, useEffect } from 'react';
 
-const HLS_SRC = 'https://stream.mux.com/tLkHO1qZoaaQOUeVWo8hEBeGQfySP02EPS02BmnNFyXys.m3u8';
+const VIDEO_SRC = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_105406_16f4600d-7a92-4292-b96e-b19156c7830a.mp4";
 
 const VideoBackground = ({ hidden = false }) => {
     const videoRef = useRef(null);
@@ -10,22 +9,40 @@ const VideoBackground = ({ hidden = false }) => {
         const video = videoRef.current;
         if (!video) return;
 
-        let hls;
-        if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = HLS_SRC;
-        } else if (Hls.isSupported()) {
-            hls = new Hls({ enableWorker: false });
-            hls.loadSource(HLS_SRC);
-            hls.attachMedia(video);
+        let hlsInstance = null;
+        let cancelled = false;
+
+        if (VIDEO_SRC.endsWith('.m3u8')) {
+            if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = VIDEO_SRC;
+                video.play().catch(() => {});
+            } else {
+                import('hls.js').then(({ default: Hls }) => {
+                    if (cancelled) return;
+                    if (!Hls.isSupported()) return;
+                    hlsInstance = new Hls({
+                        enableWorker: true,
+                        lowLatencyMode: false,
+                        backBufferLength: 90,
+                        maxBufferLength: 30,
+                        maxMaxBufferLength: 60,
+                        abrEwmaDefaultEstimate: 5000000,
+                    });
+                    hlsInstance.loadSource(VIDEO_SRC);
+                    hlsInstance.attachMedia(video);
+                    hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+                        video.play().catch(() => {});
+                    });
+                });
+            }
+        } else {
+            video.src = VIDEO_SRC;
+            video.play().catch(() => {});
         }
 
-        const tryPlay = () => { video.play().catch(() => {}); };
-        video.addEventListener('loadedmetadata', tryPlay);
-        tryPlay();
-
         return () => {
-            video.removeEventListener('loadedmetadata', tryPlay);
-            if (hls) hls.destroy();
+            cancelled = true;
+            if (hlsInstance) hlsInstance.destroy();
         };
     }, []);
 
@@ -38,13 +55,12 @@ const VideoBackground = ({ hidden = false }) => {
                 zIndex: -3,
                 pointerEvents: 'none',
                 overflow: 'hidden',
-                background: '#070b0a',
+                background: '#000',
                 opacity: hidden ? 0 : 1,
                 visibility: hidden ? 'hidden' : 'visible',
-                transition: 'opacity 0.5s ease, visibility 0.5s'
+                transition: 'opacity 0.6s ease, visibility 0.6s',
             }}
         >
-            {/* Video layer — 60% opacity */}
             <video
                 ref={videoRef}
                 muted
@@ -58,72 +74,36 @@ const VideoBackground = ({ hidden = false }) => {
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
-                    opacity: 0.6
+                    opacity: 1,
                 }}
             />
 
-            {/* Left-to-right dark gradient (#070b0a → transparent) */}
+            {/* Glassmorphic gradient overlay */}
             <div style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'linear-gradient(90deg, #070b0a 0%, rgba(7, 11, 10, 0.6) 30%, rgba(7, 11, 10, 0.2) 60%, transparent 100%)'
+                background: `
+                    linear-gradient(
+                        180deg,
+                        rgba(0, 0, 0, 0.45) 0%,
+                        rgba(0, 0, 0, 0.10) 35%,
+                        rgba(0, 0, 0, 0.10) 65%,
+                        rgba(0, 0, 0, 0.55) 100%
+                    )
+                `,
             }} />
 
-            {/* Bottom-up readability gradient */}
+            {/* Subtle frosted-glass vignette */}
             <div style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'linear-gradient(0deg, rgba(7, 11, 10, 0.92) 0%, rgba(7, 11, 10, 0.55) 30%, rgba(7, 11, 10, 0.15) 65%, transparent 100%)'
-            }} />
-
-            {/* Top-down slight darkening for navbar area */}
-            <div style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(180deg, rgba(7, 11, 10, 0.75) 0%, rgba(7, 11, 10, 0.25) 20%, transparent 40%)'
-            }} />
-
-            {/* Central horizontal SVG ellipse glow — cyan / dark green */}
-            <svg
-                style={{
-                    position: 'absolute',
-                    top: '18%',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 'min(1400px, 120%)',
-                    height: '520px',
-                    opacity: 0.75,
-                    mixBlendMode: 'screen',
-                    pointerEvents: 'none'
-                }}
-                viewBox="0 0 1400 520"
-                preserveAspectRatio="xMidYMid meet"
-            >
-                <defs>
-                    <filter id="centralGlowBlur" x="-20%" y="-50%" width="140%" height="200%">
-                        <feGaussianBlur stdDeviation="25" />
-                    </filter>
-                    <radialGradient id="centralGlowFill" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stopColor="#5ed29c" stopOpacity="0.55" />
-                        <stop offset="45%" stopColor="#22d3ee" stopOpacity="0.22" />
-                        <stop offset="100%" stopColor="#0f3a2d" stopOpacity="0" />
-                    </radialGradient>
-                </defs>
-                <ellipse
-                    cx="700"
-                    cy="260"
-                    rx="580"
-                    ry="130"
-                    fill="url(#centralGlowFill)"
-                    filter="url(#centralGlowBlur)"
-                />
-            </svg>
-
-            {/* Faint vignette for edges */}
-            <div style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'radial-gradient(ellipse 100% 80% at 50% 50%, transparent 40%, rgba(7, 11, 10, 0.45) 100%)'
+                background: `
+                    radial-gradient(
+                        ellipse at center,
+                        transparent 40%,
+                        rgba(0, 0, 0, 0.35) 100%
+                    )
+                `,
             }} />
         </div>
     );

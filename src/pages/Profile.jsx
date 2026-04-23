@@ -114,14 +114,14 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         style={{
-                            background: 'linear-gradient(135deg, rgba(94, 210, 156, 0.08), rgba(34, 211, 238, 0.04))',
-                            border: '1px solid rgba(94, 210, 156, 0.2)',
+                            background: 'linear-gradient(135deg, rgba(96, 165, 250, 0.08), rgba(34, 211, 238, 0.04))',
+                            border: '1px solid rgba(96, 165, 250, 0.2)',
                             padding: '14px 18px', marginBottom: '24px',
                             borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '10px'
                         }}
                     >
-                        <CheckCircle2 size={18} color="#8be8bc" />
-                        <span style={{ fontSize: '13.5px', color: '#8be8bc', fontWeight: '600' }}>Profile updated successfully.</span>
+                        <CheckCircle2 size={18} color="#93c5fd" />
+                        <span style={{ fontSize: '13.5px', color: '#93c5fd', fontWeight: '600' }}>Profile updated successfully.</span>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -144,7 +144,7 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             margin: '0 auto 20px', fontSize: '38px', fontWeight: '800', color: '#070b0a',
                             fontFamily: 'var(--font-heading)',
-                            boxShadow: '0 18px 42px rgba(94, 210, 156, 0.35), inset 0 2px 0 rgba(255,255,255,0.2)'
+                            boxShadow: '0 18px 42px rgba(96, 165, 250, 0.35), inset 0 2px 0 rgba(255,255,255,0.2)'
                         }}
                     >
                         {user?.name?.charAt(0)}
@@ -175,12 +175,12 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginTop: '24px' }}>
                         {[
                             { value: myPosts.length, label: 'Total', color: 'var(--text-main)' },
-                            { value: activePosts, label: 'Active', color: '#8be8bc' },
+                            { value: activePosts, label: 'Active', color: '#93c5fd' },
                             { value: closedPosts, label: 'Closed', color: '#67e8f9' }
                         ].map((s, i) => (
                             <motion.div
                                 key={i}
-                                whileHover={{ y: -3, borderColor: 'rgba(94, 210, 156, 0.25)' }}
+                                whileHover={{ y: -3, borderColor: 'rgba(96, 165, 250, 0.25)' }}
                                 transition={{ type: 'spring', stiffness: 320 }}
                                 style={{
                                     background: 'rgba(7, 11, 10, 0.5)', padding: '14px 8px',

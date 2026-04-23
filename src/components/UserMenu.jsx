@@ -98,6 +98,7 @@ const UserMenu = ({ user, logout }) => {
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleToggle}
+                aria-label="Account menu"
                 aria-haspopup="menu"
                 aria-expanded={open}
                 style={{
@@ -106,8 +107,8 @@ const UserMenu = ({ user, logout }) => {
                     gap: '10px',
                     padding: '4px 12px 4px 4px',
                     borderRadius: '999px',
-                    background: open ? 'rgba(94, 210, 156, 0.08)' : 'rgba(7, 11, 10, 0.55)',
-                    border: `1px solid ${open ? 'rgba(94, 210, 156, 0.28)' : 'rgba(255, 255, 255, 0.05)'}`,
+                    background: open ? 'rgba(96, 165, 250, 0.08)' : 'rgba(7, 11, 10, 0.55)',
+                    border: `1px solid ${open ? 'rgba(96, 165, 250, 0.28)' : 'rgba(255, 255, 255, 0.05)'}`,
                     cursor: 'pointer',
                     color: 'var(--text-main)',
                     transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -115,8 +116,8 @@ const UserMenu = ({ user, logout }) => {
                 }}
                 onMouseOver={(e) => {
                     if (open) return;
-                    e.currentTarget.style.background = 'rgba(94, 210, 156, 0.05)';
-                    e.currentTarget.style.borderColor = 'rgba(94, 210, 156, 0.2)';
+                    e.currentTarget.style.background = 'rgba(96, 165, 250, 0.05)';
+                    e.currentTarget.style.borderColor = 'rgba(96, 165, 250, 0.2)';
                 }}
                 onMouseOut={(e) => {
                     if (open) return;
@@ -134,7 +135,7 @@ const UserMenu = ({ user, logout }) => {
                     fontSize: '13px', fontWeight: '800', color: '#070b0a',
                     fontFamily: 'var(--font-heading)',
                     letterSpacing: '-0.02em',
-                    boxShadow: '0 4px 12px rgba(94, 210, 156, 0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+                    boxShadow: '0 4px 12px rgba(96, 165, 250, 0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
                     flexShrink: 0
                 }}>
                     {initial}
@@ -147,9 +148,9 @@ const UserMenu = ({ user, logout }) => {
                             bottom: '-1px', right: '-1px',
                             width: '10px', height: '10px',
                             borderRadius: '50%',
-                            background: isEngineer ? '#8be8bc' : '#67e8f9',
+                            background: isEngineer ? '#93c5fd' : '#67e8f9',
                             border: '2px solid #070b0a',
-                            boxShadow: `0 0 8px ${isEngineer ? 'rgba(94, 210, 156, 0.7)' : 'rgba(34, 211, 238, 0.7)'}`
+                            boxShadow: `0 0 8px ${isEngineer ? 'rgba(96, 165, 250, 0.7)' : 'rgba(34, 211, 238, 0.7)'}`
                         }}
                     />
                 </span>
@@ -170,7 +171,7 @@ const UserMenu = ({ user, logout }) => {
                     <span style={{
                         fontSize: '9.5px', fontWeight: '700',
                         letterSpacing: '0.13em', textTransform: 'uppercase',
-                        color: isEngineer ? '#8be8bc' : '#67e8f9',
+                        color: isEngineer ? '#93c5fd' : '#67e8f9',
                         marginTop: '2px'
                     }}>
                         {roleLabel}
@@ -205,7 +206,7 @@ const UserMenu = ({ user, logout }) => {
                                 padding: 0,
                                 zIndex: 10000,
                                 overflow: 'hidden',
-                                boxShadow: '0 30px 70px rgba(0, 0, 0, 0.6), 0 0 60px rgba(94, 210, 156, 0.1)'
+                                boxShadow: '0 30px 70px rgba(0, 0, 0, 0.6), 0 0 60px rgba(96, 165, 250, 0.1)'
                             }}
                         >
                         {/* Identity card at top */}
@@ -222,7 +223,7 @@ const UserMenu = ({ user, logout }) => {
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 fontSize: '16px', fontWeight: '800', color: '#070b0a',
                                 fontFamily: 'var(--font-heading)',
-                                boxShadow: '0 8px 18px rgba(94, 210, 156, 0.32), inset 0 1px 0 rgba(255,255,255,0.2)',
+                                boxShadow: '0 8px 18px rgba(96, 165, 250, 0.32), inset 0 1px 0 rgba(255,255,255,0.2)',
                                 flexShrink: 0, letterSpacing: '-0.03em'
                             }}>
                                 {initial}
@@ -265,8 +266,8 @@ const UserMenu = ({ user, logout }) => {
                                         fontFamily: 'var(--font-body)'
                                     }}
                                     onMouseOver={(e) => {
-                                        e.currentTarget.style.background = 'rgba(94, 210, 156, 0.06)';
-                                        e.currentTarget.style.color = '#8be8bc';
+                                        e.currentTarget.style.background = 'rgba(96, 165, 250, 0.06)';
+                                        e.currentTarget.style.color = '#93c5fd';
                                         e.currentTarget.style.transform = 'translateX(2px)';
                                     }}
                                     onMouseOut={(e) => {

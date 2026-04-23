@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { updateUserInFirestore, deleteUserFromFirestore, addActivityLog } from '../services/firestore';
 
 // Synchronous lazy initializer — runs once on first render, before any paint.
@@ -15,15 +15,18 @@ const readSavedUser = () => {
 
 export function useAuth() {
   const [user, setUser] = useState(readSavedUser);
+  const userRef = useRef(user);
+  useEffect(() => { userRef.current = user; }, [user]);
 
   const logout = useCallback(async () => {
-    if (user) {
+    const current = userRef.current;
+    if (current) {
       await addActivityLog({
         id: `log-${Date.now()}`,
         timestamp: new Date().toISOString(),
-        userId: user.id,
-        userName: user.name,
-        role: user.role,
+        userId: current.id,
+        userName: current.name,
+        role: current.role,
         actionType: 'LOGOUT',
         targetEntity: 'session',
         result: 'success',
@@ -32,11 +35,12 @@ export function useAuth() {
     }
     setUser(null);
     localStorage.removeItem('health_ai_user');
-  }, [user]);
+  }, []);
 
-  // Session timeout (30 min)
+  // Session timeout (30 min). Only re-runs when session identity changes,
+  // not on every profile field update.
   useEffect(() => {
-    if (!user) return;
+    if (!user?.id) return;
     let timeout;
     const resetTimer = () => {
       clearTimeout(timeout);
@@ -51,7 +55,7 @@ export function useAuth() {
       clearTimeout(timeout);
       events.forEach(e => window.removeEventListener(e, resetTimer));
     };
-  }, [user, logout]);
+  }, [user?.id, logout]);
 
   const login = async (userData) => {
     setUser(userData);

@@ -19,7 +19,7 @@ const ReadingProgress = () => {
                 right: 0,
                 height: '2.5px',
                 background: 'linear-gradient(90deg, var(--primary), var(--accent))',
-                boxShadow: '0 0 12px rgba(94, 210, 156, 0.45)',
+                boxShadow: '0 0 12px rgba(96, 165, 250, 0.45)',
                 transformOrigin: '0% 50%',
                 scaleX,
                 zIndex: 200,

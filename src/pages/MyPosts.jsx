@@ -88,9 +88,9 @@ const MyPosts = ({ posts, user, updatePostStatus }) => {
                 {[
                     { label: 'Total', value: stats.total, icon: <FileText size={16} />, color: 'var(--text-main)' },
                     { label: 'Drafts', value: stats.draft, icon: <Archive size={16} />, color: '#fcd34d' },
-                    { label: 'Active', value: stats.active, icon: <Eye size={16} />, color: '#8be8bc' },
+                    { label: 'Active', value: stats.active, icon: <Eye size={16} />, color: '#93c5fd' },
                     { label: 'Meeting', value: stats.meeting, icon: <Clock size={16} />, color: '#67e8f9' },
-                    { label: 'Closed', value: stats.closed, icon: <CheckCircle2 size={16} />, color: '#5eead4' }
+                    { label: 'Closed', value: stats.closed, icon: <CheckCircle2 size={16} />, color: '#7dd3fc' }
                 ].map((s, i) => (
                     <motion.div
                         key={i}
@@ -133,7 +133,7 @@ const MyPosts = ({ posts, user, updatePostStatus }) => {
                                             position: 'absolute', inset: 0,
                                             background: 'linear-gradient(135deg, var(--primary), var(--accent))',
                                             borderRadius: '10px', zIndex: -1,
-                                            boxShadow: '0 8px 22px rgba(94, 210, 156, 0.3)'
+                                            boxShadow: '0 8px 22px rgba(96, 165, 250, 0.3)'
                                         }}
                                         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                                     />

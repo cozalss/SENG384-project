@@ -12,6 +12,27 @@ dist
 dist-ssr
 *.local
 
+# Environment variables (contain EmailJS keys — never commit)
+.env
+.env.local
+.env.production
+.env.development
+.env.*.local
+
+# AWS credentials / secrets
+.aws/
+*.pem
+aws-credentials*
+
+# OS / editor scratch
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Claude & local settings
+.claude/settings.local.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

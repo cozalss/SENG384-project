@@ -11,7 +11,7 @@ const BackgroundFX = () => {
         const H = 600;
         const NODE_COUNT = 42;
 
-        const palette = ['#22d3ee', '#f472b6', '#a78bfa', '#8be8bc', '#2dd4bf'];
+        const palette = ['#22d3ee', '#f472b6', '#a78bfa', '#93c5fd', '#2dd4bf'];
 
         const nodes = Array.from({ length: NODE_COUNT }, (_, i) => ({
             id: i,
@@ -62,9 +62,9 @@ const BackgroundFX = () => {
                         <feGaussianBlur stdDeviation="3.5" />
                     </filter>
                     <radialGradient id="blob-indigo" cx="50%" cy="50%">
-                        <stop offset="0%" stopColor="rgba(139, 232, 188, 0.55)" />
-                        <stop offset="60%" stopColor="rgba(139, 232, 188, 0.15)" />
-                        <stop offset="100%" stopColor="rgba(139, 232, 188, 0)" />
+                        <stop offset="0%" stopColor="rgba(147, 197, 253, 0.55)" />
+                        <stop offset="60%" stopColor="rgba(147, 197, 253, 0.15)" />
+                        <stop offset="100%" stopColor="rgba(147, 197, 253, 0)" />
                     </radialGradient>
                     <radialGradient id="blob-magenta" cx="50%" cy="50%">
                         <stop offset="0%" stopColor="rgba(244, 114, 182, 0.5)" />

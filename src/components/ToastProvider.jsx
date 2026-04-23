@@ -12,7 +12,7 @@ const iconMap = {
 };
 
 const colorMap = {
-    success: { border: 'rgba(94, 210, 156, 0.35)', bg: 'rgba(94, 210, 156, 0.08)', accent: '#8be8bc' },
+    success: { border: 'rgba(96, 165, 250, 0.35)', bg: 'rgba(96, 165, 250, 0.08)', accent: '#93c5fd' },
     error: { border: 'rgba(239, 68, 68, 0.32)', bg: 'rgba(239, 68, 68, 0.07)', accent: '#fca5a5' },
     info: { border: 'rgba(34, 211, 238, 0.32)', bg: 'rgba(34, 211, 238, 0.07)', accent: '#67e8f9' }
 };

@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 class GlobalErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, errorInfo: null };
   }
 
   static getDerivedStateFromError(error) {
@@ -15,6 +15,7 @@ class GlobalErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error("Critical Fault Detected:", error, errorInfo);
+    this.setState({ errorInfo });
   }
 
   render() {
@@ -99,15 +100,35 @@ class GlobalErrorBoundary extends React.Component {
               </button>
             </div>
             
-            <div style={{ 
-              marginTop: '40px', 
-              paddingTop: '24px', 
-              borderTop: '1px solid var(--border)', 
-              fontSize: '11px', 
+            <div style={{
+              marginTop: '40px',
+              paddingTop: '24px',
+              borderTop: '1px solid var(--border)',
+              fontSize: '11px',
               color: 'var(--text-subtle)',
-              fontFamily: 'monospace'
+              fontFamily: 'monospace',
+              textAlign: 'left',
             }}>
-              ERROR CODE: {this.state.error?.name?.toUpperCase() || 'UNKNOWN_STMT_EXEC'}
+              <div style={{ marginBottom: '8px', color: 'var(--badge-error-text)' }}>
+                {this.state.error?.name || 'Error'}: {this.state.error?.message || 'Unknown error'}
+              </div>
+              {this.state.error?.stack && (
+                <details style={{ cursor: 'pointer', marginTop: '8px' }}>
+                  <summary style={{ color: 'var(--text-subtle)', outline: 'none' }}>Stack trace</summary>
+                  <pre style={{
+                    marginTop: '8px',
+                    padding: '12px',
+                    background: 'rgba(0,0,0,0.35)',
+                    borderRadius: '8px',
+                    maxHeight: '220px',
+                    overflow: 'auto',
+                    fontSize: '10px',
+                    lineHeight: '1.45',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                  }}>{this.state.error.stack}</pre>
+                </details>
+              )}
             </div>
           </motion.div>
         </div>

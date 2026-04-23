@@ -125,8 +125,8 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                 display: 'inline-flex', alignItems: 'center', gap: '8px',
                                 padding: '6px 14px', borderRadius: '999px', fontSize: '11px',
                                 fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.14em',
-                                background: 'rgba(94, 210, 156, 0.08)', color: '#8be8bc',
-                                border: '1px solid rgba(94, 210, 156, 0.2)',
+                                background: 'rgba(96, 165, 250, 0.08)', color: '#93c5fd',
+                                border: '1px solid rgba(96, 165, 250, 0.2)',
                                 marginBottom: '20px'
                             }}
                         >
@@ -210,9 +210,9 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                         <div style={{
                             display: 'inline-flex', alignItems: 'center', gap: '6px',
                             padding: '5px 11px', borderRadius: '8px',
-                            background: 'rgba(94, 210, 156, 0.08)',
-                            border: '1px solid rgba(94, 210, 156, 0.16)',
-                            color: '#8be8bc', fontSize: '11px', fontWeight: '700',
+                            background: 'rgba(96, 165, 250, 0.08)',
+                            border: '1px solid rgba(96, 165, 250, 0.16)',
+                            color: '#93c5fd', fontSize: '11px', fontWeight: '700',
                             letterSpacing: '0.04em', whiteSpace: 'nowrap'
                         }}>
                             <Filter size={11} /> {filteredPosts.length} {filteredPosts.length === 1 ? 'result' : 'results'}
@@ -238,7 +238,7 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                                 position: 'absolute', inset: 0,
                                                 background: 'linear-gradient(135deg, var(--primary), var(--accent))',
                                                 borderRadius: '10px', zIndex: -1,
-                                                boxShadow: '0 8px 22px rgba(94, 210, 156, 0.3)'
+                                                boxShadow: '0 8px 22px rgba(96, 165, 250, 0.3)'
                                             }}
                                             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                                         />
@@ -250,8 +250,8 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                             justifyContent: 'center',
                                             minWidth: '18px', height: '18px', padding: '0 5px',
                                             borderRadius: '999px',
-                                            background: feedType === tab.key ? 'rgba(7,11,10,0.3)' : 'rgba(94,210,156,0.15)',
-                                            color: feedType === tab.key ? '#070b0a' : '#8be8bc',
+                                            background: feedType === tab.key ? 'rgba(7,11,10,0.3)' : 'rgba(96,165,250,0.15)',
+                                            color: feedType === tab.key ? '#070b0a' : '#93c5fd',
                                             fontSize: '10px', fontWeight: '800',
                                             marginLeft: '2px'
                                         }}>{tab.count}</span>
@@ -345,134 +345,142 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                         marginRight: offset === 2 ? '24px' : '0'
                                     }}
                                 >
-                                    <Link to={`/post/${post.id}`} className="editorial-card">
-                                        {/* Bookmark float button */}
+                                    <div style={{ position: 'relative' }}>
+                                        <Link to={`/post/${post.id}`} className="editorial-card">
+                                            {/* VISUAL SLOT — stylized domain icon with glow */}
+                                            <div className="card-visual">
+                                                <div className="visual-glow" />
+                                                <div style={{ position: 'relative', zIndex: 1, color: '#93c5fd' }}>
+                                                    {domainIcon(post.domain)}
+                                                </div>
+                                            </div>
+
+                                            {/* CONTENT SLOT */}
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', minWidth: 0 }}>
+                                                {/* Top: tag cluster (upper-right area of title block) */}
+                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px', alignItems: 'center' }}>
+                                                    <span className="pill pill-neon">
+                                                        {post.authorRole === 'Engineer' ? 'Engineer' : 'Healthcare Professional'}
+                                                    </span>
+                                                    <span className="pill pill-dim" style={{ textTransform: 'uppercase' }}>
+                                                        {post.domain}
+                                                    </span>
+                                                    <span className={`pill ${status.cls}`}>{status.label}</span>
+                                                    {isLocalMatch(post) && (
+                                                        <span className="pill pill-cyan" style={{ animation: 'statusPulse 2.4s infinite' }}>
+                                                            <MapPin size={10} /> Local
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                {/* Editorial title */}
+                                                <h2
+                                                    className="card-title"
+                                                    style={{
+                                                        fontSize: 'clamp(22px, 2.2vw, 28px)',
+                                                        fontWeight: '800',
+                                                        letterSpacing: '-0.03em',
+                                                        lineHeight: '1.12',
+                                                        color: 'var(--text-main)',
+                                                        marginTop: '2px'
+                                                    }}
+                                                >
+                                                    {post.title}
+                                                </h2>
+
+                                                {/* Description */}
+                                                <p style={{
+                                                    color: 'var(--text-muted)', fontSize: '14px',
+                                                    lineHeight: '1.7', letterSpacing: '-0.005em',
+                                                    display: '-webkit-box', WebkitLineClamp: 2,
+                                                    WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                                                    maxWidth: '640px'
+                                                }}>
+                                                    {post.explanation}
+                                                </p>
+
+                                                {/* Match ribbon — only if relevant */}
+                                                {getMatchExplanation(post) && (
+                                                    <div style={{
+                                                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                                        color: '#67e8f9', fontSize: '11.5px', fontWeight: '600',
+                                                        letterSpacing: '0.04em',
+                                                        textTransform: 'uppercase',
+                                                        alignSelf: 'flex-start'
+                                                    }}>
+                                                        <Sparkles size={12} /> Match · {getMatchExplanation(post)}
+                                                    </div>
+                                                )}
+
+                                                {/* Required expertise + author row */}
+                                                <div style={{
+                                                    display: 'flex', flexWrap: 'wrap', gap: '20px',
+                                                    alignItems: 'center', justifyContent: 'space-between',
+                                                    marginTop: '8px',
+                                                    paddingTop: '18px',
+                                                    borderTop: '1px solid rgba(255,255,255,0.05)'
+                                                }}>
+                                                    <div className="expertise-badge">
+                                                        <span className="expertise-badge-label">Required Expertise</span>
+                                                        <span className="expertise-badge-role">
+                                                            <MessageSquare size={11} />
+                                                            {post.authorRole === 'Engineer' ? 'Clinical / Healthcare Expert' : 'Engineering / Dev Expert'}
+                                                        </span>
+                                                    </div>
+
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                        <div style={{
+                                                            width: '34px', height: '34px', borderRadius: '11px',
+                                                            background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                            fontWeight: '800', fontSize: '13px', color: '#070b0a',
+                                                            flexShrink: 0
+                                                        }}>
+                                                            {post.authorName.charAt(0)}
+                                                        </div>
+                                                        <div style={{ minWidth: 0 }}>
+                                                            <div style={{ fontSize: '13.5px', fontWeight: '600', color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+                                                                {post.authorName}
+                                                            </div>
+                                                            <div style={{
+                                                                fontSize: '11px', color: 'var(--text-subtle)',
+                                                                display: 'flex', alignItems: 'center', gap: '4px',
+                                                                letterSpacing: '0.02em'
+                                                            }}>
+                                                                <Calendar size={10} /> {new Date(post.createdAt).toLocaleDateString()}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* CTA SLOT — right edge, aligned */}
+                                            <div style={{
+                                                display: 'flex', alignItems: 'center',
+                                                alignSelf: 'stretch', paddingLeft: '8px',
+                                                borderLeft: '1px dashed rgba(255,255,255,0.04)'
+                                            }} className="cta-slot">
+                                                <span className="card-cta">
+                                                    Explore <ArrowUpRight size={14} strokeWidth={2.5} />
+                                                </span>
+                                            </div>
+                                        </Link>
+
+                                        {/* Bookmark float button moved OUTSIDE of the Link */}
                                         <button
                                             onClick={(e) => toggleBookmark(e, post.id)}
                                             className={`bookmark-float ${isSaved ? 'saved' : ''}`}
                                             aria-label={isSaved ? 'Remove bookmark' : 'Save project'}
+                                            style={{ 
+                                                position: 'absolute', 
+                                                top: '24px', 
+                                                right: '24px',
+                                                zIndex: 10 
+                                            }}
                                         >
                                             {isSaved ? <BookmarkCheck size={17} fill="currentColor" /> : <Bookmark size={17} />}
                                         </button>
-
-                                        {/* VISUAL SLOT — stylized domain icon with glow */}
-                                        <div className="card-visual">
-                                            <div className="visual-glow" />
-                                            <div style={{ position: 'relative', zIndex: 1, color: '#8be8bc' }}>
-                                                {domainIcon(post.domain)}
-                                            </div>
-                                        </div>
-
-                                        {/* CONTENT SLOT */}
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', minWidth: 0 }}>
-                                            {/* Top: tag cluster (upper-right area of title block) */}
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px', alignItems: 'center' }}>
-                                                <span className="pill pill-neon">
-                                                    {post.authorRole === 'Engineer' ? 'Engineer' : 'Healthcare Professional'}
-                                                </span>
-                                                <span className="pill pill-dim" style={{ textTransform: 'uppercase' }}>
-                                                    {post.domain}
-                                                </span>
-                                                <span className={`pill ${status.cls}`}>{status.label}</span>
-                                                {isLocalMatch(post) && (
-                                                    <span className="pill pill-cyan" style={{ animation: 'statusPulse 2.4s infinite' }}>
-                                                        <MapPin size={10} /> Local
-                                                    </span>
-                                                )}
-                                            </div>
-
-                                            {/* Editorial title */}
-                                            <h2
-                                                className="card-title"
-                                                style={{
-                                                    fontSize: 'clamp(22px, 2.2vw, 28px)',
-                                                    fontWeight: '800',
-                                                    letterSpacing: '-0.03em',
-                                                    lineHeight: '1.12',
-                                                    color: 'var(--text-main)',
-                                                    marginTop: '2px'
-                                                }}
-                                            >
-                                                {post.title}
-                                            </h2>
-
-                                            {/* Description */}
-                                            <p style={{
-                                                color: 'var(--text-muted)', fontSize: '14px',
-                                                lineHeight: '1.7', letterSpacing: '-0.005em',
-                                                display: '-webkit-box', WebkitLineClamp: 2,
-                                                WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                                                maxWidth: '640px'
-                                            }}>
-                                                {post.explanation}
-                                            </p>
-
-                                            {/* Match ribbon — only if relevant */}
-                                            {getMatchExplanation(post) && (
-                                                <div style={{
-                                                    display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                                    color: '#67e8f9', fontSize: '11.5px', fontWeight: '600',
-                                                    letterSpacing: '0.04em',
-                                                    textTransform: 'uppercase',
-                                                    alignSelf: 'flex-start'
-                                                }}>
-                                                    <Sparkles size={12} /> Match · {getMatchExplanation(post)}
-                                                </div>
-                                            )}
-
-                                            {/* Required expertise + author row */}
-                                            <div style={{
-                                                display: 'flex', flexWrap: 'wrap', gap: '20px',
-                                                alignItems: 'center', justifyContent: 'space-between',
-                                                marginTop: '8px',
-                                                paddingTop: '18px',
-                                                borderTop: '1px solid rgba(255,255,255,0.05)'
-                                            }}>
-                                                <div className="expertise-badge">
-                                                    <span className="expertise-badge-label">Required Expertise</span>
-                                                    <span className="expertise-badge-role">
-                                                        <MessageSquare size={11} />
-                                                        {post.authorRole === 'Engineer' ? 'Clinical / Healthcare Expert' : 'Engineering / Dev Expert'}
-                                                    </span>
-                                                </div>
-
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                    <div style={{
-                                                        width: '34px', height: '34px', borderRadius: '11px',
-                                                        background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        fontWeight: '800', fontSize: '13px', color: '#070b0a',
-                                                        flexShrink: 0
-                                                    }}>
-                                                        {post.authorName.charAt(0)}
-                                                    </div>
-                                                    <div style={{ minWidth: 0 }}>
-                                                        <div style={{ fontSize: '13.5px', fontWeight: '600', color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-                                                            {post.authorName}
-                                                        </div>
-                                                        <div style={{
-                                                            fontSize: '11px', color: 'var(--text-subtle)',
-                                                            display: 'flex', alignItems: 'center', gap: '4px',
-                                                            letterSpacing: '0.02em'
-                                                        }}>
-                                                            <Calendar size={10} /> {new Date(post.createdAt).toLocaleDateString()}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* CTA SLOT — right edge, aligned */}
-                                        <div style={{
-                                            display: 'flex', alignItems: 'center',
-                                            alignSelf: 'stretch', paddingLeft: '8px',
-                                            borderLeft: '1px dashed rgba(255,255,255,0.04)'
-                                        }} className="cta-slot">
-                                            <span className="card-cta">
-                                                Explore <ArrowUpRight size={14} strokeWidth={2.5} />
-                                            </span>
-                                        </div>
-                                    </Link>
+                                    </div>
                                 </motion.div>
                             );
                         })

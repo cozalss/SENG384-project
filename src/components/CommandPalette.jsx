@@ -152,9 +152,9 @@ const CommandPalette = ({ posts = [], user }) => {
                     letterSpacing: '0.01em'
                 }}
                 onMouseOver={(e) => {
-                    e.currentTarget.style.background = 'rgba(94, 210, 156, 0.06)';
-                    e.currentTarget.style.borderColor = 'rgba(94, 210, 156, 0.25)';
-                    e.currentTarget.style.color = '#8be8bc';
+                    e.currentTarget.style.background = 'rgba(96, 165, 250, 0.06)';
+                    e.currentTarget.style.borderColor = 'rgba(96, 165, 250, 0.25)';
+                    e.currentTarget.style.color = '#93c5fd';
                 }}
                 onMouseOut={(e) => {
                     e.currentTarget.style.background = 'rgba(7, 11, 10, 0.5)';
@@ -221,7 +221,7 @@ const CommandPalette = ({ posts = [], user }) => {
                                     zIndex: 9999,
                                     padding: 0,
                                     overflow: 'hidden',
-                                    boxShadow: '0 50px 120px rgba(0, 0, 0, 0.6), 0 0 100px rgba(94, 210, 156, 0.14)'
+                                    boxShadow: '0 50px 120px rgba(0, 0, 0, 0.6), 0 0 100px rgba(96, 165, 250, 0.14)'
                                 }}
                             >
                             {/* Search input header */}
@@ -233,7 +233,7 @@ const CommandPalette = ({ posts = [], user }) => {
                                 borderBottom: '1px solid rgba(255,255,255,0.05)',
                                 position: 'relative'
                             }}>
-                                <Search size={18} color="#8be8bc" strokeWidth={2.2} />
+                                <Search size={18} color="#93c5fd" strokeWidth={2.2} />
                                 <input
                                     ref={inputRef}
                                     type="text"
@@ -303,8 +303,8 @@ const CommandPalette = ({ posts = [], user }) => {
                                                             width: '100%',
                                                             padding: '11px 14px',
                                                             borderRadius: '11px',
-                                                            background: active ? 'rgba(94, 210, 156, 0.08)' : 'transparent',
-                                                            border: `1px solid ${active ? 'rgba(94, 210, 156, 0.2)' : 'transparent'}`,
+                                                            background: active ? 'rgba(96, 165, 250, 0.08)' : 'transparent',
+                                                            border: `1px solid ${active ? 'rgba(96, 165, 250, 0.2)' : 'transparent'}`,
                                                             color: active ? 'var(--text-main)' : 'var(--text-muted)',
                                                             cursor: 'pointer',
                                                             fontFamily: 'var(--font-body)',
@@ -317,7 +317,7 @@ const CommandPalette = ({ posts = [], user }) => {
                                                             borderRadius: '10px',
                                                             background: item.accent ? 'linear-gradient(135deg, var(--primary), var(--accent))' : 'rgba(255,255,255,0.04)',
                                                             border: `1px solid ${item.accent ? 'transparent' : 'rgba(255,255,255,0.05)'}`,
-                                                            color: item.accent ? '#070b0a' : (active ? '#8be8bc' : 'var(--text-muted)'),
+                                                            color: item.accent ? '#070b0a' : (active ? '#93c5fd' : 'var(--text-muted)'),
                                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                             flexShrink: 0,
                                                             transition: 'color 0.15s'
@@ -348,7 +348,7 @@ const CommandPalette = ({ posts = [], user }) => {
                                                             </div>
                                                         </span>
                                                         {active && (
-                                                            <span style={{ color: '#8be8bc', display: 'flex', flexShrink: 0 }}>
+                                                            <span style={{ color: '#93c5fd', display: 'flex', flexShrink: 0 }}>
                                                                 <ArrowRight size={14} />
                                                             </span>
                                                         )}
@@ -402,7 +402,7 @@ const CommandPalette = ({ posts = [], user }) => {
                                 </span>
                                 <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                                     Powered by
-                                    <span style={{ color: '#8be8bc', fontWeight: '700', letterSpacing: '0.08em' }}>HEALTHAI</span>
+                                    <span style={{ color: '#93c5fd', fontWeight: '700', letterSpacing: '0.08em' }}>HEALTHAI</span>
                                 </span>
                             </div>
                             </motion.div>

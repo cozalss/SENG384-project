@@ -4,10 +4,11 @@ import { AnimatePresence } from 'framer-motion';
 
 import PageTransition from '../components/PageTransition';
 
-// Route-level code splitting. Each page ships as its own chunk — initial
-// bundle drops dramatically. The user only downloads what they navigate to.
-const LandingPage = lazy(() => import('../pages/LandingPage'));
-const Login = lazy(() => import('../pages/Login'));
+// LandingPage and Login stay eager — they are the first paint targets.
+// Authenticated routes are code-split so the main bundle stays lean.
+import LandingPage from '../pages/LandingPage';
+import Login from '../pages/Login';
+
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const CreatePost = lazy(() => import('../pages/CreatePost'));
 const PostDetail = lazy(() => import('../pages/PostDetail'));
@@ -25,8 +26,8 @@ const RouteFallback = () => (
   }}>
     <div style={{
       width: '28px', height: '28px',
-      border: '2.5px solid rgba(94, 210, 156, 0.18)',
-      borderTopColor: '#8be8bc',
+      border: '2.5px solid rgba(96, 165, 250, 0.18)',
+      borderTopColor: '#93c5fd',
       borderRadius: '50%',
       animation: 'spin 0.8s linear infinite'
     }} />
