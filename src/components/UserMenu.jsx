@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { ChevronDown, UserCircle, Shield, LogOut, Bookmark, FileText } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion, AnimatePresence } from 'framer-motion';
 
 const UserMenu = ({ user, logout }) => {
@@ -35,12 +35,11 @@ const UserMenu = ({ user, logout }) => {
         };
     }, [open, computeCoords]);
 
-    // Close on route change — synchronous in-render
-    const [trackedPath, setTrackedPath] = useState(location.pathname);
-    if (location.pathname !== trackedPath) {
-        setTrackedPath(location.pathname);
-        if (open) setOpen(false);
-    }
+    useEffect(() => {
+        if (!open) return;
+        const frame = requestAnimationFrame(() => setOpen(false));
+        return () => cancelAnimationFrame(frame);
+    }, [location.pathname, open]);
 
     // Close on outside click (checks BOTH the trigger wrapper and the portal dropdown)
     useEffect(() => {
@@ -107,50 +106,55 @@ const UserMenu = ({ user, logout }) => {
                     gap: '10px',
                     padding: '4px 12px 4px 4px',
                     borderRadius: '999px',
-                    background: open ? 'rgba(96, 165, 250, 0.08)' : 'rgba(7, 11, 10, 0.55)',
-                    border: `1px solid ${open ? 'rgba(96, 165, 250, 0.28)' : 'rgba(255, 255, 255, 0.05)'}`,
+                    background: open ? 'rgba(249, 168, 96, 0.08)' : 'rgba(255, 255, 255, 0.035)',
+                    border: `1px solid ${open ? 'rgba(249, 168, 96, 0.28)' : 'rgba(255, 255, 255, 0.08)'}`,
                     cursor: 'pointer',
                     color: 'var(--text-main)',
-                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                    fontFamily: 'var(--font-body)'
+                    transition: 'background 180ms cubic-bezier(0.32, 0.72, 0, 1), border-color 180ms cubic-bezier(0.32, 0.72, 0, 1)',
+                    fontFamily: 'var(--font-body)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)'
                 }}
                 onMouseOver={(e) => {
                     if (open) return;
-                    e.currentTarget.style.background = 'rgba(96, 165, 250, 0.05)';
-                    e.currentTarget.style.borderColor = 'rgba(96, 165, 250, 0.2)';
+                    e.currentTarget.style.background = 'rgba(249, 168, 96, 0.06)';
+                    e.currentTarget.style.borderColor = 'rgba(249, 168, 96, 0.22)';
                 }}
                 onMouseOut={(e) => {
                     if (open) return;
-                    e.currentTarget.style.background = 'rgba(7, 11, 10, 0.55)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.035)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
                 }}
             >
-                {/* Avatar */}
+                {/* Avatar — amber for engineer, emerald for clinician (mirrors Profile) */}
                 <span style={{
                     position: 'relative',
                     width: '30px', height: '30px',
                     borderRadius: '999px',
-                    background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+                    background: isEngineer
+                        ? 'linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%)'
+                        : 'linear-gradient(135deg, #34d399, #6ee7b7)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '13px', fontWeight: '800', color: '#070b0a',
+                    fontSize: '13px', fontWeight: 700, color: '#1a1012',
                     fontFamily: 'var(--font-heading)',
                     letterSpacing: '-0.02em',
-                    boxShadow: '0 4px 12px rgba(96, 165, 250, 0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+                    boxShadow: isEngineer
+                        ? '0 1px 2px rgba(0,0,0,0.22), 0 4px 12px -4px rgba(249, 168, 96, 0.32), inset 0 1px 0 rgba(255,255,255,0.22)'
+                        : '0 1px 2px rgba(0,0,0,0.22), 0 4px 12px -4px rgba(52, 211, 153, 0.3), inset 0 1px 0 rgba(255,255,255,0.22)',
                     flexShrink: 0
                 }}>
                     {initial}
-                    {/* Status dot */}
+                    {/* Online status dot — emerald for "available" semantics regardless of role */}
                     <motion.span
-                        animate={{ scale: [1, 1.2, 1], opacity: [0.85, 1, 0.85] }}
+                        animate={{ scale: [1, 1.18, 1], opacity: [0.85, 1, 0.85] }}
                         transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
                         style={{
                             position: 'absolute',
                             bottom: '-1px', right: '-1px',
                             width: '10px', height: '10px',
                             borderRadius: '50%',
-                            background: isEngineer ? '#93c5fd' : '#67e8f9',
-                            border: '2px solid #070b0a',
-                            boxShadow: `0 0 8px ${isEngineer ? 'rgba(96, 165, 250, 0.7)' : 'rgba(34, 211, 238, 0.7)'}`
+                            background: '#34d399',
+                            border: '2px solid #14111a',
+                            boxShadow: '0 0 8px rgba(52, 211, 153, 0.7)'
                         }}
                     />
                 </span>
@@ -171,7 +175,7 @@ const UserMenu = ({ user, logout }) => {
                     <span style={{
                         fontSize: '9.5px', fontWeight: '700',
                         letterSpacing: '0.13em', textTransform: 'uppercase',
-                        color: isEngineer ? '#93c5fd' : '#67e8f9',
+                        color: isEngineer ? '#f5c48a' : '#6ee7b7',
                         marginTop: '2px'
                     }}>
                         {roleLabel}
@@ -202,7 +206,7 @@ const UserMenu = ({ user, logout }) => {
                                 position: 'fixed',
                                 top: coords.top,
                                 right: coords.right,
-                                width: '280px',
+                                width: 'min(280px, calc(100vw - 24px))',
                                 padding: 0,
                                 zIndex: 10000,
                                 overflow: 'hidden',
@@ -254,6 +258,7 @@ const UserMenu = ({ user, logout }) => {
                                     to={item.path}
                                     state={item.state}
                                     role="menuitem"
+                                    onClick={() => setOpen(false)}
                                     style={{
                                         display: 'flex',
                                         alignItems: 'center',

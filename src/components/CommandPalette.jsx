@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
     Search, LayoutDashboard, FileText, MessageSquare, UserCircle, Shield,
     Plus, ArrowRight, Command as CmdIcon, CornerDownLeft, Sparkles
 } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion, AnimatePresence } from 'framer-motion';
 
 const isMac = typeof navigator !== 'undefined' && /Mac/.test(navigator.platform);
@@ -14,18 +14,14 @@ const CommandPalette = ({ posts = [], user }) => {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [activeIndex, setActiveIndex] = useState(0);
-    const [prevOpen, setPrevOpen] = useState(false);
     const navigate = useNavigate();
     const inputRef = useRef(null);
 
-    // Reset query/activeIndex when the palette closes — synchronous
-    if (open !== prevOpen) {
-        setPrevOpen(open);
-        if (!open) {
-            if (query !== '') setQuery('');
-            if (activeIndex !== 0) setActiveIndex(0);
-        }
-    }
+    const closePalette = useCallback(() => {
+        setOpen(false);
+        setQuery('');
+        setActiveIndex(0);
+    }, []);
 
     // Global shortcut
     useEffect(() => {
@@ -34,12 +30,12 @@ const CommandPalette = ({ posts = [], user }) => {
                 e.preventDefault();
                 setOpen(o => !o);
             } else if (e.key === 'Escape' && open) {
-                setOpen(false);
+                closePalette();
             }
         };
         window.addEventListener('keydown', onKeyDown);
         return () => window.removeEventListener('keydown', onKeyDown);
-    }, [open]);
+    }, [open, closePalette]);
 
     // Focus input on open
     useEffect(() => {
@@ -102,19 +98,13 @@ const CommandPalette = ({ posts = [], user }) => {
         return g;
     }, [filteredItems]);
 
-    // Reset active index when query changes — synchronous in-render
-    const [prevQuery, setPrevQuery] = useState(query);
-    if (query !== prevQuery) {
-        setPrevQuery(query);
-        if (activeIndex !== 0) setActiveIndex(0);
-    }
-
     const onItemNav = (item) => {
         navigate(item.path);
-        setOpen(false);
+        closePalette();
     };
 
     const handleInputKeyDown = (e) => {
+        if (filteredItems.length === 0) return;
         if (e.key === 'ArrowDown') {
             e.preventDefault();
             setActiveIndex(i => Math.min(i + 1, filteredItems.length - 1));
@@ -141,24 +131,25 @@ const CommandPalette = ({ posts = [], user }) => {
                     alignItems: 'center',
                     gap: '10px',
                     padding: '8px 8px 8px 14px',
-                    borderRadius: '12px',
-                    background: 'rgba(7, 11, 10, 0.5)',
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                    borderRadius: '11px',
+                    background: 'rgba(255, 255, 255, 0.035)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
                     cursor: 'pointer',
                     color: 'var(--text-muted)',
                     fontSize: '12.5px',
                     fontFamily: 'var(--font-body)',
-                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                    letterSpacing: '0.01em'
+                    letterSpacing: '-0.005em',
+                    transition: 'background 180ms cubic-bezier(0.32, 0.72, 0, 1), border-color 180ms cubic-bezier(0.32, 0.72, 0, 1), color 180ms cubic-bezier(0.32, 0.72, 0, 1)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)'
                 }}
                 onMouseOver={(e) => {
-                    e.currentTarget.style.background = 'rgba(96, 165, 250, 0.06)';
-                    e.currentTarget.style.borderColor = 'rgba(96, 165, 250, 0.25)';
-                    e.currentTarget.style.color = '#93c5fd';
+                    e.currentTarget.style.background = 'rgba(249, 168, 96, 0.08)';
+                    e.currentTarget.style.borderColor = 'rgba(249, 168, 96, 0.26)';
+                    e.currentTarget.style.color = '#f5c48a';
                 }}
                 onMouseOut={(e) => {
-                    e.currentTarget.style.background = 'rgba(7, 11, 10, 0.5)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.035)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
                     e.currentTarget.style.color = 'var(--text-muted)';
                 }}
             >
@@ -191,7 +182,7 @@ const CommandPalette = ({ posts = [], user }) => {
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.2 }}
-                                onClick={() => setOpen(false)}
+                                onClick={closePalette}
                                 style={{
                                     position: 'fixed', inset: 0, zIndex: 9998,
                                     background: 'rgba(3, 7, 10, 0.75)',
@@ -239,7 +230,10 @@ const CommandPalette = ({ posts = [], user }) => {
                                     type="text"
                                     placeholder="Search pages, posts, actions…"
                                     value={query}
-                                    onChange={(e) => setQuery(e.target.value)}
+                                    onChange={(e) => {
+                                        setQuery(e.target.value);
+                                        setActiveIndex(0);
+                                    }}
                                     onKeyDown={handleInputKeyDown}
                                     style={{
                                         flex: 1,

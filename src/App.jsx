@@ -9,6 +9,7 @@ import GlobalErrorBoundary from './components/GlobalErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 import ShortcutsModal from './components/ShortcutsModal';
 import { ToastProvider } from './components/ToastProvider';
+import { useToast } from './hooks/useToast';
 import { useState, useEffect } from 'react';
 import { MotionConfig } from 'framer-motion';
 import { AnimReadyContext } from './hooks/useAnimReady';
@@ -44,12 +45,29 @@ function AppContent() {
     return () => mq.removeEventListener?.('change', handler);
   }, []);
 
+  // Real-time arrivals ALSO surface as a toast so important events (new
+  // interest, meeting response, post closed) don't wait for the user to open
+  // the bell dropdown. The type of the notification maps to the toast intent.
+  const toast = useToast();
   const {
     notifications,
     addNotification,
     dismissNotification,
     dismissAllNotifications
-  } = useNotifications();
+  } = useNotifications({
+    onNewNotification: (n) => {
+      const intentByType = {
+        interest: 'success',
+        'meeting-accepted': 'success',
+        'post-closed': 'success',
+        'meeting-request': 'info',
+        'meeting-declined': 'info',
+        error: 'error',
+      };
+      const intent = intentByType[n.type] || 'info';
+      toast[intent]?.(n.message || '', { title: n.title, duration: 5500 });
+    },
+  });
 
   const {
     posts,
@@ -66,6 +84,19 @@ function AppContent() {
   const isFullWidth = location.pathname === '/' || location.pathname === '/login';
   const isLanding = location.pathname === '/';
 
+  // Once LandingBackground has been mounted, keep it mounted for the rest of
+  // the session. On non-landing routes the inner Spline canvas is display:none'd,
+  // so its WebGL render loop is paused and it consumes ~zero CPU. This makes
+  // Login → Landing instant (no Spline re-init) and keeps Landing → Login
+  // transition cheap (no WebGL teardown mid-transition). Users who land directly
+  // on /login never mount LandingBackground at all.
+  const [mountLandingBg, setMountLandingBg] = useState(isLanding);
+  useEffect(() => {
+    if (!isLanding) return;
+    const id = requestAnimationFrame(() => setMountLandingBg(true));
+    return () => cancelAnimationFrame(id);
+  }, [isLanding]);
+
   return (
     <AnimReadyContext.Provider value={animReady}>
     <MotionConfig
@@ -73,7 +104,11 @@ function AppContent() {
       reducedMotion={prefersReducedMotion ? 'always' : animReady ? 'never' : 'always'}
     >
       <VideoBackground hidden={isLanding} />
-      {isLanding && <LandingBackground />}
+      {mountLandingBg && <LandingBackground hidden={!isLanding} />}
+      {/* 3.5% SVG noise overlay — kills OLED gradient banding, adds tactile texture
+          that premium sites (Stripe, Arc, Framer) all ship. Pointer-events: none,
+          pure CSS, zero JS cost. */}
+      <div className="fx-grain-global" aria-hidden="true" />
 
       <NetworkStatus />
       <ShortcutsModal />

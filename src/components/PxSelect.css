@@ -1,0 +1,180 @@
+/* ===== PxSelect — premium custom select ===== */
+
+.px-select-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+    padding: 0 14px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 11px;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    transition:
+        background-color 160ms var(--ease-smooth, cubic-bezier(0.32, 0.72, 0, 1)),
+        border-color 160ms var(--ease-smooth, cubic-bezier(0.32, 0.72, 0, 1)),
+        box-shadow 160ms var(--ease-smooth, cubic-bezier(0.32, 0.72, 0, 1));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    text-align: left;
+    outline: none;
+    min-height: 38px;
+}
+
+.px-select-trigger:hover {
+    background-color: rgba(255, 255, 255, 0.055);
+    border-color: rgba(249, 168, 96, 0.3);
+}
+
+.px-select-trigger:focus-visible,
+.px-select-trigger.is-open {
+    border-color: rgba(249, 168, 96, 0.55);
+    box-shadow:
+        0 0 0 3px rgba(249, 168, 96, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.px-select-trigger.sm { height: 32px; padding: 0 10px; font-size: 12px; }
+.px-select-trigger.md { /* default */ }
+
+.px-select-value {
+    flex: 1;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.px-select-label {
+    color: var(--text-subtle);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.px-select-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.px-select-chev {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-subtle);
+    flex-shrink: 0;
+}
+
+.px-select-trigger:hover .px-select-chev,
+.px-select-trigger.is-open .px-select-chev {
+    color: var(--text-main);
+}
+
+/* ===== Popover ===== */
+
+.px-select-popover {
+    z-index: 3000;
+    min-width: 220px;
+    max-height: min(340px, 60vh);
+    overflow-y: auto;
+    padding: 6px;
+    border-radius: 14px;
+    background: rgba(22, 22, 28, 0.96);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 28px 60px -12px rgba(0, 0, 0, 0.6),
+        0 72px 128px -28px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    outline: none;
+}
+
+.px-select-popover::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(249, 168, 96, 0.35) 30%,
+        rgba(34, 211, 238, 0.3) 70%,
+        transparent);
+    pointer-events: none;
+}
+
+.px-select-popover::-webkit-scrollbar { width: 8px; }
+.px-select-popover::-webkit-scrollbar-track { background: transparent; }
+.px-select-popover::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.px-select-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    transition: background 140ms var(--ease-smooth, cubic-bezier(0.32, 0.72, 0, 1)), color 140ms;
+    text-align: left;
+}
+
+.px-select-option.is-active {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.px-select-option.is-selected {
+    color: #f5c48a;
+    background: linear-gradient(135deg, rgba(249, 168, 96, 0.12), rgba(34, 211, 238, 0.06));
+}
+
+.px-select-option.is-selected.is-active {
+    background: linear-gradient(135deg, rgba(249, 168, 96, 0.18), rgba(34, 211, 238, 0.08));
+}
+
+.px-select-option-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.px-select-option-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.px-select-option-hint {
+    font-size: 11px;
+    color: var(--text-subtle);
+    font-weight: 400;
+    letter-spacing: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

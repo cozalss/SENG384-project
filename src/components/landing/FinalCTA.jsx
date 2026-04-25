@@ -1,11 +1,17 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Cpu, Stethoscope, Globe, ShieldCheck, Activity, Rocket, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Cpu, Stethoscope, Activity, Rocket, ArrowRight, CheckCircle2 } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
 
 const FinalCTA = ({ isMobile }) => {
     return (
-        <section className="container" style={{ maxWidth: '1000px', marginBottom: isMobile ? '80px' : '120px', padding: isMobile ? '0 16px' : '0 24px' }}>
+        <section id="final-cta" className="container px-cta-section" style={{
+            maxWidth: '1000px',
+            // Match the unified landing rhythm.
+            marginTop: isMobile ? '40px' : '64px',
+            marginBottom: isMobile ? '64px' : '88px',
+            padding: isMobile ? '0 16px' : '0 24px',
+        }}>
             <ScrollReveal direction="scale">
                 <div style={{
                     position: 'relative',
@@ -33,40 +39,24 @@ const FinalCTA = ({ isMobile }) => {
                         pointerEvents: 'none'
                     }} />
 
-                    {/* Floating orbit badges (desktop) */}
+                    {/* Floating badges — two focal points, not four */}
                     {!isMobile && (
                         <>
                             <motion.div
-                                animate={{ y: [0, -14, 0] }}
-                                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                                animate={{ y: [0, -10, 0] }}
+                                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
                                 className="floating-badge"
-                                style={{ position: 'absolute', top: '14%', left: '6%', color: 'var(--primary-light)' }}
+                                style={{ position: 'absolute', top: '16%', left: '7%', color: 'var(--primary-light)' }}
                             >
                                 <Cpu size={12} /> Engineering
                             </motion.div>
                             <motion.div
-                                animate={{ y: [0, 14, 0] }}
-                                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                                animate={{ y: [0, 10, 0] }}
+                                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
                                 className="floating-badge"
-                                style={{ position: 'absolute', top: '22%', right: '8%', color: 'var(--secondary)' }}
+                                style={{ position: 'absolute', bottom: '18%', right: '9%', color: 'var(--secondary)' }}
                             >
                                 <Stethoscope size={12} /> Clinical
-                            </motion.div>
-                            <motion.div
-                                animate={{ y: [0, -12, 0] }}
-                                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-                                className="floating-badge"
-                                style={{ position: 'absolute', bottom: '18%', left: '10%', color: 'var(--cyan)' }}
-                            >
-                                <Globe size={12} /> Pan-European
-                            </motion.div>
-                            <motion.div
-                                animate={{ y: [0, 12, 0] }}
-                                transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-                                className="floating-badge"
-                                style={{ position: 'absolute', bottom: '20%', right: '10%', color: 'var(--badge-warning-text)' }}
-                            >
-                                <ShieldCheck size={12} /> GDPR
                             </motion.div>
                         </>
                     )}
@@ -74,7 +64,7 @@ const FinalCTA = ({ isMobile }) => {
                     <div style={{ textAlign: 'center', position: 'relative', zIndex: 3 }}>
                         <motion.div
                             animate={{ rotate: [0, 360] }}
-                            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                            transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
                             style={{
                                 width: isMobile ? '64px' : '84px', height: isMobile ? '64px' : '84px',
                                 borderRadius: '24px',
@@ -84,17 +74,17 @@ const FinalCTA = ({ isMobile }) => {
                                 boxShadow: '0 20px 60px rgba(96, 165, 250, 0.5), 0 0 80px rgba(34, 211, 238, 0.3)'
                             }}
                         >
-                            <motion.div
-                                animate={{ rotate: [0, -360] }}
-                                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                            <div
                                 style={{
                                     width: '100%', height: '100%', borderRadius: '22px',
                                     background: 'var(--background)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center'
                                 }}
                             >
-                                <Activity size={isMobile ? 28 : 36} color="var(--primary-light)" />
-                            </motion.div>
+                                <span className="spin-reverse-slow" style={{ display: 'inline-flex' }}>
+                                    <Activity size={isMobile ? 28 : 36} color="var(--primary-light)" />
+                                </span>
+                            </div>
                         </motion.div>
 
                         <h2 style={{
@@ -108,21 +98,29 @@ const FinalCTA = ({ isMobile }) => {
                             fontSize: isMobile ? '15px' : '18px', lineHeight: '1.7',
                             maxWidth: '540px', margin: '0 auto 40px'
                         }}>
-                            Join the HEALTH AI network and discover your cross-disciplinary partner today. Registration takes under 60 seconds.
+                            Create an institutional account and post your first cross-disciplinary collaboration request.
                         </p>
 
                         <div className="flex gap-3 justify-center" style={{ flexWrap: 'wrap' }}>
-                            <Link to="/login" className="btn btn-accent" style={{
-                                padding: isMobile ? '14px 30px' : '18px 48px',
-                                fontSize: isMobile ? '15px' : '17px', borderRadius: '16px',
-                                boxShadow: '0 12px 40px rgba(96, 165, 250, 0.45), 0 0 80px rgba(34, 211, 238, 0.2)'
-                            }}>
+                            <Link
+                                to="/login"
+                                className="btn btn-accent"
+                                style={{
+                                    padding: isMobile ? '14px 30px' : '18px 48px',
+                                    fontSize: isMobile ? '15px' : '17px', borderRadius: '16px',
+                                    boxShadow: '0 12px 40px rgba(96, 165, 250, 0.45), 0 0 80px rgba(34, 211, 238, 0.2)'
+                                }}
+                            >
                                 <Rocket size={20} /> Create Account <ArrowRight size={18} />
                             </Link>
-                            <a href="#how-it-works" className="btn btn-secondary" style={{
-                                padding: isMobile ? '14px 24px' : '18px 36px',
-                                fontSize: isMobile ? '15px' : '17px', borderRadius: '16px'
-                            }}>
+                            <a
+                                href="#how-it-works"
+                                className="btn btn-secondary"
+                                style={{
+                                    padding: isMobile ? '14px 24px' : '18px 36px',
+                                    fontSize: isMobile ? '15px' : '17px', borderRadius: '16px'
+                                }}
+                            >
                                 Read the Flow
                             </a>
                         </div>
@@ -135,7 +133,7 @@ const FinalCTA = ({ isMobile }) => {
                             <span style={{ opacity: 0.3 }}>•</span>
                             <span className="flex items-center gap-1"><CheckCircle2 size={12} color="var(--secondary)" /> .edu verified</span>
                             <span style={{ opacity: 0.3 }}>•</span>
-                            <span className="flex items-center gap-1"><CheckCircle2 size={12} color="var(--secondary)" /> Under 60s</span>
+                            <span className="flex items-center gap-1"><CheckCircle2 size={12} color="var(--secondary)" /> NDA gated</span>
                         </div>
                     </div>
                 </div>

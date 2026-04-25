@@ -1,23 +1,36 @@
 import { Link } from 'react-router-dom';
-import { Sparkles, Brain, ArrowRight, MousePointer2, Shield, Lock, Globe } from 'lucide-react';
-import AnimatedCounter from '../AnimatedCounter';
+import { ArrowDown, ArrowRight, Brain } from 'lucide-react';
 
+/**
+ * Hero — Sentinel-template structure with HEALTH AI content.
+ *
+ * The reference spec calls for: bottom-left content block, single big
+ * "BRAND AI" heading (AI in green), subheading, description, two CTA
+ * buttons, single trust line. All elements stagger-fade-up via CSS only —
+ * no per-word framer-motion (which was the source of first-paint jank).
+ *
+ * Pointer events on the content wrapper are off so cursor activity reaches
+ * the canvas behind it; the CTA buttons opt back in via pointer-events:auto.
+ */
 const Hero = () => {
     return (
         <section
-            className="sentinel-scope"
+            className="sentinel-scope px-hero landing-hero"
             style={{
                 position: 'relative',
-                minHeight: '100vh',
+                minHeight: '100svh',
                 display: 'flex',
                 alignItems: 'flex-end',
                 overflow: 'hidden',
                 background: 'transparent',
+                isolation: 'isolate',
             }}
         >
+            <div className="landing-hero-vignette" aria-hidden="true" />
 
-            {/* Content container — bottom-left */}
+            {/* Bottom-left content block */}
             <div
+                className="landing-hero-content"
                 style={{
                     position: 'relative',
                     zIndex: 10,
@@ -25,78 +38,72 @@ const Hero = () => {
                     width: '100%',
                     maxWidth: 'min(92%, 54rem)',
                     padding: 'clamp(6rem, 10vw, 8rem) clamp(1.5rem, 4vw, 2.5rem) clamp(2rem, 5vw, 2.5rem)',
+                    fontFamily: 'Sora, sans-serif',
                 }}
             >
-                {/* Badge */}
-                <div
-                    className="animate-fade-up"
-                    style={{ animationDelay: '0.1s', marginBottom: '1.25rem' }}
-                >
-                    <span
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            padding: '0.5rem 1rem',
-                            borderRadius: '999px',
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                            background: 'rgba(15, 23, 42, 0.6)',
-                            border: '1px solid rgba(255, 255, 255, 0.08)',
-                            color: 'hsl(119 99% 65%)',
-                            backdropFilter: 'blur(8px)',
-                            fontFamily: 'Sora, sans-serif',
-                            letterSpacing: '0.05em',
-                            textTransform: 'uppercase',
-                        }}
-                    >
-                        <Sparkles size={14} />
-                        European HealthTech Innovation Platform
-                    </span>
-                </div>
-
-                {/* Heading */}
+                {/* HEADING — single "HEALTH" + " AI" (green accent), uppercase, bold display */}
                 <h1
                     className="animate-fade-up"
                     style={{
+                        opacity: 0,
                         animationDelay: '0.2s',
-                        fontSize: 'clamp(2.25rem, 6.5vw, 5rem)',
-                        fontWeight: 700,
+                        fontSize: 'clamp(3rem, 8vw, 6rem)',
+                        // Premium 2026: display weight 600 (was 700/bold per spec — softened
+                        // from raw spec for the same visual hierarchy without the heavy feel).
+                        fontWeight: 600,
                         lineHeight: 1.05,
                         letterSpacing: '-0.05em',
                         color: 'hsl(0 0% 96%)',
-                        marginBottom: 'clamp(0.75rem, 2vw, 1rem)',
+                        marginBottom: 'clamp(0.5rem, 1.5vw, 1rem)',
                         textTransform: 'uppercase',
-                        fontFamily: 'Sora, sans-serif',
+                        textWrap: 'balance',
                     }}
                 >
-                    Where <span style={{ color: 'hsl(119 99% 46%)' }}>Healthcare</span>
-                    <br />
-                    Meets <span style={{ color: 'hsl(119 99% 46%)' }}>Engineering</span>
+                    HEALTH<span style={{ color: 'hsl(119 99% 46%)' }}> AI</span>
                 </h1>
 
-                {/* Description */}
+                {/* SUBHEADING — single value statement */}
                 <p
                     className="animate-fade-up"
                     style={{
+                        opacity: 0,
                         animationDelay: '0.4s',
+                        fontSize: 'clamp(1.125rem, 2.5vw, 1.875rem)',
+                        fontWeight: 300,
+                        lineHeight: 1.25,
+                        color: 'hsl(0 0% 96% / 0.85)',
+                        marginBottom: 'clamp(0.75rem, 2vw, 1.5rem)',
+                        letterSpacing: '-0.015em',
+                        textWrap: 'balance',
+                    }}
+                >
+                    Where medicine meets engineering.
+                </p>
+
+                {/* DESCRIPTION — longer detail */}
+                <p
+                    className="animate-fade-up"
+                    style={{
+                        opacity: 0,
+                        animationDelay: '0.55s',
                         fontSize: 'clamp(0.95rem, 1.5vw, 1.25rem)',
                         fontWeight: 300,
                         color: 'hsl(0 0% 75%)',
                         marginBottom: 'clamp(1.5rem, 3vw, 2rem)',
-                        fontFamily: 'Sora, sans-serif',
                         lineHeight: 1.6,
                         maxWidth: '40rem',
+                        textWrap: 'pretty',
                     }}
                 >
-                    A secure, GDPR-compliant platform for structured partner discovery between healthcare professionals and engineers. No IP stored. No coincidence needed.
+                    A secure, GDPR-compliant platform for structured partner discovery between healthcare professionals and engineers. NDA-gated. No IP stored. No coincidence needed.
                 </p>
 
-                {/* CTA buttons */}
+                {/* TWO CTA BUTTONS — pointer-events:auto re-enables clicks */}
                 <div
-                    className="animate-fade-up"
+                    className="animate-fade-up landing-hero-actions"
                     style={{
-                        animationDelay: '0.55s',
+                        opacity: 0,
+                        animationDelay: '0.7s',
                         display: 'flex',
                         flexWrap: 'wrap',
                         gap: '0.75rem',
@@ -104,6 +111,7 @@ const Hero = () => {
                 >
                     <Link
                         to="/login"
+                        aria-label="Join the HEALTH AI network"
                         style={{
                             pointerEvents: 'auto',
                             background: 'hsl(119 99% 46%)',
@@ -111,22 +119,21 @@ const Hero = () => {
                             padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 3vw, 2rem)',
                             fontSize: '0.875rem',
                             fontWeight: 700,
-                            borderRadius: '0.125rem',
+                            borderRadius: '0.5rem',
                             cursor: 'pointer',
                             textDecoration: 'none',
-                            transition: 'all 0.2s ease',
-                            fontFamily: 'Sora, sans-serif',
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '0.5rem',
+                            boxShadow: '0 14px 40px rgba(34, 211, 102, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22)',
+                            transition: 'filter 0.2s, transform 0.18s',
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
                     >
                         <Brain size={18} /> Join the Network <ArrowRight size={16} />
                     </Link>
                     <a
-                        href="#how-it-works"
+                        href="#premise"
+                        aria-label="Start the landing page flow from the first section"
                         style={{
                             pointerEvents: 'auto',
                             background: '#fff',
@@ -134,114 +141,78 @@ const Hero = () => {
                             padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 3vw, 2rem)',
                             fontSize: '0.875rem',
                             fontWeight: 700,
-                            borderRadius: '0.125rem',
+                            borderRadius: '0.5rem',
                             cursor: 'pointer',
                             textDecoration: 'none',
-                            transition: 'all 0.2s ease',
-                            fontFamily: 'Sora, sans-serif',
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '0.5rem',
+                            boxShadow: '0 14px 30px rgba(255, 255, 255, 0.1)',
+                            transition: 'filter 0.2s, transform 0.18s',
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(0.9)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
                     >
-                        <MousePointer2 size={16} /> How It Works
+                        <ArrowDown size={16} /> Start the Flow
                     </a>
                 </div>
 
-                {/* Trust pills */}
+                {/* ECG pulse + trust line: one compact proof row, no extra visual noise. */}
                 <div
-                    className="animate-fade-up"
+                    className="animate-fade-up landing-hero-trust"
                     style={{
-                        animationDelay: '0.7s',
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: '0.5rem',
-                        marginTop: '1.5rem',
-                    }}
-                >
-                    {[
-                        { icon: <Shield size={14} />, text: 'GDPR Compliant' },
-                        { icon: <Lock size={14} />, text: 'NDA Protected' },
-                        { icon: <Globe size={14} />, text: '.edu Only' },
-                    ].map((item, i) => (
-                        <div
-                            key={i}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                                fontSize: '0.75rem',
-                                color: 'hsl(0 0% 75%)',
-                                fontWeight: 500,
-                                padding: '0.5rem 0.875rem',
-                                borderRadius: '999px',
-                                background: 'rgba(15, 23, 42, 0.5)',
-                                border: '1px solid rgba(255, 255, 255, 0.08)',
-                                backdropFilter: 'blur(8px)',
-                                fontFamily: 'Sora, sans-serif',
-                            }}
-                        >
-                            <span style={{ color: 'hsl(119 99% 65%)' }}>{item.icon}</span>
-                            {item.text}
-                        </div>
-                    ))}
-                </div>
-
-                {/* Stats */}
-                <div
-                    className="animate-fade-up"
-                    style={{
+                        opacity: 0,
                         animationDelay: '0.85s',
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                        gap: '0.75rem',
-                        marginTop: '2rem',
-                        maxWidth: '42rem',
+                        marginTop: 'clamp(1rem, 2vw, 1.5rem)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        flexWrap: 'wrap',
+                        color: 'hsl(0 0% 60% / 0.88)',
                     }}
                 >
-                    {[
-                        { value: 150, suffix: '+', label: 'Active Innovators' },
-                        { value: 85, suffix: '+', label: 'Projects Posted' },
-                        { value: 12, suffix: '', label: 'Countries' },
-                        { value: 34, suffix: '', label: 'Partnerships' },
-                    ].map((s, i) => (
-                        <div
-                            key={i}
-                            style={{
-                                padding: '0.875rem 0.75rem',
-                                borderRadius: '0.5rem',
-                                background: 'rgba(15, 23, 42, 0.5)',
-                                border: '1px solid rgba(255, 255, 255, 0.08)',
-                                backdropFilter: 'blur(8px)',
-                                fontFamily: 'Sora, sans-serif',
-                            }}
-                        >
-                            <div
-                                style={{
-                                    fontSize: 'clamp(1.25rem, 2vw, 1.75rem)',
-                                    fontWeight: 700,
-                                    letterSpacing: '-0.03em',
-                                    color: 'hsl(119 99% 46%)',
-                                }}
-                            >
-                                <AnimatedCounter value={s.value} suffix={s.suffix} />
-                            </div>
-                            <div
-                                style={{
-                                    fontSize: '0.6875rem',
-                                    color: 'hsl(0 0% 60%)',
-                                    fontWeight: 500,
-                                    marginTop: '0.25rem',
-                                    letterSpacing: '0.03em',
-                                    textTransform: 'uppercase',
-                                }}
-                            >
-                                {s.label}
-                            </div>
-                        </div>
-                    ))}
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 200 28"
+                        style={{ width: 120, height: 24, flexShrink: 0, overflow: 'visible' }}
+                    >
+                        <defs>
+                            <linearGradient id="ecg-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stopColor="hsl(119 99% 56%)" stopOpacity="0" />
+                                <stop offset="50%" stopColor="hsl(119 99% 56%)" stopOpacity="1" />
+                                <stop offset="100%" stopColor="hsl(119 99% 56%)" stopOpacity="0" />
+                            </linearGradient>
+                        </defs>
+                        {/* Faint baseline */}
+                        <line x1="0" y1="14" x2="200" y2="14" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                        {/* ECG waveform — looping pulse drawn endlessly across the line */}
+                        <path
+                            d="M 0 14 L 60 14 L 70 6 L 80 22 L 88 14 L 200 14"
+                            fill="none"
+                            stroke="url(#ecg-grad)"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                            strokeDasharray="220"
+                            style={{ animation: 'ecg-sweep 2.4s linear infinite' }}
+                        />
+                    </svg>
+                    <style>{`
+                        @keyframes ecg-sweep {
+                            0%   { stroke-dashoffset: 220; }
+                            100% { stroke-dashoffset: -220; }
+                        }
+                        @media (prefers-reduced-motion: reduce) {
+                            svg path[stroke="url(#ecg-grad)"] { animation: none; stroke-dashoffset: 0; }
+                        }
+                    `}</style>
+                    <p
+                        style={{
+                            margin: 0,
+                            fontSize: '0.75rem',
+                            fontWeight: 400,
+                            letterSpacing: '0.04em',
+                        }}
+                    >
+                        GDPR compliant · NDA gated · Verified .edu institutions only
+                    </p>
                 </div>
             </div>
         </section>

@@ -18,9 +18,9 @@ const SkeletonCard = () => {
             className="editorial-panel"
             style={{
                 display: 'grid',
-                gridTemplateColumns: '220px 1fr auto',
-                gap: '32px',
-                padding: '32px 36px',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))',
+                gap: 'clamp(20px, 4vw, 32px)',
+                padding: 'clamp(26px, 5vw, 32px) clamp(20px, 5vw, 36px)',
                 alignItems: 'stretch'
             }}
             aria-hidden="true"

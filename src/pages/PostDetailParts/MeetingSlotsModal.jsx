@@ -1,5 +1,5 @@
 import { Calendar, Send, Video, X } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAnimReady } from '../../hooks/useAnimReady';
 
@@ -90,10 +90,10 @@ const MeetingSlotsModal = ({
                             ))}
                         </div>
 
-                        <div className="flex justify-end gap-4">
-                            <button className="btn btn-secondary" onClick={onClose} style={{ padding: '14px 28px', borderRadius: '14px' }}>Cancel</button>
-                            <button className="btn btn-accent" disabled={!selectedSlot} onClick={onSend} style={{ padding: '14px 36px', borderRadius: '14px' }}>
-                                <Send size={18} /> Send Meeting Request
+                        <div className="px-modal-footer">
+                            <button type="button" className="px-btn ghost" onClick={onClose}>Cancel</button>
+                            <button type="button" className="px-btn primary" disabled={!selectedSlot} onClick={onSend}>
+                                <Send size={16} /> Send Meeting Request
                             </button>
                         </div>
                     </motion.div>

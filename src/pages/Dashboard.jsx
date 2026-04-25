@@ -1,16 +1,18 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
     Search, Plus, MapPin, Calendar, Filter, Sparkles, ArrowUpRight,
     Bookmark, BookmarkCheck, LayoutDashboard, Brain, HeartPulse,
     Stethoscope, FlaskConical, Dna, Microscope, Cpu, Activity,
-    Layers, MessageSquare
+    Layers, MessageSquare, TrendingUp, FileText, Flame, Clock, Users
 } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+import AnimatedCounter from '../components/AnimatedCounter';
+ 
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { useAnimReady } from '../hooks/useAnimReady';
 import { useToast } from '../hooks/useToast';
 import SkeletonCard from '../components/SkeletonCard';
+import PxSelect from '../components/PxSelect';
 
 /* Domain → illustration icon map (stylized, editorial) */
 const domainIcon = (domain = '') => {
@@ -24,6 +26,31 @@ const domainIcon = (domain = '') => {
     if (d.includes('diagn') || d.includes('ai') || d.includes('ml')) return <Activity size={96} strokeWidth={1.1} />;
     return <Stethoscope size={96} strokeWidth={1.1} />;
 };
+
+/* Domain → accent hue tokens. Gives cards a visual identity at a glance
+   instead of the generic blue treatment that had every card look the same. */
+const domainAccent = (domain = '') => {
+    const d = domain.toLowerCase();
+    if (d.includes('neur') || d.includes('rehab') || d.includes('vr') || d.includes('cognitive'))
+        return { ink: '#c4b5fd', wash: 'rgba(167, 139, 250, 0.14)', glow: 'rgba(167, 139, 250, 0.18)' };
+    if (d.includes('cardio') || d.includes('heart'))
+        return { ink: '#fda4af', wash: 'rgba(251, 113, 133, 0.14)', glow: 'rgba(251, 113, 133, 0.18)' };
+    if (d.includes('imag') || d.includes('radio') || d.includes('scan'))
+        return { ink: '#67e8f9', wash: 'rgba(34, 211, 238, 0.14)', glow: 'rgba(34, 211, 238, 0.18)' };
+    if (d.includes('bio') || d.includes('genom') || d.includes('dna'))
+        return { ink: '#6ee7b7', wash: 'rgba(52, 211, 153, 0.14)', glow: 'rgba(52, 211, 153, 0.18)' };
+    if (d.includes('clinic') || d.includes('research') || d.includes('pharm'))
+        return { ink: '#fcd34d', wash: 'rgba(245, 158, 11, 0.14)', glow: 'rgba(245, 158, 11, 0.18)' };
+    if (d.includes('device') || d.includes('robot') || d.includes('iot'))
+        return { ink: '#7dd3fc', wash: 'rgba(56, 189, 248, 0.14)', glow: 'rgba(56, 189, 248, 0.18)' };
+    if (d.includes('diagn') || d.includes('ai') || d.includes('ml'))
+        return { ink: '#f5c48a', wash: 'rgba(249, 168, 96, 0.14)', glow: 'rgba(249, 168, 96, 0.18)' };
+    // Default — aurora amber
+    return { ink: '#f5c48a', wash: 'rgba(249, 168, 96, 0.12)', glow: 'rgba(249, 168, 96, 0.16)' };
+};
+
+const MS_PER_DAY = 86400000;
+const INITIAL_DASHBOARD_NOW = Date.now();
 
 const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
     const animReady = useAnimReady();
@@ -39,6 +66,12 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
         // Honor state hint from UserMenu → "Saved" shortcut
         location.state?.feedType === 'saved' ? 'saved' : 'all'
     );
+    const [now, setNow] = useState(INITIAL_DASHBOARD_NOW);
+
+    useEffect(() => {
+        const id = window.setInterval(() => setNow(Date.now()), 60000);
+        return () => window.clearInterval(id);
+    }, []);
 
     const savedPostIds = useMemo(() => user?.savedPosts || [], [user?.savedPosts]);
 
@@ -80,6 +113,42 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
         });
     }, [posts, filterStatus, searchTerm, filterDomain, filterStage, filterCountry, filterCity, feedType, savedPostIds]);
 
+    // ---- Dashboard stats ----
+    // Premium dashboards show a pulse at a glance. These four numbers answer
+    // "what's happening right now?" without making the user read every card.
+    const stats = useMemo(() => {
+        const livePosts = posts.filter(p => p.status !== 'DELETED');
+        const active = livePosts.filter(p => p.status === 'Active').length;
+        const newThisWeek = livePosts.filter(p => {
+            const created = new Date(p.createdAt).getTime();
+            return (now - created) < (7 * MS_PER_DAY);
+        }).length;
+        const saved = savedPostIds.length;
+        const pendingMeetings = livePosts.filter(p => (p.meetings || []).some(m => m.status === 'pending')).length;
+        return { active, newThisWeek, saved, pendingMeetings };
+    }, [posts, savedPostIds, now]);
+
+    // ---- Trending domains — top 3 by active post count ----
+    const trendingDomains = useMemo(() => {
+        const counts = new Map();
+        posts.forEach(p => {
+            if (p.status === 'DELETED' || p.status === 'Expired') return;
+            counts.set(p.domain, (counts.get(p.domain) || 0) + 1);
+        });
+        return Array.from(counts.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 4)
+            .map(([name, count]) => ({ name, count }));
+    }, [posts]);
+
+    // ---- Recent activity — last 5 non-deleted posts ----
+    const recentActivity = useMemo(() => {
+        return [...posts]
+            .filter(p => p.status !== 'DELETED')
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 5);
+    }, [posts]);
+
     const isLocalMatch = (post) => {
         return user?.city && post.city && user.city.toLowerCase() === post.city.toLowerCase();
     };
@@ -100,104 +169,101 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
 
     return (
         <div className="animate-fade-in" style={{ paddingBottom: '100px' }}>
-            {/* ===== UNIFIED DISCOVERY PORTAL ===== */}
+            {/* ===== COMPACT HERO ===== */}
             <motion.section
                 initial={animReady ? { opacity: 0, y: 24 } : false}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="discovery-portal"
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="dash-hero"
             >
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'minmax(0, 1fr) auto',
-                    gap: '40px',
-                    alignItems: 'flex-start',
-                    position: 'relative', zIndex: 2,
-                    marginBottom: '32px'
-                }} className="portal-top">
-                    {/* Editorial title + description */}
-                    <div>
+                <div className="dash-hero-row">
+                    <div className="dash-hero-text">
                         <motion.div
-                            initial={animReady ? {  opacity: 0, x: -12  } : false}
+                            initial={animReady ? { opacity: 0, x: -8 } : false}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.6, delay: 0.1 }}
-                            style={{
-                                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                                padding: '6px 14px', borderRadius: '999px', fontSize: '11px',
-                                fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.14em',
-                                background: 'rgba(96, 165, 250, 0.08)', color: '#93c5fd',
-                                border: '1px solid rgba(96, 165, 250, 0.2)',
-                                marginBottom: '20px'
-                            }}
+                            transition={{ duration: 0.5, delay: 0.08 }}
+                            className="dash-eyebrow"
                         >
                             <Layers size={11} /> Discovery Portal
                         </motion.div>
 
                         <motion.h1
-                            initial={animReady ? {  opacity: 0, y: 12  } : false}
+                            initial={animReady ? { opacity: 0, y: 10 } : false}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.7, delay: 0.15 }}
-                            className="editorial-title"
+                            transition={{ duration: 0.55, delay: 0.12 }}
+                            className="dash-title"
                         >
-                            Innovator <span className="accent">Feed</span>
+                            Innovator <span className="dash-title-accent">Feed</span>
                         </motion.h1>
 
                         <motion.p
-                            initial={animReady ? {  opacity: 0  } : false}
+                            initial={animReady ? { opacity: 0 } : false}
                             animate={{ opacity: 1 }}
-                            transition={{ duration: 0.6, delay: 0.25 }}
-                            style={{
-                                fontSize: '16px', color: 'var(--text-muted)',
-                                maxWidth: '560px', lineHeight: '1.6', letterSpacing: '-0.005em'
-                            }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                            className="dash-subtitle"
                         >
                             Discover cross-disciplinary expertise to accelerate health-tech.
                         </motion.p>
                     </div>
 
-                    {/* New Announcement — floating CTA */}
                     <motion.div
-                        initial={animReady ? {  opacity: 0, scale: 0.9  } : false}
+                        initial={animReady ? { opacity: 0, scale: 0.95 } : false}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.5, delay: 0.3 }}
-                        whileHover={{ scale: 1.03, y: -2 }}
-                        whileTap={{ scale: 0.98 }}
+                        transition={{ duration: 0.4, delay: 0.22 }}
                     >
                         <Link
                             to="/create-post"
                             id="new-announcement-btn"
-                            className="btn btn-announce"
-                            style={{
-                                padding: '14px 22px', borderRadius: '14px',
-                                background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-                                color: '#070b0a', fontWeight: '700', fontSize: '13.5px',
-                                letterSpacing: '0.01em',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                                textDecoration: 'none',
-                                whiteSpace: 'nowrap'
-                            }}
+                            className="px-btn primary lg"
+                            style={{ whiteSpace: 'nowrap' }}
                         >
-                            <Plus size={17} strokeWidth={2.5} /> New Announcement
+                            <Plus size={16} strokeWidth={2.5} /> New Announcement
                         </Link>
                     </motion.div>
                 </div>
+            </motion.section>
 
-                {/* Integrated search + tabs row */}
-                <motion.div
-                    initial={animReady ? {  opacity: 0, y: 12  } : false}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.35 }}
-                    style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'minmax(0, 1fr) auto',
-                        gap: '16px',
-                        alignItems: 'center',
-                        position: 'relative', zIndex: 2,
-                        marginBottom: '20px'
-                    }}
-                    className="portal-search-row"
-                >
+            {/* ===== STAT STRIP — at-a-glance pulse ===== */}
+            <motion.div
+                initial={animReady ? { opacity: 0, y: 10 } : false}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.26 }}
+                className="dash-stat-strip"
+            >
+                {[
+                    { icon: Flame, label: 'Active', value: stats.active, tone: 'amber' },
+                    { icon: Sparkles, label: 'New this week', value: stats.newThisWeek, tone: 'cyan' },
+                    { icon: Bookmark, label: 'Saved', value: stats.saved, tone: 'emerald' },
+                    { icon: Clock, label: 'Pending meetings', value: stats.pendingMeetings, tone: 'violet' },
+                ].map((s, i) => {
+                    const Icon = s.icon;
+                    return (
+                        <motion.div
+                            key={s.label}
+                            className={`dash-stat-card tone-${s.tone}`}
+                            whileHover={{ y: -2 }}
+                            transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+                        >
+                            <div className="dash-stat-icon"><Icon size={16} strokeWidth={2} /></div>
+                            <div className="dash-stat-body">
+                                <span className="dash-stat-value">
+                                    <AnimatedCounter value={s.value} duration={850 + i * 100} />
+                                </span>
+                                <span className="dash-stat-label">{s.label}</span>
+                            </div>
+                        </motion.div>
+                    );
+                })}
+            </motion.div>
+
+            {/* ===== SEARCH + TABS + FILTERS (unified control strip) ===== */}
+            <motion.div
+                initial={animReady ? { opacity: 0, y: 10 } : false}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.32 }}
+                className="dash-controls"
+            >
+                <div className="dash-search-row">
                     <div className="portal-search">
                         <Search size={18} color="var(--text-subtle)" />
                         <input
@@ -207,24 +273,16 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <div style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '6px',
-                            padding: '5px 11px', borderRadius: '8px',
-                            background: 'rgba(96, 165, 250, 0.08)',
-                            border: '1px solid rgba(96, 165, 250, 0.16)',
-                            color: '#93c5fd', fontSize: '11px', fontWeight: '700',
-                            letterSpacing: '0.04em', whiteSpace: 'nowrap'
-                        }}>
+                        <div className="dash-result-pill">
                             <Filter size={11} /> {filteredPosts.length} {filteredPosts.length === 1 ? 'result' : 'results'}
                         </div>
                     </div>
 
-                    {/* Segmented tabs — LayoutGroup animates the pill */}
                     <LayoutGroup>
                         <div className="segmented-control">
                             {[
                                 { key: 'all', label: 'All Channels', icon: <LayoutDashboard size={14} /> },
-                                { key: 'saved', label: 'Saved', icon: <Bookmark size={14} />, count: savedPostIds.length }
+                                { key: 'saved', label: 'Saved', icon: <Bookmark size={14} />, count: savedPostIds.length },
                             ].map(tab => (
                                 <button
                                     key={tab.key}
@@ -234,68 +292,47 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                     {feedType === tab.key && (
                                         <motion.span
                                             layoutId="segmented-pill"
-                                            style={{
-                                                position: 'absolute', inset: 0,
-                                                background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-                                                borderRadius: '10px', zIndex: -1,
-                                                boxShadow: '0 8px 22px rgba(96, 165, 250, 0.3)'
-                                            }}
+                                            className="dash-segmented-fill"
                                             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                                         />
                                     )}
                                     {tab.icon} {tab.label}
                                     {tab.count > 0 && (
-                                        <span style={{
-                                            display: 'inline-flex', alignItems: 'center',
-                                            justifyContent: 'center',
-                                            minWidth: '18px', height: '18px', padding: '0 5px',
-                                            borderRadius: '999px',
-                                            background: feedType === tab.key ? 'rgba(7,11,10,0.3)' : 'rgba(96,165,250,0.15)',
-                                            color: feedType === tab.key ? '#070b0a' : '#93c5fd',
-                                            fontSize: '10px', fontWeight: '800',
-                                            marginLeft: '2px'
-                                        }}>{tab.count}</span>
+                                        <span className={`dash-tab-count ${feedType === tab.key ? 'active' : ''}`}>
+                                            {tab.count}
+                                        </span>
                                     )}
                                 </button>
                             ))}
                         </div>
                     </LayoutGroup>
-                </motion.div>
+                </div>
 
-                {/* Elegant single-line filters */}
-                <motion.div
-                    initial={animReady ? {  opacity: 0, y: 8  } : false}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.45 }}
-                    className="filter-row"
-                    style={{ position: 'relative', zIndex: 2 }}
-                >
+                <div className="filter-row" style={{ marginTop: 12 }}>
                     {[
                         { id: 'domain', value: filterDomain, setter: setFilterDomain, opts: allDomains, label: 'Domain' },
                         { id: 'stage', value: filterStage, setter: setFilterStage, opts: stages, label: 'Stage' },
                         { id: 'country', value: filterCountry, setter: setFilterCountry, opts: countries, label: 'Country' },
                         { id: 'city', value: filterCity, setter: setFilterCity, opts: cities, label: 'City' },
-                        { id: 'status', value: filterStatus, setter: setFilterStatus, opts: statuses, label: 'Status' }
+                        { id: 'status', value: filterStatus, setter: setFilterStatus, opts: statuses, label: 'Status' },
                     ].map(f => (
-                        <select
+                        <PxSelect
                             key={f.id}
                             id={`filter-${f.id}`}
-                            className="filter-chip"
+                            size="sm"
+                            ariaLabel={f.label}
+                            label={`${f.label}:`}
                             value={f.value}
-                            onChange={(e) => f.setter(e.target.value)}
-                        >
-                            {f.opts.map(o => (
-                                <option key={o} value={o} style={{ background: '#0a1210', color: 'var(--text-main)' }}>
-                                    {f.label}: {o}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={f.setter}
+                            options={f.opts.map(o => ({ value: o, label: o }))}
+                        />
                     ))}
-                </motion.div>
-            </motion.section>
+                </div>
+            </motion.div>
 
-            {/* ===== EDITORIAL FEED ===== */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            {/* ===== FEED + RIGHT RAIL ===== */}
+            <div className="dash-main-grid">
+            <div className="dash-feed" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                 {/* Loading skeletons — shown while Firestore subscription initializes */}
                 {postsLoading && posts.length === 0 && (
                     <>
@@ -309,48 +346,87 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                     {!postsLoading && filteredPosts.length === 0 ? (
                         <motion.div
                             key="empty"
-                            initial={animReady ? {  opacity: 0, scale: 0.95  } : false}
-                            animate={{ opacity: 1, scale: 1 }}
+                            initial={animReady ? {  opacity: 0, scale: 0.98, y: 8  } : false}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0 }}
+                            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
                             className="editorial-card"
                             style={{
+                                position: 'relative',
                                 display: 'block', textAlign: 'center',
-                                padding: '72px 48px', color: 'var(--text-muted)'
+                                padding: 'clamp(44px, 9vw, 84px) clamp(18px, 5vw, 48px)', color: 'var(--text-muted)',
+                                overflow: 'hidden',
                             }}
                         >
-                            <Sparkles size={48} style={{ margin: '0 auto 24px', opacity: 0.25 }} />
-                            <h3 style={{ fontSize: '26px', color: 'var(--text-main)', marginBottom: '12px', fontWeight: '700' }}>
-                                No announcements found
+                            {/* Aurora glow behind the empty — echoes the amber+cyan system */}
+                            <div aria-hidden="true" style={{
+                                position: 'absolute', inset: 0, pointerEvents: 'none',
+                                background: 'radial-gradient(ellipse 60% 50% at 30% 30%, rgba(249, 168, 96, 0.09), transparent 60%), radial-gradient(ellipse 55% 45% at 80% 80%, rgba(34, 211, 238, 0.07), transparent 65%)',
+                            }} />
+                            <div style={{
+                                position: 'relative',
+                                width: 72, height: 72, margin: '0 auto 22px',
+                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                borderRadius: 20,
+                                background: 'linear-gradient(135deg, rgba(249, 168, 96, 0.14), rgba(34, 211, 238, 0.1))',
+                                border: '1px solid rgba(255, 255, 255, 0.08)',
+                                color: '#f5c48a',
+                                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 12px 32px -8px rgba(249, 168, 96, 0.25)',
+                            }}>
+                                <Sparkles size={30} strokeWidth={1.6} />
+                            </div>
+                            <h3 style={{
+                                position: 'relative',
+                                fontFamily: 'var(--font-heading)',
+                                fontSize: 'clamp(22px, 2.4vw, 28px)',
+                                fontWeight: 600,
+                                letterSpacing: '-0.025em',
+                                color: 'var(--text-main)',
+                                marginBottom: 10,
+                            }}>
+                                {searchTerm ? `No matches for "${searchTerm}"` : 'No announcements found'}
                             </h3>
-                            <p style={{ fontSize: '15px', maxWidth: '440px', margin: '0 auto', lineHeight: '1.7' }}>
-                                Adjust your filters or be the first to post a new collaboration request in this category.
+                            <p style={{
+                                position: 'relative',
+                                fontSize: 14.5, maxWidth: 440, margin: '0 auto', lineHeight: 1.65,
+                                letterSpacing: '-0.005em',
+                            }}>
+                                {searchTerm
+                                    ? `No matches for "${searchTerm}". Try broadening your search, or clear the filters above to see everything active.`
+                                    : 'Adjust your filters above, or be the first to post a new collaboration request in this category.'}
                             </p>
                         </motion.div>
                     ) : (
                         filteredPosts.map((post, index) => {
                             const status = getStatusPill(post.status);
                             const isSaved = savedPostIds.includes(post.id);
-                            const offset = index % 3;
+                            const accent = domainAccent(post.domain);
                             return (
                                 <motion.div
                                     key={post.id}
                                     layout
-                                    initial={animReady ? {  opacity: 0, y: 28  } : false}
+                                    initial={animReady ? { opacity: 0, y: 20 } : false}
                                     animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.5, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                                    whileHover={{ y: -4 }}
-                                    style={{
-                                        marginLeft: offset === 1 ? '24px' : offset === 2 ? '12px' : '0',
-                                        marginRight: offset === 2 ? '24px' : '0'
-                                    }}
+                                    exit={{ opacity: 0, y: -16 }}
+                                    transition={{ duration: 0.45, delay: Math.min(index * 0.04, 0.3), ease: [0.22, 1, 0.36, 1] }}
+                                    whileHover={{ y: -3 }}
                                 >
                                     <div style={{ position: 'relative' }}>
-                                        <Link to={`/post/${post.id}`} className="editorial-card">
-                                            {/* VISUAL SLOT — stylized domain icon with glow */}
-                                            <div className="card-visual">
-                                                <div className="visual-glow" />
-                                                <div style={{ position: 'relative', zIndex: 1, color: '#93c5fd' }}>
+                                        <Link
+                                            to={`/post/${post.id}`}
+                                            className="editorial-card dash-feed-card"
+                                            style={{
+                                                '--card-accent-ink': accent.ink,
+                                                '--card-accent-wash': accent.wash,
+                                                '--card-accent-glow': accent.glow,
+                                            }}
+                                        >
+                                            {/* VISUAL SLOT — domain-accented icon with halo */}
+                                            <div className="card-visual" style={{
+                                                background: `radial-gradient(ellipse 70% 90% at 50% 50%, ${accent.glow}, transparent 70%), linear-gradient(135deg, rgba(26, 24, 30, 0.7), rgba(10, 10, 14, 0.5))`,
+                                            }}>
+                                                <div className="visual-glow" style={{ background: `radial-gradient(circle at 30% 30%, ${accent.glow}, transparent 60%)` }} />
+                                                <div style={{ position: 'relative', zIndex: 1, color: accent.ink }}>
                                                     {domainIcon(post.domain)}
                                                 </div>
                                             </div>
@@ -377,8 +453,10 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                                 <h2
                                                     className="card-title"
                                                     style={{
+                                                        fontFamily: 'var(--font-heading)',
                                                         fontSize: 'clamp(22px, 2.2vw, 28px)',
-                                                        fontWeight: '800',
+                                                        // Premium display caps at 600 — 800 read as bold-template, not editorial.
+                                                        fontWeight: 600,
                                                         letterSpacing: '-0.03em',
                                                         lineHeight: '1.12',
                                                         color: 'var(--text-main)',
@@ -403,7 +481,7 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                                 {getMatchExplanation(post) && (
                                                     <div style={{
                                                         display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                                        color: '#67e8f9', fontSize: '11.5px', fontWeight: '600',
+                                                        color: '#f5c48a', fontSize: '11.5px', fontWeight: '600',
                                                         letterSpacing: '0.04em',
                                                         textTransform: 'uppercase',
                                                         alignSelf: 'flex-start'
@@ -431,10 +509,11 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                         <div style={{
                                                             width: '34px', height: '34px', borderRadius: '11px',
-                                                            background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+                                                            background: `linear-gradient(135deg, ${accent.ink}, ${accent.ink}99)`,
                                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                            fontWeight: '800', fontSize: '13px', color: '#070b0a',
-                                                            flexShrink: 0
+                                                            fontWeight: '700', fontSize: '13px', color: '#1a1012',
+                                                            flexShrink: 0,
+                                                            boxShadow: `0 6px 16px -4px ${accent.glow}, inset 0 1px 0 rgba(255,255,255,0.2)`
                                                         }}>
                                                             {post.authorName.charAt(0)}
                                                         </div>
@@ -488,18 +567,112 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                 </AnimatePresence>
             </div>
 
-            {/* Collapse visual column on narrow screens */}
-            <style>{`
-                @media (max-width: 900px) {
-                    .portal-top { grid-template-columns: 1fr !important; }
-                    .portal-search-row { grid-template-columns: 1fr !important; }
-                    .cta-slot { border-left: 0 !important; padding-left: 0 !important; }
-                    .editorial-card .card-cta { align-self: flex-start; }
-                }
-                @media (max-width: 700px) {
-                    .discovery-portal .editorial-title { font-size: 40px; }
-                }
-            `}</style>
+            {/* ===== RIGHT RAIL ===== */}
+            <aside className="dash-rail">
+                {/* Trending Domains */}
+                <motion.div
+                    initial={animReady ? { opacity: 0, y: 10 } : false}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                    className="dash-rail-card"
+                >
+                    <div className="dash-rail-head">
+                        <span className="dash-rail-eyebrow"><TrendingUp size={11} /> Trending</span>
+                        <h4 className="dash-rail-title">Top domains</h4>
+                    </div>
+                    {trendingDomains.length === 0 ? (
+                        <p className="dash-rail-empty">No activity yet.</p>
+                    ) : (
+                        <ul className="dash-rail-list">
+                            {trendingDomains.map((d, i) => {
+                                const accent = domainAccent(d.name);
+                                return (
+                                    <li key={d.name}>
+                                        <button
+                                            type="button"
+                                            className={`dash-rail-row ${filterDomain === d.name ? 'is-active' : ''}`}
+                                            onClick={() => setFilterDomain(filterDomain === d.name ? 'All' : d.name)}
+                                        >
+                                            <span className="dash-rail-rank">{i + 1}</span>
+                                            <span className="dash-rail-dot" style={{ background: accent.ink }} />
+                                            <span className="dash-rail-label" title={d.name}>{d.name}</span>
+                                            <span className="dash-rail-count">{d.count}</span>
+                                        </button>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
+                </motion.div>
+
+                {/* Recent activity pulse */}
+                <motion.div
+                    initial={animReady ? { opacity: 0, y: 10 } : false}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.48 }}
+                    className="dash-rail-card"
+                >
+                    <div className="dash-rail-head">
+                        <span className="dash-rail-eyebrow"><Activity size={11} /> Pulse</span>
+                        <h4 className="dash-rail-title">Latest posts</h4>
+                    </div>
+                    {recentActivity.length === 0 ? (
+                        <p className="dash-rail-empty">Quiet for now.</p>
+                    ) : (
+                        <ul className="dash-rail-list compact">
+                            {recentActivity.map(p => {
+                                const accent = domainAccent(p.domain);
+                                const hoursAgo = Math.max(1, Math.floor((now - new Date(p.createdAt)) / 3600000));
+                                return (
+                                    <li key={p.id}>
+                                        <Link
+                                            to={`/post/${p.id}`}
+                                            className="dash-rail-row dash-rail-row-post"
+                                        >
+                                            <span className="dash-rail-dot" style={{ background: accent.ink }} />
+                                            <div className="dash-rail-post-body">
+                                                <span className="dash-rail-post-title" title={p.title}>{p.title}</span>
+                                                <span className="dash-rail-post-meta">
+                                                    {p.authorName} · {hoursAgo < 24 ? `${hoursAgo}h ago` : `${Math.floor(hoursAgo / 24)}d ago`}
+                                                </span>
+                                            </div>
+                                            <ArrowUpRight size={13} className="dash-rail-arrow" />
+                                        </Link>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
+                </motion.div>
+
+                {/* Saved shortcut */}
+                <motion.div
+                    initial={animReady ? { opacity: 0, y: 10 } : false}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.56 }}
+                    className="dash-rail-card dash-rail-cta"
+                >
+                    <div className="dash-rail-cta-glow" aria-hidden="true" />
+                    <div className="dash-rail-cta-body">
+                        <Users size={18} className="dash-rail-cta-icon" />
+                        <h4 className="dash-rail-title">{savedPostIds.length} saved for later</h4>
+                        <p className="dash-rail-subtle">
+                            {savedPostIds.length === 0
+                                ? 'Bookmark projects to revisit them.'
+                                : 'Jump back into the threads you marked.'}
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => setFeedType(feedType === 'saved' ? 'all' : 'saved')}
+                            className="px-btn sm"
+                            style={{ marginTop: 10 }}
+                        >
+                            {feedType === 'saved' ? 'Show all' : 'Show saved'}
+                        </button>
+                    </div>
+                </motion.div>
+            </aside>
+            </div>
         </div>
     );
 };

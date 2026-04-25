@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   subscribeToNotificationsRT,
   addNotificationToFirestore,
@@ -33,10 +33,18 @@ const defaultNotifications = [
   }
 ];
 
-export function useNotifications() {
+export function useNotifications({ onNewNotification } = {}) {
   // Start empty — default demo data is only a fallback if Firebase fails.
   // Prevents the visible "fake → real" swap flicker on refresh.
   const [notifications, setNotifications] = useState([]);
+  // Track which notification IDs we have already "seen" so we only toast truly
+  // new ones (not the entire first-snapshot firehose).
+  const seenIdsRef = useRef(null);
+  const onNewRef = useRef(onNewNotification);
+
+  useEffect(() => {
+    onNewRef.current = onNewNotification;
+  }, [onNewNotification]);
 
   useEffect(() => {
     let unsubNotifs;
@@ -47,6 +55,22 @@ export function useNotifications() {
         if (!isActive) return;
         firestoreNotifs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         setNotifications(firestoreNotifs);
+
+        // Diff against the last-seen set. First snapshot populates the set
+        // silently; subsequent snapshots fire onNewNotification for IDs that
+        // weren't there before (new real-time arrivals).
+        if (seenIdsRef.current === null) {
+          seenIdsRef.current = new Set(firestoreNotifs.map((n) => n.id));
+        } else {
+          for (const n of firestoreNotifs) {
+            if (!seenIdsRef.current.has(n.id)) {
+              seenIdsRef.current.add(n.id);
+              if (!n.read && typeof onNewRef.current === 'function') {
+                try { onNewRef.current(n); } catch { /* no-op */ }
+              }
+            }
+          }
+        }
       });
     } catch (error) {
       console.error('Firebase init error for notifications:', error);

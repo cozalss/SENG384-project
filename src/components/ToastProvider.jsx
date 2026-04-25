@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { CheckCircle2, AlertTriangle, Info, X } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ToastContext } from './ToastContext';
 
@@ -79,8 +79,7 @@ export const ToastProvider = ({ children }) => {
                                         alignItems: 'flex-start',
                                         gap: '12px',
                                         padding: '14px 16px 14px 16px',
-                                        minWidth: '280px',
-                                        maxWidth: '380px',
+                                        width: 'min(380px, calc(100vw - 48px))',
                                         borderRadius: '14px',
                                         background: `linear-gradient(135deg, ${c.bg}, rgba(7, 11, 10, 0.65))`,
                                         border: `1px solid ${c.border}`,

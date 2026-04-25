@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { ArrowLeft, ArrowRight, Mail, RefreshCw, Shield } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion } from 'framer-motion';
 import AuthErrorBanner from './AuthErrorBanner';
 
@@ -52,7 +52,7 @@ const OTPVerificationPanel = ({
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 className="editorial-panel"
                 style={{
-                    width: '100%', maxWidth: '480px', padding: '52px 44px 40px',
+                    width: '100%', maxWidth: '480px', padding: 'clamp(36px, 8vw, 52px) clamp(18px, 5vw, 44px) clamp(32px, 7vw, 40px)',
                     position: 'relative', zIndex: 1,
                     boxShadow: '0 40px 90px rgba(0, 0, 0, 0.55), 0 0 120px rgba(96, 165, 250, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
                 }}
@@ -64,7 +64,7 @@ const OTPVerificationPanel = ({
                 }} />
                 <div style={{
                     position: 'absolute', inset: 0, pointerEvents: 'none',
-                    background: 'radial-gradient(ellipse 60% 50% at 0% 0%, rgba(96, 165, 250, 0.12), transparent 60%), radial-gradient(ellipse 55% 55% at 100% 100%, rgba(34, 211, 238, 0.10), transparent 60%)',
+                    background: 'radial-gradient(ellipse 60% 50% at 0% 0%, rgba(249, 168, 96, 0.12), transparent 60%), radial-gradient(ellipse 55% 55% at 100% 100%, rgba(34, 211, 238, 0.10), transparent 60%)',
                 }} />
 
                 <motion.button
@@ -131,23 +131,43 @@ const OTPVerificationPanel = ({
 
                 {verifying && (
                     <div className="animate-fade-in text-center" style={{
-                        background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)',
+                        background: 'rgba(249, 168, 96, 0.08)', border: '1px solid rgba(249, 168, 96, 0.2)',
                         padding: '16px', marginBottom: '24px', borderRadius: 'var(--border-radius-sm)',
-                    }}>
-                        <div style={{
-                            width: '28px', height: '28px', border: '3px solid rgba(99,102,241,0.2)',
-                            borderTopColor: 'var(--primary)', borderRadius: '50%',
-                            animation: 'spin 0.8s linear infinite', margin: '0 auto 10px',
+                    }} role="status" aria-live="polite">
+                        <div className="otp-spinner" style={{
+                            width: '28px', height: '28px',
+                            border: '3px solid rgba(249, 168, 96, 0.2)',
+                            borderTopColor: '#f5c48a', borderRadius: '50%',
+                            margin: '0 auto 10px',
                         }} />
-                        <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
-                        <p className="text-sm font-medium" style={{ color: 'var(--badge-primary-text)' }}>Creating your account…</p>
+                        {/* WCAG 2.3.3: respect prefers-reduced-motion. The
+                            keyframe is a class so the @media query below can
+                            disable it for users with vestibular sensitivity. */}
+                        <style>{`
+                            .otp-spinner { animation: otp-spin 0.8s linear infinite; }
+                            @keyframes otp-spin { 100% { transform: rotate(360deg); } }
+                            @media (prefers-reduced-motion: reduce) {
+                              .otp-spinner { animation: none; opacity: 0.6; }
+                            }
+                        `}</style>
+                        <p className="text-sm font-medium" style={{ color: '#f5c48a' }}>Creating your account…</p>
                     </div>
                 )}
 
                 <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }} role="group" aria-label="6-digit verification code">
+                    <motion.div
+                        style={{ display: 'flex', gap: 'clamp(6px, 2vw, 10px)', justifyContent: 'center' }}
+                        role="group"
+                        aria-label="6-digit verification code"
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            hidden: {},
+                            visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
+                        }}
+                    >
                         {enteredCode.map((digit, i) => (
-                            <input
+                            <motion.input
                                 key={i}
                                 ref={el => { digitRefs.current[i] = el; }}
                                 id={`otp-digit-${i}`}
@@ -159,48 +179,47 @@ const OTPVerificationPanel = ({
                                 onChange={e => handleDigitChange(i, e.target.value)}
                                 onKeyDown={e => handleDigitKeyDown(i, e)}
                                 onPaste={handleDigitPaste}
+                                variants={{
+                                    hidden: { opacity: 0, y: 12, scale: 0.9 },
+                                    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
+                                }}
                                 style={{
-                                    width: '54px', height: '64px',
-                                    textAlign: 'center', fontSize: '26px', fontWeight: '800',
+                                    width: 'clamp(38px, 12vw, 54px)', height: 'clamp(50px, 14vw, 64px)',
+                                    textAlign: 'center', fontSize: 'clamp(20px, 6vw, 26px)', fontWeight: '600',
                                     fontFamily: 'var(--font-heading)',
-                                    background: digit ? 'rgba(96, 165, 250, 0.12)' : 'rgba(7, 11, 10, 0.5)',
-                                    border: digit ? '2px solid rgba(96, 165, 250, 0.55)' : '2px solid rgba(255,255,255,0.06)',
+                                    background: digit ? 'rgba(249, 168, 96, 0.12)' : 'rgba(7, 11, 10, 0.5)',
+                                    border: digit ? '2px solid rgba(249, 168, 96, 0.55)' : '2px solid rgba(255,255,255,0.06)',
                                     borderRadius: '14px',
                                     color: 'var(--text-main)',
                                     outline: 'none',
-                                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                                    caretColor: 'var(--primary)',
-                                    letterSpacing: '-0.02em',
+                                    transition: 'border-color 0.2s cubic-bezier(0.32, 0.72, 0, 1), background 0.2s, box-shadow 0.2s, transform 0.2s',
+                                    caretColor: '#f39a54',
+                                    letterSpacing: '-0.03em',
                                 }}
                                 onFocus={e => {
-                                    e.target.style.borderColor = 'rgba(96, 165, 250, 0.8)';
-                                    e.target.style.boxShadow = '0 0 0 3px rgba(96, 165, 250, 0.14), 0 8px 24px rgba(96, 165, 250, 0.1)';
+                                    e.target.style.borderColor = 'rgba(249, 168, 96, 0.8)';
+                                    e.target.style.boxShadow = '0 0 0 3px rgba(249, 168, 96, 0.14), 0 8px 24px rgba(249, 168, 96, 0.1)';
                                     e.target.style.transform = 'translateY(-1px)';
                                 }}
                                 onBlur={e => {
-                                    e.target.style.borderColor = digit ? 'rgba(96, 165, 250, 0.55)' : 'rgba(255,255,255,0.06)';
+                                    e.target.style.borderColor = digit ? 'rgba(249, 168, 96, 0.55)' : 'rgba(255,255,255,0.06)';
                                     e.target.style.boxShadow = 'none';
                                     e.target.style.transform = 'translateY(0)';
                                 }}
                             />
                         ))}
-                    </div>
+                    </motion.div>
 
-                    <motion.button
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.97 }}
+                    <button
                         id="verify-code-button"
                         type="submit"
-                        className="btn-lux btn-announce"
+                        className="px-btn primary lg"
                         disabled={verifying}
-                        style={{
-                            width: '100%', padding: '15px',
-                            fontSize: '14.5px', justifyContent: 'center',
-                        }}
+                        style={{ width: '100%', justifyContent: 'center' }}
                     >
                         {verifying ? 'Verifying…' : 'Verify & Create Account'}
                         {!verifying && <ArrowRight size={17} style={{ marginLeft: '2px' }} strokeWidth={2.5} />}
-                    </motion.button>
+                    </button>
                 </form>
 
                 <div style={{ textAlign: 'center', marginTop: '22px' }}>

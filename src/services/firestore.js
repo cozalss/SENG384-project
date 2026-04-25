@@ -315,8 +315,10 @@ export const getOrCreateConversation = async (user1, user2) => {
     return { id: convoSnap.id, ...convoSnap.data() };
 };
 
-// Send a message within a conversation
-export const sendMessage = async (convoId, senderId, text, senderName) => {
+// Send a message within a conversation. `metadata` is optional and carries
+// rich-composition fields like replyTo (quoted parent message snapshot). New
+// fields are additive so older clients render fine.
+export const sendMessage = async (convoId, senderId, text, senderName, metadata = {}) => {
     const convoDocRef = doc(db, "conversations", convoId);
     const messagesSubRef = collection(convoDocRef, "messages");
 
@@ -325,8 +327,18 @@ export const sendMessage = async (convoId, senderId, text, senderName) => {
         senderName,
         text,
         timestamp: serverTimestamp(),
-        read: false
+        read: false,
+        reactions: {},
     };
+    if (metadata.replyTo) {
+        // Snapshot at send time so the quote survives edits/deletions of parent.
+        newMessage.replyTo = {
+            id: metadata.replyTo.id,
+            text: (metadata.replyTo.text || '').slice(0, 280),
+            senderId: metadata.replyTo.senderId,
+            senderName: metadata.replyTo.senderName || '',
+        };
+    }
 
     // 1. Add message to sub-collection
     await addDoc(messagesSubRef, newMessage);
@@ -340,6 +352,36 @@ export const sendMessage = async (convoId, senderId, text, senderName) => {
         lastMessage: text,
         updatedAt: serverTimestamp(),
         [`unreadCount.${otherMemberId}`]: (currentData.unreadCount?.[otherMemberId] || 0) + 1
+    });
+};
+
+// Delete a single message within a conversation. Optimistic UI can hide the
+// row immediately; the firestore delete is then authoritative.
+export const deleteMessage = async (convoId, messageId) => {
+    const msgRef = doc(db, "conversations", convoId, "messages", messageId);
+    await deleteDoc(msgRef);
+};
+
+// Toggle a single-user reaction on a message. Reactions are stored as
+// `reactions: { [emoji]: [userId, ...] }`. If the user already has this emoji
+// on the message, it's removed; otherwise added.
+export const toggleMessageReaction = async (convoId, messageId, userId, emoji) => {
+    const msgRef = doc(db, "conversations", convoId, "messages", messageId);
+    await runTransaction(db, async (tx) => {
+        const snap = await tx.get(msgRef);
+        if (!snap.exists()) return;
+        const data = snap.data();
+        const reactions = { ...(data.reactions || {}) };
+        const users = Array.isArray(reactions[emoji]) ? [...reactions[emoji]] : [];
+        const idx = users.indexOf(userId);
+        if (idx >= 0) {
+            users.splice(idx, 1);
+            if (users.length === 0) delete reactions[emoji];
+            else reactions[emoji] = users;
+        } else {
+            reactions[emoji] = [...users, userId];
+        }
+        tx.update(msgRef, { reactions });
     });
 };
 

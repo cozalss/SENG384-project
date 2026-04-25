@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserCircle, MapPin, Building, Globe, Mail, Briefcase, Download, Trash2, Activity, Shield, Calendar, CheckCircle2, AlertTriangle, ArrowLeft, Sparkles } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAnimReady } from '../hooks/useAnimReady';
 import { useToast } from '../hooks/useToast';
+import AnimatedCounter from '../components/AnimatedCounter';
 
 const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
     const navigate = useNavigate();
@@ -19,13 +20,17 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
     const [saved, setSaved] = useState(false);
     const [trackedUserId, setTrackedUserId] = useState(user?.id);
 
-    if (user && user.id !== trackedUserId) {
-        setTrackedUserId(user.id);
-        setName(user.name || '');
-        setCity(user.city || '');
-        setCountry(user.country || '');
-        setInstitution(user.institution || '');
-    }
+    useEffect(() => {
+        if (!user || user.id === trackedUserId) return;
+        const frame = requestAnimationFrame(() => {
+            setTrackedUserId(user.id);
+            setName(user.name || '');
+            setCity(user.city || '');
+            setCountry(user.country || '');
+            setInstitution(user.institution || '');
+        });
+        return () => cancelAnimationFrame(frame);
+    }, [trackedUserId, user]);
 
     const handleSave = () => {
         if (updateUser) {
@@ -68,9 +73,16 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
     const activePosts = myPosts.filter(p => p.status === 'Active').length;
     const closedPosts = myPosts.filter(p => p.status === 'CLOSED').length;
 
+    // Role-based avatar gradient. Engineers get the aurora amber palette (mirrors
+    // the warm half of the site-wide video); clinicians get emerald — distinct
+    // at-a-glance, but both now sit in the same "warm + organic" family rather
+    // than the cool navy-blue that fought the background.
     const accentGradient = user?.role === 'Engineer'
-        ? 'linear-gradient(135deg, var(--primary), var(--accent))'
-        : 'linear-gradient(135deg, var(--secondary), #34d399)';
+        ? 'linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%)'
+        : 'linear-gradient(135deg, #34d399, #6ee7b7)';
+    const accentShadow = user?.role === 'Engineer'
+        ? '0 18px 42px rgba(249, 168, 96, 0.35), inset 0 2px 0 rgba(255,255,255,0.25)'
+        : '0 18px 42px rgba(52, 211, 153, 0.32), inset 0 2px 0 rgba(255,255,255,0.22)';
 
     return (
         <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', paddingBottom: '80px' }}>
@@ -84,44 +96,59 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                 <ArrowLeft size={15} /> Back
             </motion.button>
 
-            {/* Editorial page header */}
+            {/* ===== COMPACT HERO — shares the dash-* pattern used across the app ===== */}
             <motion.section
-                initial={animReady ? {  opacity: 0, y: 20  } : false}
+                initial={animReady ? { opacity: 0, y: 20 } : false}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="editorial-header"
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="dash-hero"
             >
-                <div className="editorial-header-inner">
-                    <div>
-                        <span className="editorial-eyebrow">
+                <div className="dash-hero-row" style={{ gridTemplateColumns: '1fr' }}>
+                    <div className="dash-hero-text">
+                        <motion.div
+                            initial={animReady ? { opacity: 0, x: -8 } : false}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, delay: 0.08 }}
+                            className="dash-eyebrow"
+                        >
                             <Sparkles size={11} /> Your Workspace
-                        </span>
-                        <h1 className="editorial-display">
-                            Your <span className="accent">Profile</span>
-                        </h1>
-                        <p className="editorial-subtitle">
+                        </motion.div>
+                        <motion.h1
+                            initial={animReady ? { opacity: 0, y: 10 } : false}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.55, delay: 0.12 }}
+                            className="dash-title"
+                        >
+                            Your <span className="dash-title-accent">Profile</span>
+                        </motion.h1>
+                        <motion.p
+                            initial={animReady ? { opacity: 0 } : false}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                            className="dash-subtitle"
+                        >
                             Manage your identity, control your data, and exercise your rights under GDPR.
-                        </p>
+                        </motion.p>
                     </div>
                 </div>
             </motion.section>
 
-            {/* Saved Success Message */}
+            {/* Saved Success Banner */}
             <AnimatePresence>
                 {saved && (
                     <motion.div
-                        initial={animReady ? {  opacity: 0, y: -10  } : false}
+                        initial={animReady ? { opacity: 0, y: -10 } : false}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         style={{
-                            background: 'linear-gradient(135deg, rgba(96, 165, 250, 0.08), rgba(34, 211, 238, 0.04))',
-                            border: '1px solid rgba(96, 165, 250, 0.2)',
+                            background: 'linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(110, 231, 183, 0.05))',
+                            border: '1px solid rgba(52, 211, 153, 0.26)',
                             padding: '14px 18px', marginBottom: '24px',
-                            borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '10px'
+                            borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '10px',
                         }}
                     >
-                        <CheckCircle2 size={18} color="#93c5fd" />
-                        <span style={{ fontSize: '13.5px', color: '#93c5fd', fontWeight: '600' }}>Profile updated successfully.</span>
+                        <CheckCircle2 size={18} color="#6ee7b7" />
+                        <span style={{ fontSize: '13.5px', color: '#6ee7b7', fontWeight: 600 }}>Profile updated successfully.</span>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -133,7 +160,7 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                     initial={animReady ? {  opacity: 0, y: 20  } : false}
                     animate={{ opacity: 1, y: 0 }}
                     className="editorial-panel"
-                    style={{ padding: '40px 32px', textAlign: 'center' }}
+                    style={{ padding: 'clamp(30px, 5vw, 40px) clamp(20px, 4vw, 32px)', textAlign: 'center' }}
                 >
                     <motion.div
                         whileHover={{ scale: 1.06, rotate: 3 }}
@@ -142,9 +169,10 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                             width: '92px', height: '92px', borderRadius: '26px',
                             background: accentGradient,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            margin: '0 auto 20px', fontSize: '38px', fontWeight: '800', color: '#070b0a',
+                            margin: '0 auto 20px', fontSize: '38px', fontWeight: 700, color: '#1a1012',
                             fontFamily: 'var(--font-heading)',
-                            boxShadow: '0 18px 42px rgba(96, 165, 250, 0.35), inset 0 2px 0 rgba(255,255,255,0.2)'
+                            letterSpacing: '-0.03em',
+                            boxShadow: accentShadow,
                         }}
                     >
                         {user?.name?.charAt(0)}
@@ -172,23 +200,41 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                     </div>
 
                     {/* Stats */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginTop: '24px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginTop: '24px' }}>
                         {[
                             { value: myPosts.length, label: 'Total', color: 'var(--text-main)' },
-                            { value: activePosts, label: 'Active', color: '#93c5fd' },
+                            { value: activePosts, label: 'Active', color: '#f5c48a' },
                             { value: closedPosts, label: 'Closed', color: '#67e8f9' }
                         ].map((s, i) => (
                             <motion.div
                                 key={i}
-                                whileHover={{ y: -3, borderColor: 'rgba(96, 165, 250, 0.25)' }}
-                                transition={{ type: 'spring', stiffness: 320 }}
-                                style={{
-                                    background: 'rgba(7, 11, 10, 0.5)', padding: '14px 8px',
-                                    borderRadius: '14px', border: '1px solid rgba(255,255,255,0.05)',
-                                    transition: 'all 0.3s'
+                                whileHover={{ y: -2 }}
+                                transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+                                className="px-stat-card"
+                                style={{ position: 'relative', overflow: 'hidden' }}
+                            >
+                                <div className="px-stat-card-glow" aria-hidden="true" />
+                                <div style={{
+                                    position: 'relative',
+                                    fontSize: '28px',
+                                    fontWeight: 600,
+                                    color: s.color,
+                                    fontFamily: 'var(--font-heading)',
+                                    letterSpacing: '-0.035em',
+                                    lineHeight: 1,
+                                    fontVariantNumeric: 'tabular-nums',
                                 }}>
-                                <div style={{ fontSize: '26px', fontWeight: '800', color: s.color, fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}>{s.value}</div>
-                                <div style={{ fontSize: '9.5px', color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: '700', marginTop: '2px' }}>{s.label}</div>
+                                    <AnimatedCounter value={s.value} duration={900} />
+                                </div>
+                                <div style={{
+                                    position: 'relative',
+                                    fontSize: 10,
+                                    color: 'var(--text-subtle)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.14em',
+                                    fontWeight: 600,
+                                    marginTop: 6,
+                                }}>{s.label}</div>
                             </motion.div>
                         ))}
                     </div>
@@ -206,21 +252,21 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                     >
                         <div className="flex justify-between items-center mb-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '18px' }}>
                             <div>
-                                <span className="editorial-eyebrow" style={{ marginBottom: '8px' }}>
+                                <span className="dash-eyebrow" style={{ marginBottom: 8 }}>
                                     <UserCircle size={11} /> Settings
                                 </span>
                                 <h3 className="editorial-section-heading">Profile Details</h3>
                             </div>
                             {!editMode ? (
-                                <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }} onClick={() => setEditMode(true)} className="btn-lux-ghost" style={{ padding: '10px 18px', fontSize: '12.5px' }}>
+                                <button type="button" onClick={() => setEditMode(true)} className="px-btn sm">
                                     Edit
-                                </motion.button>
+                                </button>
                             ) : (
                                 <div className="flex gap-2">
-                                    <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }} onClick={() => { setEditMode(false); setName(user.name); setCity(user.city); setCountry(user.country); setInstitution(user.institution); }} className="btn-lux-ghost" style={{ padding: '10px 18px', fontSize: '12.5px' }}>Cancel</motion.button>
-                                    <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }} onClick={handleSave} className="btn-lux" style={{ padding: '10px 18px', fontSize: '12.5px' }}>
+                                    <button type="button" onClick={() => { setEditMode(false); setName(user.name); setCity(user.city); setCountry(user.country); setInstitution(user.institution); }} className="px-btn ghost sm">Cancel</button>
+                                    <button type="button" onClick={handleSave} className="px-btn primary sm">
                                         <CheckCircle2 size={14} /> Save
-                                    </motion.button>
+                                    </button>
                                 </div>
                             )}
                         </div>
@@ -259,32 +305,34 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                         transition={{ delay: 0.2 }}
                         className="editorial-panel"
                     >
-                        <span className="editorial-eyebrow cyan">
+                        <span className="dash-eyebrow" style={{ background: 'rgba(34, 211, 238, 0.1)', color: '#7dd3fc', borderColor: 'rgba(34, 211, 238, 0.24)' }}>
                             <Shield size={11} /> Privacy
                         </span>
-                        <h3 className="editorial-section-heading">Data Rights (GDPR)</h3>
+                        <h3 className="editorial-section-heading" style={{ marginTop: 12 }}>Data Rights (GDPR)</h3>
                         <p className="text-muted text-sm mb-6" style={{ lineHeight: '1.7', fontSize: '13.5px' }}>
                             Exercise your data rights under GDPR Article 15, 17, and 20.
                         </p>
 
                         <div className="flex-col gap-3">
-                            <motion.button whileHover={{ x: 4 }} id="export-data-btn" onClick={handleExportData} className="btn-lux-ghost" style={{ justifyContent: 'flex-start', padding: '14px 20px', width: '100%' }}>
+                            <button
+                                type="button"
+                                id="export-data-btn"
+                                onClick={handleExportData}
+                                className="px-btn"
+                                style={{ justifyContent: 'flex-start', width: '100%', height: 46, padding: '0 18px' }}
+                            >
                                 <Download size={15} /> Export My Data (JSON)
-                            </motion.button>
+                            </button>
 
-                            <motion.button whileHover={{ x: 4 }} id="delete-account-btn" onClick={() => setShowDeleteConfirm(true)} style={{
-                                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                                justifyContent: 'flex-start', padding: '14px 20px', borderRadius: '13px',
-                                background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.15)',
-                                color: 'var(--badge-error-text)', cursor: 'pointer',
-                                fontWeight: '600', fontSize: '13.5px', letterSpacing: '0.01em',
-                                transition: 'all 0.3s'
-                            }}
-                                onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.28)'; }}
-                                onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.05)'; e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.15)'; }}
+                            <button
+                                type="button"
+                                id="delete-account-btn"
+                                onClick={() => setShowDeleteConfirm(true)}
+                                className="px-btn danger"
+                                style={{ justifyContent: 'flex-start', width: '100%', height: 46, padding: '0 18px' }}
                             >
                                 <Trash2 size={15} /> Delete My Account (Art. 17)
-                            </motion.button>
+                            </button>
                         </div>
                     </motion.div>
 
@@ -316,10 +364,10 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                                 This action will permanently delete your account, all published announcements, and associated data. This operation cannot be reversed.
                             </p>
 
-                            <div className="flex justify-end gap-3">
-                                <button className="btn btn-secondary" onClick={() => setShowDeleteConfirm(false)} style={{ padding: '12px 24px', borderRadius: '12px' }}>Cancel</button>
-                                <button className="btn btn-danger" onClick={handleDeleteAccount} style={{ padding: '12px 24px', borderRadius: '12px' }}>
-                                    <Trash2 size={16} /> Permanently Delete
+                            <div className="px-modal-footer">
+                                <button type="button" className="px-btn ghost" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+                                <button type="button" className="px-btn danger" onClick={handleDeleteAccount}>
+                                    <Trash2 size={16} /> Permanently delete
                                 </button>
                             </div>
                         </motion.div>

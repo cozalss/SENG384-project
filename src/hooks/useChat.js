@@ -1,14 +1,16 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { 
-  sendMessage, 
-  subscribeToMessagesRT, 
+import {
+  sendMessage,
+  subscribeToMessagesRT,
   subscribeToConversationsRT,
   getOrCreateConversation,
   markAsRead,
   getUsers,
   setTypingStatus,
   updateUserStatus,
-  deleteConversation
+  deleteConversation,
+  deleteMessage,
+  toggleMessageReaction
 } from '../services/firestore';
 import { onSnapshot, doc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -127,16 +129,34 @@ export function useChat(currentUser) {
     }
   }, [activeConvoId, currentUser]);
 
-  const send = useCallback(async (text) => {
+  const send = useCallback(async (text, metadata = {}) => {
     if (!activeConvoId || !currentUser || !text.trim()) return;
-    
+
     try {
       setTyping(false); // Immediate stop typing on send
-      await sendMessage(activeConvoId, currentUser.id, text, currentUser.name);
+      await sendMessage(activeConvoId, currentUser.id, text, currentUser.name, metadata);
     } catch (error) {
       console.error("Message send error:", error);
     }
   }, [activeConvoId, currentUser, setTyping]);
+
+  const reactToMessage = useCallback(async (messageId, emoji) => {
+    if (!activeConvoId || !currentUser) return;
+    try {
+      await toggleMessageReaction(activeConvoId, messageId, currentUser.id, emoji);
+    } catch (err) {
+      console.error("Reaction toggle error:", err);
+    }
+  }, [activeConvoId, currentUser]);
+
+  const removeMessage = useCallback(async (messageId) => {
+    if (!activeConvoId || !messageId) return;
+    try {
+      await deleteMessage(activeConvoId, messageId);
+    } catch (err) {
+      console.error("Message delete error:", err);
+    }
+  }, [activeConvoId]);
 
   // Compute other user status
   const otherIsTyping = useMemo(() => {
@@ -177,6 +197,8 @@ export function useChat(currentUser) {
     activeRecipient,
     setActiveRecipient,
     send,
+    reactToMessage,
+    removeMessage,
     setTyping,
     loading,
     allUsers,

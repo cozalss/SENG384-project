@@ -1,7 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Activity, FileText, LayoutDashboard, UserCircle, Shield, MessageSquare } from 'lucide-react';
 import { useState, useEffect } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion, LayoutGroup } from 'framer-motion';
 import Notifications from './Notifications';
 import CommandPalette from './CommandPalette';
@@ -13,7 +12,7 @@ const Navbar = ({ user, logout, notifications, dismissNotification, dismissAllNo
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
@@ -25,7 +24,7 @@ const Navbar = ({ user, logout, notifications, dismissNotification, dismissAllNo
         { path: '/dashboard', icon: <LayoutDashboard size={15} />, label: 'Feed' },
         { path: '/my-posts', icon: <FileText size={15} />, label: 'My Posts' },
         { path: '/chat', icon: <MessageSquare size={15} />, label: 'Messages' },
-        { path: '/profile', icon: <UserCircle size={15} />, label: 'Profile' }
+        { path: '/profile', icon: <UserCircle size={15} />, label: 'Profile' },
     ];
 
     if (user.role === 'Admin') {
@@ -33,120 +32,69 @@ const Navbar = ({ user, logout, notifications, dismissNotification, dismissAllNo
     }
 
     return (
-        <div style={{
-            position: 'fixed',
-            top: 0, left: 0, width: '100%',
-            zIndex: 100,
-            padding: scrolled ? '8px 20px' : '14px 20px',
-            transition: 'padding 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
-        }}>
+        <div className={`px-nav-frame ${scrolled ? 'is-scrolled' : ''}`}>
             <motion.header
-                initial={{ opacity: 0, y: -12 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="nav-premium"
-                style={{
-                    maxWidth: '1320px',
-                    margin: '0 auto',
-                    borderRadius: scrolled ? '18px' : '24px',
-                    transition: 'border-radius 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
-                }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                className={`nav-premium px-nav-shell ${scrolled ? 'is-scrolled' : ''}`}
             >
-                <div className="flex justify-between items-center" style={{
-                    height: scrolled ? '58px' : '66px',
-                    padding: '0 22px',
-                    transition: 'height 0.4s ease'
-                }}>
-                    {/* Logo — hoverable */}
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                        <Link to="/dashboard" className="flex items-center gap-3" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>
-                            <motion.div
-                                whileHover={{ rotate: 8, scale: 1.08 }}
-                                transition={{ type: 'spring', stiffness: 300 }}
-                                style={{
-                                    background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-                                    padding: '7px', borderRadius: '11px',
-                                    boxShadow: '0 6px 18px rgba(96, 165, 250, 0.4), inset 0 1px 0 rgba(255,255,255,0.25)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                }}
-                            >
-                                <Activity size={19} color="#070b0a" strokeWidth={2.5} />
-                            </motion.div>
-                            <span style={{
-                                fontSize: '18px', fontWeight: '800', letterSpacing: '-0.04em',
-                                fontFamily: 'var(--font-heading)'
-                            }}>
-                                HEALTH<span style={{
-                                    background: 'linear-gradient(135deg, var(--primary-light), var(--accent-light))',
-                                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                                    backgroundClip: 'text'
-                                }}>AI</span>
-                            </span>
-                        </Link>
-                    </motion.div>
+                <div className="px-nav-inner">
 
-                    <nav className="flex items-center gap-2">
-                        {/* Nav pill with animated indicator */}
+                    {/* ===== LOGO LOCKUP ===== */}
+                    <Link to="/dashboard" className="px-nav-brand">
+                        <motion.div
+                            whileHover={{ rotate: 6, scale: 1.06 }}
+                            whileTap={{ scale: 0.96 }}
+                            transition={{ type: 'spring', stiffness: 320, damping: 22 }}
+                            className="px-nav-mark"
+                        >
+                            <Activity size={18} color="#1a1012" strokeWidth={2.6} />
+                        </motion.div>
+                        <span className="px-nav-wordmark">
+                            HEALTH<span className="px-nav-wordmark-accent">AI</span>
+                        </span>
+                    </Link>
+
+                    {/* ===== NAV PILLS ===== */}
+                    <nav className="px-nav-pills">
                         <LayoutGroup id="navbar-links">
-                            <div className="flex items-center" style={{
-                                background: 'rgba(7, 11, 10, 0.5)',
-                                borderRadius: '13px',
-                                padding: '4px',
-                                border: '1px solid rgba(255, 255, 255, 0.05)'
-                            }}>
+                            <div className="px-nav-pill-group">
                                 {navLinks.map(({ path, icon, label }) => {
                                     const active = isActive(path);
                                     return (
                                         <Link
                                             key={path}
                                             to={path}
-                                            style={{
-                                                position: 'relative',
-                                                fontSize: '12.5px',
-                                                fontWeight: active ? '700' : '500',
-                                                color: active ? '#070b0a' : 'var(--text-muted)',
-                                                textDecoration: 'none',
-                                                transition: 'color 0.3s ease',
-                                                display: 'flex', alignItems: 'center', gap: '6px',
-                                                padding: '8px 14px',
-                                                borderRadius: '9px',
-                                                letterSpacing: '0.01em'
-                                            }}
+                                            className={`px-nav-link ${active ? 'is-active' : ''}`}
                                         >
                                             {active && (
                                                 <motion.span
                                                     layoutId="nav-indicator"
-                                                    style={{
-                                                        position: 'absolute', inset: 0,
-                                                        background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-                                                        borderRadius: '9px', zIndex: -1,
-                                                        boxShadow: '0 6px 18px rgba(96, 165, 250, 0.35)'
-                                                    }}
-                                                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                                                    className="px-nav-indicator"
+                                                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                                                 />
                                             )}
-                                            {icon} <span className="hide-mobile">{label}</span>
+                                            <span className="px-nav-link-icon">{icon}</span>
+                                            <span className="px-nav-link-label hide-mobile">{label}</span>
                                         </Link>
                                     );
                                 })}
                             </div>
                         </LayoutGroup>
+                    </nav>
 
-                        <div style={{ width: '1px', height: '22px', background: 'rgba(255,255,255,0.08)', margin: '0 4px' }} />
-
-                        {/* ⌘K Command palette trigger */}
+                    {/* ===== ACTIONS CLUSTER ===== */}
+                    <div className="px-nav-actions">
+                        <span className="px-nav-divider" aria-hidden="true" />
                         <CommandPalette posts={posts} user={user} />
-
-                        {/* Notifications */}
                         <Notifications
                             notifications={notifications || []}
                             onDismiss={dismissNotification}
                             onDismissAll={dismissAllNotifications}
                         />
-
-                        {/* User menu (avatar + dropdown with Profile / Saved / Logout) */}
                         <UserMenu user={user} logout={logout} />
-                    </nav>
+                    </div>
                 </div>
             </motion.header>
         </div>

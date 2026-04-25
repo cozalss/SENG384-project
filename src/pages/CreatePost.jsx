@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, CheckCircle2, FileText, MapPin, Globe, Briefcase, Tag, Clock, LockKeyhole, Shield, Sparkles, Send, Edit3 } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+import { ArrowLeft, ArrowRight, CheckCircle2, FileText, MapPin, Globe, Briefcase, Tag, Clock, LockKeyhole, Shield, Sparkles, Send, Edit3, AlertCircle } from 'lucide-react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAnimReady } from '../hooks/useAnimReady';
+import PxSelect from '../components/PxSelect';
+import WizardProgress from '../components/WizardProgress';
 
 const CreatePost = ({ user, addPost }) => {
     const navigate = useNavigate();
@@ -28,6 +30,15 @@ const CreatePost = ({ user, addPost }) => {
 
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState('');
+    // Field-level validation — populated on submit attempt. Keys match formData.
+    const [fieldErrors, setFieldErrors] = useState({});
+    const clearFieldError = (key) => {
+        setFieldErrors((prev) => {
+            if (!prev[key]) return prev;
+            const { [key]: _removed, ...rest } = prev;
+            return rest;
+        });
+    };
 
     const domains = ['Telemedicine', 'AI Diagnostics', 'Wearable Tech', 'Genomics', 'Mental Health Tech', 'Surgical Robotics', 'Drug Discovery', 'Health Data Analytics', 'Others'];
 
@@ -41,11 +52,19 @@ const CreatePost = ({ user, addPost }) => {
 
     const handleSubmit = () => {
         setError('');
-        if (!formData.title || !formData.explanation || !formData.expertiseNeeded) {
-            setError('Please fill in all required fields (Title, Description, Required Expertise).');
-            setStep(1);
+        const errs = {};
+        if (!formData.title.trim()) errs.title = 'Title is required.';
+        if (!formData.explanation.trim()) errs.explanation = 'Description is required.';
+        if (!formData.expertiseNeeded.trim()) errs.expertiseNeeded = 'Tell us what expertise you need.';
+        if (Object.keys(errs).length > 0) {
+            setFieldErrors(errs);
+            setError('Please complete the highlighted fields before publishing.');
+            // Jump to the earliest step containing an error so the user can see it.
+            if (errs.title || errs.explanation) setStep(1);
+            else if (errs.expertiseNeeded) setStep(2);
             return;
         }
+        setFieldErrors({});
 
         const now = new Date();
         const expiry = new Date(now);
@@ -91,7 +110,7 @@ const CreatePost = ({ user, addPost }) => {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ type: 'spring', damping: 20, stiffness: 200 }}
                     className="editorial-panel text-center"
-                    style={{ padding: '64px 48px', maxWidth: '520px', width: '100%' }}
+                    style={{ padding: 'clamp(36px, 8vw, 64px) clamp(22px, 6vw, 48px)', maxWidth: '520px', width: '100%' }}
                 >
                     <motion.div
                         initial={animReady ? {  scale: 0, rotate: -15  } : false}
@@ -118,12 +137,12 @@ const CreatePost = ({ user, addPost }) => {
                         Your announcement is now visible to potential cross-disciplinary partners across the network.
                     </p>
                     <div className="flex gap-3" style={{ justifyContent: 'center' }}>
-                        <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }} onClick={() => navigate('/dashboard')} className="btn-lux" style={{ padding: '13px 26px' }}>
+                        <button type="button" onClick={() => navigate('/dashboard')} className="px-btn primary lg">
                             <Sparkles size={15} /> View in Feed
-                        </motion.button>
-                        <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }} onClick={() => navigate('/my-posts')} className="btn-lux-ghost" style={{ padding: '13px 20px' }}>
+                        </button>
+                        <button type="button" onClick={() => navigate('/my-posts')} className="px-btn ghost lg">
                             My Posts
-                        </motion.button>
+                        </button>
                     </div>
                 </motion.div>
             </div>
@@ -167,29 +186,19 @@ const CreatePost = ({ user, addPost }) => {
                 initial={animReady ? {  opacity: 0, y: 20  } : false}
                 animate={{ opacity: 1, y: 0 }}
                 className="editorial-panel"
-                style={{ padding: '36px 40px 32px' }}
+                style={{ padding: 'clamp(24px, 4.5vw, 36px) clamp(18px, 5vw, 40px) clamp(24px, 4vw, 32px)' }}
             >
 
-                {/* Step Progress Bar */}
-                <div className="flex items-center gap-4 mb-10 create-post-steps">
-                    {[
-                        { n: 1, label: 'Core Details' },
-                        { n: 2, label: 'Technical Info' },
-                        { n: 3, label: 'Settings' }
-                    ].map((s, i) => (
-                        <div key={s.n} className="flex items-center gap-3" style={{ flex: i < 2 ? 1 : 'unset' }}>
-                            <div
-                                className={`step-dot ${step === s.n ? 'step-dot-active' : step > s.n ? 'step-dot-completed' : 'step-dot-inactive'}`}
-                                onClick={() => setStep(s.n)}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                {step > s.n ? <CheckCircle2 size={16} /> : s.n}
-                            </div>
-                            <span className="text-xs font-semibold hide-mobile" style={{ color: step >= s.n ? 'var(--text-main)' : 'var(--text-subtle)', whiteSpace: 'nowrap' }}>{s.label}</span>
-                            {i < 2 && <div className={`step-line ${step > s.n ? 'step-line-active' : ''}`}></div>}
-                        </div>
-                    ))}
-                </div>
+                {/* Step Progress — single continuous amber→emerald gradient bar */}
+                <WizardProgress
+                    steps={[
+                        { label: 'Core Details' },
+                        { label: 'Technical Info' },
+                        { label: 'Settings' },
+                    ]}
+                    current={step}
+                    onStepClick={(n) => setStep(n)}
+                />
 
                 {/* Error */}
                 <AnimatePresence>
@@ -218,14 +227,30 @@ const CreatePost = ({ user, addPost }) => {
                             <div className="flex-col" style={{ gap: '32px', paddingTop: '12px' }}>
                                 <div className="flex-col gap-2">
                                     <label className="input-lux-label flex items-center gap-2" style={{ display: 'inline-flex' }}><FileText size={14} /> Title *</label>
-                                    <input id="post-title-input" type="text" className="input-lux" placeholder="e.g. ML-Based ECG Anomaly Detection for Rural Clinics" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
+                                    <input
+                                        id="post-title-input"
+                                        type="text"
+                                        className={`input-lux ${fieldErrors.title ? 'is-error' : ''}`}
+                                        placeholder="e.g. ML-Based ECG Anomaly Detection for Rural Clinics"
+                                        value={formData.title}
+                                        onChange={(e) => { setFormData({ ...formData, title: e.target.value }); clearFieldError('title'); }}
+                                        aria-invalid={!!fieldErrors.title}
+                                        required
+                                    />
+                                    {fieldErrors.title && (
+                                        <span className="px-field-error"><AlertCircle size={12} /> {fieldErrors.title}</span>
+                                    )}
                                 </div>
 
                                 <div className="flex-col gap-2">
                                     <label className="input-lux-label flex items-center gap-2" style={{ display: 'inline-flex' }}><Tag size={14} /> Domain *</label>
-                                    <select id="post-domain-select" className="filter-chip" style={{ padding: '12px 34px 12px 16px', width: '100%' }} value={formData.domain} onChange={(e) => setFormData({ ...formData, domain: e.target.value })}>
-                                        {domains.map(d => <option key={d} value={d} style={{ background: 'var(--background)' }}>{d}</option>)}
-                                    </select>
+                                    <PxSelect
+                                        id="post-domain-select"
+                                        ariaLabel="Domain"
+                                        value={formData.domain}
+                                        onChange={(v) => setFormData({ ...formData, domain: v })}
+                                        options={domains.map(d => ({ value: d, label: d }))}
+                                    />
                                 </div>
 
                                 <div className="flex-col gap-2">
@@ -253,7 +278,19 @@ const CreatePost = ({ user, addPost }) => {
 
                                 <div className="flex-col gap-2">
                                     <label className="input-lux-label flex items-center gap-2" style={{ display: 'inline-flex' }}><Edit3 size={14} /> Project Description *</label>
-                                    <textarea id="post-description-input" className="input-lux" style={{ minHeight: '140px', resize: 'vertical' }} placeholder="Describe the problem you're solving, initial outcomes, and ideal partner profile..." value={formData.explanation} onChange={(e) => setFormData({ ...formData, explanation: e.target.value })} required />
+                                    <textarea
+                                        id="post-description-input"
+                                        className={`input-lux ${fieldErrors.explanation ? 'is-error' : ''}`}
+                                        style={{ minHeight: '140px', resize: 'vertical' }}
+                                        placeholder="Describe the problem you're solving, initial outcomes, and ideal partner profile..."
+                                        value={formData.explanation}
+                                        onChange={(e) => { setFormData({ ...formData, explanation: e.target.value }); clearFieldError('explanation'); }}
+                                        aria-invalid={!!fieldErrors.explanation}
+                                        required
+                                    />
+                                    {fieldErrors.explanation && (
+                                        <span className="px-field-error"><AlertCircle size={12} /> {fieldErrors.explanation}</span>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -268,16 +305,35 @@ const CreatePost = ({ user, addPost }) => {
 
                                 <div className="flex-col gap-2">
                                     <label className="input-lux-label flex items-center gap-2" style={{ display: 'inline-flex' }}><Briefcase size={14} /> Required Expertise *</label>
-                                    <textarea id="post-expertise-input" className="input-lux" style={{ minHeight: '100px', resize: 'vertical' }} placeholder="What specific expertise or role do you need from your partner?" value={formData.expertiseNeeded} onChange={(e) => setFormData({ ...formData, expertiseNeeded: e.target.value })} required />
+                                    <textarea
+                                        id="post-expertise-input"
+                                        className={`input-lux ${fieldErrors.expertiseNeeded ? 'is-error' : ''}`}
+                                        style={{ minHeight: '100px', resize: 'vertical' }}
+                                        placeholder="What specific expertise or role do you need from your partner?"
+                                        value={formData.expertiseNeeded}
+                                        onChange={(e) => { setFormData({ ...formData, expertiseNeeded: e.target.value }); clearFieldError('expertiseNeeded'); }}
+                                        aria-invalid={!!fieldErrors.expertiseNeeded}
+                                        required
+                                    />
+                                    {fieldErrors.expertiseNeeded && (
+                                        <span className="px-field-error"><AlertCircle size={12} /> {fieldErrors.expertiseNeeded}</span>
+                                    )}
                                 </div>
 
                                 <div className="flex-col gap-2">
                                     <label className="input-lux-label flex items-center gap-2" style={{ display: 'inline-flex' }}><Tag size={14} /> Collaboration Type</label>
-                                    <select className="filter-chip" style={{ padding: '12px 34px 12px 16px', width: '100%' }} value={formData.collaborationType} onChange={(e) => setFormData({ ...formData, collaborationType: e.target.value, commitmentLevel: e.target.value })}>
-                                        {['co-development', 'advisory', 'licensing', 'joint research', 'pilot partnership'].map(t => (
-                                            <option key={t} value={t} style={{ background: 'var(--background)', textTransform: 'capitalize' }}>{t}</option>
-                                        ))}
-                                    </select>
+                                    <PxSelect
+                                        ariaLabel="Collaboration type"
+                                        value={formData.collaborationType}
+                                        onChange={(v) => setFormData({ ...formData, collaborationType: v, commitmentLevel: v })}
+                                        options={[
+                                            { value: 'co-development', label: 'Co-development', hint: 'Build together end-to-end' },
+                                            { value: 'advisory', label: 'Advisory', hint: 'Strategic input, light touch' },
+                                            { value: 'licensing', label: 'Licensing', hint: 'Transfer IP / permissions' },
+                                            { value: 'joint research', label: 'Joint research', hint: 'Shared scientific scope' },
+                                            { value: 'pilot partnership', label: 'Pilot partnership', hint: 'Limited, defined rollout' },
+                                        ]}
+                                    />
                                 </div>
                             </div>
                         )}
@@ -322,9 +378,17 @@ const CreatePost = ({ user, addPost }) => {
 
                                 <div className="flex-col gap-2">
                                     <label className="input-lux-label flex items-center gap-2" style={{ display: 'inline-flex' }}><Clock size={14} /> Expiry (days)</label>
-                                    <select className="filter-chip" style={{ padding: '12px 34px 12px 16px', width: '100%' }} value={formData.expiryDays} onChange={(e) => setFormData({ ...formData, expiryDays: parseInt(e.target.value) })}>
-                                        {[15, 30, 60, 90].map(d => <option key={d} value={d} style={{ background: 'var(--background)' }}>{d} days</option>)}
-                                    </select>
+                                    <PxSelect
+                                        ariaLabel="Expiry"
+                                        value={String(formData.expiryDays)}
+                                        onChange={(v) => setFormData({ ...formData, expiryDays: parseInt(v, 10) })}
+                                        options={[
+                                            { value: '15', label: '15 days', hint: 'Short discovery window' },
+                                            { value: '30', label: '30 days', hint: 'Default' },
+                                            { value: '60', label: '60 days' },
+                                            { value: '90', label: '90 days', hint: 'Extended, one quarter' },
+                                        ]}
+                                    />
                                 </div>
                             </div>
                         )}
@@ -335,20 +399,20 @@ const CreatePost = ({ user, addPost }) => {
                 <div className="flex justify-between items-center mt-10" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '24px' }}>
                     <div>
                         {step > 1 && (
-                            <motion.button whileHover={{ x: -2 }} whileTap={{ scale: 0.96 }} onClick={prevStep} className="btn-lux-ghost" style={{ padding: '12px 22px' }}>
+                            <button type="button" onClick={prevStep} className="px-btn ghost">
                                 <ArrowLeft size={15} /> Previous
-                            </motion.button>
+                            </button>
                         )}
                     </div>
                     <div className="flex gap-3">
                         {step < totalSteps ? (
-                            <motion.button whileHover={{ x: 2 }} whileTap={{ scale: 0.96 }} onClick={nextStep} className="btn-lux" style={{ padding: '12px 26px' }}>
+                            <button type="button" onClick={nextStep} className="px-btn primary">
                                 Next Step <ArrowRight size={15} />
-                            </motion.button>
+                            </button>
                         ) : (
-                            <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }} id="publish-post-btn" onClick={handleSubmit} className="btn-lux btn-announce" style={{ padding: '13px 28px', fontSize: '14px' }}>
-                                <Send size={15} /> Publish Announcement
-                            </motion.button>
+                            <button type="button" id="publish-post-btn" onClick={handleSubmit} className="px-btn primary lg">
+                                <Send size={15} /> Publish announcement
+                            </button>
                         )}
                     </div>
                 </div>

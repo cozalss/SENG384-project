@@ -1,70 +1,69 @@
-// eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion';
-const shimmer = {
-    initial: { x: '-100%' },
-    animate: {
-        x: '100%',
-        transition: {
-            repeat: Infinity,
-            duration: 1.5,
-            ease: 'linear',
-        },
-    },
-};
+/**
+ * Premium skeleton loaders (2026 spec): 1.4s linear shimmer sweep with an
+ * aurora-tinted highlight, replacing the old 2s pulse. Pure CSS — no JS
+ * animation cost on pages rendering many skeletons at once.
+ *
+ * Shimmer styles live in index.css as `.shimmer`; this component composes
+ * the typical editorial-card layout.
+ */
 
 const SkeletonBlock = ({ width = '100%', height = '16px', radius = '8px', style = {} }) => (
-    <div style={{
-        width, height, borderRadius: radius,
-        background: 'var(--panel-base)',
-        position: 'relative', overflow: 'hidden',
-        ...style
-    }}>
-        <motion.div
-            variants={shimmer}
-            initial="initial"
-            animate="animate"
-            style={{
-                position: 'absolute', top: 0, left: 0,
-                width: '100%', height: '100%',
-                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)',
-            }}
-        />
-    </div>
+    <div
+        className="shimmer"
+        style={{ width, height, borderRadius: radius, ...style }}
+    />
 );
 
 const SkeletonCard = () => (
-    <div className="glass-panel" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
-            <SkeletonBlock width="80px" height="24px" radius="12px" />
-            <SkeletonBlock width="120px" height="24px" radius="12px" />
-            <SkeletonBlock width="60px" height="24px" radius="12px" />
-        </div>
-        <SkeletonBlock width="85%" height="24px" radius="6px" />
-        <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-            <SkeletonBlock width="100px" height="28px" radius="6px" />
-            <SkeletonBlock width="120px" height="28px" radius="6px" />
-            <SkeletonBlock width="80px" height="28px" radius="6px" />
-        </div>
-        <SkeletonBlock width="100%" height="16px" style={{ marginTop: '8px' }} />
-        <SkeletonBlock width="90%" height="16px" />
-        <SkeletonBlock width="75%" height="16px" />
-        <SkeletonBlock width="100%" height="44px" radius="8px" style={{ marginTop: '8px' }} />
-        <SkeletonBlock width="100%" height="56px" radius="8px" />
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <SkeletonBlock width="32px" height="32px" radius="50%" />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <SkeletonBlock width="100px" height="14px" />
-                    <SkeletonBlock width="70px" height="10px" />
-                </div>
+    <div
+        className="editorial-card"
+        aria-hidden="true"
+        style={{
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))',
+            gap: 'clamp(20px, 4vw, 32px)',
+            padding: 'clamp(26px, 5vw, 32px) clamp(20px, 5vw, 36px)',
+            pointerEvents: 'none',
+        }}
+    >
+        {/* Visual slot */}
+        <SkeletonBlock width="100%" height="100%" radius="18px" style={{ minHeight: 160 }} />
+
+        {/* Body */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0 }}>
+            <div style={{ display: 'flex', gap: 8 }}>
+                <SkeletonBlock width="120px" height="22px" radius="999px" />
+                <SkeletonBlock width="90px" height="22px" radius="999px" />
             </div>
-            <SkeletonBlock width="80px" height="32px" radius="8px" />
+            <SkeletonBlock width="70%" height="28px" radius="8px" />
+            <SkeletonBlock width="100%" height="14px" radius="6px" />
+            <SkeletonBlock width="96%" height="14px" radius="6px" />
+            <SkeletonBlock width="78%" height="14px" radius="6px" />
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                marginTop: 10,
+                paddingTop: 14,
+                borderTop: '1px dashed rgba(255,255,255,0.05)',
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <SkeletonBlock width="32px" height="32px" radius="50%" />
+                    <SkeletonBlock width="110px" height="12px" />
+                </div>
+                <SkeletonBlock width="86px" height="14px" radius="6px" />
+            </div>
+        </div>
+
+        {/* CTA column */}
+        <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <SkeletonBlock width="108px" height="40px" radius="11px" />
         </div>
     </div>
 );
 
 const SkeletonGrid = ({ count = 3 }) => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
         {Array.from({ length: count }).map((_, i) => (
             <SkeletonCard key={i} />
         ))}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Shield, Download, Search, Clock, Users, FileText, Activity, Trash2, Power, Briefcase, Lock } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import {
     subscribeToLogsRT,
@@ -10,6 +10,7 @@ import {
 } from '../services/firestore';
 import { useAnimReady } from '../hooks/useAnimReady';
 import { useToast } from '../hooks/useToast';
+import PxSelect from '../components/PxSelect';
 
 const AdminDashboard = ({ user, posts }) => {
     const animReady = useAnimReady();
@@ -41,6 +42,9 @@ const AdminDashboard = ({ user, posts }) => {
             });
         } catch (err) {
             console.error("Dashboard subscription error:", err);
+            // Subscription init failed; surface as "loaded with empty state"
+            // so the UI can render an error placeholder. Rule misfire here.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLoading(false);
             return () => { cancelled = true; };
         }
@@ -295,24 +299,38 @@ const AdminDashboard = ({ user, posts }) => {
                 {activeTab === 'logs' && (
                     <motion.div key="logs" initial={animReady ? { opacity:0, y:10 } : false} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}}>
                         <div className="editorial-panel" style={{ padding: '20px', marginBottom: '20px' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '12px' }} className="items-center">
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '12px' }} className="items-center">
                                 <div className="portal-search" style={{ padding: '11px 16px' }}>
                                     <Search size={16} color="var(--text-subtle)" />
                                     <input type="text" placeholder="Search events…" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                                 </div>
-                                <select className="filter-chip" style={{ width: '150px' }} value={filterRole} onChange={e => setFilterRole(e.target.value)}>
-                                    <option value="All" style={{ background: '#0a1210' }}>All Roles</option>
-                                    <option value="Admin" style={{ background: '#0a1210' }}>Admin</option>
-                                    <option value="Engineer" style={{ background: '#0a1210' }}>Engineer</option>
-                                    <option value="Healthcare Professional" style={{ background: '#0a1210' }}>Healthcare</option>
-                                </select>
-                                <select className="filter-chip" style={{ width: '150px' }} value={filterAction} onChange={e => setFilterAction(e.target.value)}>
-                                    <option value="All" style={{ background: '#0a1210' }}>All Actions</option>
-                                    <option value="LOGIN" style={{ background: '#0a1210' }}>Logins</option>
-                                    <option value="POST" style={{ background: '#0a1210' }}>Posts</option>
-                                    <option value="MEETING" style={{ background: '#0a1210' }}>Meetings</option>
-                                </select>
-                                <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }} onClick={exportToCSV} className="btn-lux-ghost" style={{ padding: '11px 16px', fontSize: '12.5px' }}>
+                                <PxSelect
+                                    size="sm"
+                                    ariaLabel="Filter by role"
+                                    label="Role:"
+                                    value={filterRole}
+                                    onChange={setFilterRole}
+                                    options={[
+                                        { value: 'All', label: 'All Roles' },
+                                        { value: 'Admin', label: 'Admin' },
+                                        { value: 'Engineer', label: 'Engineer' },
+                                        { value: 'Healthcare Professional', label: 'Healthcare' },
+                                    ]}
+                                />
+                                <PxSelect
+                                    size="sm"
+                                    ariaLabel="Filter by action"
+                                    label="Action:"
+                                    value={filterAction}
+                                    onChange={setFilterAction}
+                                    options={[
+                                        { value: 'All', label: 'All Actions' },
+                                        { value: 'LOGIN', label: 'Logins' },
+                                        { value: 'POST', label: 'Posts' },
+                                        { value: 'MEETING', label: 'Meetings' },
+                                    ]}
+                                />
+                                <motion.button whileHover={{ y: -1 }} whileTap={{ scale: 0.96 }} onClick={exportToCSV} className="px-btn sm" style={{ fontSize: '12.5px', justifyContent: 'center' }}>
                                     <Download size={14} /> Export CSV
                                 </motion.button>
                             </div>
@@ -320,9 +338,39 @@ const AdminDashboard = ({ user, posts }) => {
 
                         <div className="editorial-panel" style={{ padding: '0', overflow: 'hidden' }}>
                             {loading ? (
-                                <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading audit records...</div>
+                                <div style={{ padding: '60px 24px' }}>
+                                    <div className="shimmer" style={{ height: 12, borderRadius: 6, marginBottom: 10 }} />
+                                    <div className="shimmer" style={{ height: 12, width: '92%', borderRadius: 6, marginBottom: 10 }} />
+                                    <div className="shimmer" style={{ height: 12, width: '76%', borderRadius: 6 }} />
+                                </div>
                             ) : filteredLogs.length === 0 ? (
-                                <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>No logs found matching your criteria.</div>
+                                <div style={{ position: 'relative', padding: '72px 28px', textAlign: 'center', overflow: 'hidden' }}>
+                                    <div aria-hidden="true" style={{
+                                        position: 'absolute', inset: 0, pointerEvents: 'none',
+                                        background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(249, 168, 96, 0.08), transparent 65%)',
+                                    }} />
+                                    <div style={{
+                                        position: 'relative',
+                                        width: 56, height: 56, margin: '0 auto 14px',
+                                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                        borderRadius: 16,
+                                        background: 'rgba(255, 255, 255, 0.04)',
+                                        border: '1px solid rgba(255, 255, 255, 0.07)',
+                                        color: 'var(--text-muted)',
+                                    }}>
+                                        <Activity size={22} strokeWidth={1.6} />
+                                    </div>
+                                    <p style={{
+                                        position: 'relative',
+                                        fontFamily: 'var(--font-heading)', fontSize: 17, fontWeight: 600,
+                                        letterSpacing: '-0.02em', color: 'var(--text-main)', marginBottom: 6,
+                                    }}>No audit records</p>
+                                    <p style={{ position: 'relative', fontSize: 13, color: 'var(--text-subtle)', maxWidth: 340, margin: '0 auto', lineHeight: 1.55 }}>
+                                        {searchTerm || filterRole !== 'All' || filterAction !== 'All'
+                                            ? 'Try loosening the filters above.'
+                                            : 'Events will appear here as users interact with the platform.'}
+                                    </p>
+                                </div>
                             ) : (
                                 <div style={{ overflowX: 'auto' }}>
                                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>

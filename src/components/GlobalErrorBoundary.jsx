@@ -1,6 +1,6 @@
 import React from 'react';
 import { ShieldAlert, RefreshCcw, Home } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion } from 'framer-motion';
 
 class GlobalErrorBoundary extends React.Component {
@@ -34,8 +34,8 @@ class GlobalErrorBoundary extends React.Component {
           {/* Animated Background Orbs (Re-used from App.css style) */}
           <div style={{
             position: 'fixed',
-            width: '600px',
-            height: '600px',
+            width: 'min(600px, 90vw)',
+            height: 'min(600px, 90vw)',
             borderRadius: '50%',
             filter: 'blur(100px)',
             background: 'radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%)',
@@ -50,7 +50,8 @@ class GlobalErrorBoundary extends React.Component {
             className="glass-panel"
             style={{
               maxWidth: '540px',
-              padding: '64px 48px',
+              width: '100%',
+              padding: 'clamp(32px, 7vw, 64px) clamp(22px, 5vw, 48px)',
               textAlign: 'center',
               border: '1px solid rgba(239, 68, 68, 0.2)',
               boxShadow: '0 25px 64px rgba(0, 0, 0, 0.8), 0 0 40px rgba(239, 68, 68, 0.05)'
@@ -83,20 +84,22 @@ class GlobalErrorBoundary extends React.Component {
               We encountered an unhandled exception in the platform state. No data has been lost, but a system restart is required.
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <button 
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+              <button
+                type="button"
                 onClick={() => window.location.reload()}
-                className="btn btn-accent"
-                style={{ padding: '14px', borderRadius: '14px' }}
+                className="px-btn primary lg"
+                style={{ justifyContent: 'center' }}
               >
-                <RefreshCcw size={18} /> Recover Session
+                <RefreshCcw size={16} /> Recover session
               </button>
-              <button 
+              <button
+                type="button"
                 onClick={() => window.location.href = '/'}
-                className="btn btn-secondary"
-                style={{ padding: '14px', borderRadius: '14px' }}
+                className="px-btn ghost lg"
+                style={{ justifyContent: 'center' }}
               >
-                <Home size={18} /> Return Home
+                <Home size={16} /> Return home
               </button>
             </div>
             

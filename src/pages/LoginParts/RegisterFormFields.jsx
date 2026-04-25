@@ -1,5 +1,5 @@
 import { User, Briefcase, Building, Globe, MapPin } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion, AnimatePresence } from 'framer-motion';
 
 const inputWrapperStyle = () => ({
@@ -12,7 +12,7 @@ const iconStyle = (field, focusedField) => ({
     top: '50%',
     left: '16px',
     transform: 'translateY(-50%)',
-    color: focusedField === field ? 'var(--primary-light)' : 'var(--text-subtle)',
+    color: focusedField === field ? '#f5c48a' : 'var(--text-subtle)',
     transition: 'color 0.3s ease',
 });
 

@@ -1,5 +1,5 @@
 import { CheckCircle2, MessageSquare, Send, ShieldAlert, X } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAnimReady } from '../../hooks/useAnimReady';
 
@@ -104,10 +104,10 @@ const NDAModal = ({
                             </div>
                         </button>
 
-                        <div className="flex justify-end gap-4">
-                            <button className="btn btn-secondary" onClick={onClose} style={{ padding: '14px 28px', borderRadius: '14px' }}>Cancel</button>
-                            <button className="btn btn-accent" disabled={!acceptedNda} onClick={onSubmit} style={{ padding: '14px 36px', borderRadius: '14px' }}>
-                                Accept & Express Interest <Send size={18} />
+                        <div className="px-modal-footer">
+                            <button type="button" className="px-btn ghost" onClick={onClose}>Cancel</button>
+                            <button type="button" className="px-btn primary" disabled={!acceptedNda} onClick={onSubmit}>
+                                Accept & Express Interest <Send size={16} />
                             </button>
                         </div>
                     </motion.div>

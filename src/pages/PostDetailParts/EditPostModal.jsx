@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { CheckCircle2, Edit3, X } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAnimReady } from '../../hooks/useAnimReady';
 
@@ -85,10 +85,10 @@ const EditPostModal = ({
                             </div>
                         </div>
 
-                        <div className="flex justify-end gap-4">
-                            <button className="btn btn-secondary" onClick={handleCloseClick} style={{ padding: '14px 28px', borderRadius: '14px' }}>Cancel</button>
-                            <button className="btn btn-accent" onClick={onSave} style={{ padding: '14px 28px', borderRadius: '14px' }}>
-                                <CheckCircle2 size={18} /> Save Changes
+                        <div className="px-modal-footer">
+                            <button type="button" className="px-btn ghost" onClick={handleCloseClick}>Cancel</button>
+                            <button type="button" className="px-btn primary" onClick={onSave}>
+                                <CheckCircle2 size={16} /> Save changes
                             </button>
                         </div>
                     </motion.div>

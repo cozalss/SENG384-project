@@ -5,7 +5,7 @@ import {
     ArrowLeft, MapPin, Briefcase, Calendar, CheckCircle2,
     LockKeyhole, FileText, Clock, Sparkles,
 } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion } from 'framer-motion';
 import { useAnimReady } from '../hooks/useAnimReady';
 import { useToast } from '../hooks/useToast';
@@ -86,13 +86,13 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                     initial={animReady ? { opacity: 0, scale: 0.95 } : false}
                     animate={{ opacity: 1, scale: 1 }}
                     className="glass-panel"
-                    style={{ padding: '64px', textAlign: 'center', width: '100%', maxWidth: '500px' }}
+                    style={{ padding: 'clamp(32px, 7vw, 64px) clamp(18px, 5vw, 48px)', textAlign: 'center', width: '100%', maxWidth: '500px' }}
                 >
                     <FileText size={48} color="var(--text-subtle)" style={{ margin: '0 auto 16px', opacity: 0.4 }} />
                     <h2 style={{ fontSize: '24px', marginBottom: '8px', fontFamily: 'var(--font-heading)' }}>Project Not Found</h2>
                     <p className="text-muted mb-6">The requested collaboration protocol does not exist or has been removed.</p>
-                    <button className="btn btn-secondary" onClick={() => navigate('/dashboard')} style={{ width: '100%', borderRadius: '12px' }}>
-                        Return to Feed
+                    <button type="button" className="px-btn ghost" onClick={() => navigate('/dashboard')} style={{ width: '100%', justifyContent: 'center' }}>
+                        Back to Feed
                     </button>
                 </motion.div>
             </div>
@@ -189,7 +189,7 @@ const PostDetail = ({ posts, user, updatePost, updatePostStatus, addMeetingReque
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                     className="editorial-panel"
-                    style={{ padding: '40px 44px 36px' }}
+                    style={{ padding: 'clamp(28px, 5vw, 40px) clamp(18px, 5vw, 44px) clamp(28px, 4vw, 36px)' }}
                 >
                     <div className="flex gap-2 items-center mb-5" style={{ flexWrap: 'wrap' }}>
                         <span className={`pill ${post.status === 'CLOSED' ? 'pill-neon' : post.status === 'Meeting Scheduled' ? 'pill-cyan' : 'pill-neon'}`}>

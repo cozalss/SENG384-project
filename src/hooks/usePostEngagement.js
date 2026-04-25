@@ -16,8 +16,14 @@ export function usePostEngagement(postId) {
 
     useEffect(() => {
         if (!postId) {
+            // Reset subscription state when postId becomes nullish; the effect
+            // is synchronizing with an external system (Firestore), so these
+            // setStates are intentional resets, not cascading renders.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setInterests([]);
+             
             setMeetings([]);
+             
             setLoaded(true);
             return;
         }

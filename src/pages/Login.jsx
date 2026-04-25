@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { getUserByEmail, emailExists, addUserToFirestore, hashPassword, addActivityLog } from '../services/firestore';
 import { sendConfirmationEmail, generateConfirmationCode } from '../services/emailService';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion, LayoutGroup } from 'framer-motion';
 
 import AuthErrorBanner from './LoginParts/AuthErrorBanner';
@@ -235,7 +235,7 @@ const Login = ({ login }) => {
 
     const iconStyle = (field) => ({
         position: 'absolute', top: '50%', left: '16px', transform: 'translateY(-50%)',
-        color: focusedField === field ? 'var(--primary-light)' : 'var(--text-subtle)',
+        color: focusedField === field ? '#f5c48a' : 'var(--text-subtle)',
         transition: 'color 0.3s ease',
     });
 
@@ -265,24 +265,24 @@ const Login = ({ login }) => {
                 style={{
                     width: '100%',
                     maxWidth: mode === 'register' ? '560px' : '480px',
-                    padding: '52px 44px 40px',
+                    padding: 'clamp(32px, 6vw, 52px) clamp(22px, 5vw, 44px) clamp(28px, 5vw, 40px)',
                     position: 'relative',
                     zIndex: 1,
                     transition: 'max-width 0.4s ease',
                     overflow: 'hidden',
-                    boxShadow: '0 40px 90px rgba(0, 0, 0, 0.55), 0 0 120px rgba(96, 165, 250, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+                    boxShadow: '0 40px 90px rgba(0, 0, 0, 0.55), 0 0 120px rgba(249, 168, 96, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
                 }}
             >
                 <div style={{
                     position: 'absolute', top: 0, left: 0, right: 0, height: '1px',
-                    background: 'linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.45), rgba(34, 211, 238, 0.3), transparent)',
+                    background: 'linear-gradient(90deg, transparent, rgba(249, 168, 96, 0.42) 30%, rgba(34, 211, 238, 0.32) 70%, transparent)',
                     pointerEvents: 'none',
                 }} />
                 <div style={{
                     position: 'absolute', inset: 0, pointerEvents: 'none',
                     background:
-                        'radial-gradient(ellipse 60% 50% at 0% 0%, rgba(96, 165, 250, 0.12), transparent 60%),' +
-                        'radial-gradient(ellipse 55% 55% at 100% 100%, rgba(34, 211, 238, 0.10), transparent 60%)',
+                        'radial-gradient(ellipse 60% 50% at 0% 0%, rgba(249, 168, 96, 0.08), transparent 60%),' +
+                        'radial-gradient(ellipse 55% 55% at 100% 100%, rgba(34, 211, 238, 0.06), transparent 60%)',
                 }} />
 
                 <motion.div whileHover={{ x: -2 }} style={{ position: 'relative', zIndex: 2 }}>
@@ -298,53 +298,58 @@ const Login = ({ login }) => {
                     <motion.div
                         animate={{
                             boxShadow: [
-                                '0 0 30px rgba(96, 165, 250, 0.3), 0 12px 28px rgba(96, 165, 250, 0.3)',
-                                '0 0 60px rgba(34, 211, 238, 0.35), 0 14px 34px rgba(34, 211, 238, 0.3)',
-                                '0 0 30px rgba(96, 165, 250, 0.3), 0 12px 28px rgba(96, 165, 250, 0.3)',
+                                '0 0 30px rgba(249, 168, 96, 0.28), 0 12px 28px rgba(249, 168, 96, 0.26)',
+                                '0 0 50px rgba(34, 211, 238, 0.28), 0 14px 32px rgba(34, 211, 238, 0.24)',
+                                '0 0 30px rgba(249, 168, 96, 0.28), 0 12px 28px rgba(249, 168, 96, 0.26)',
                             ],
                         }}
                         transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
                         whileHover={{ rotate: 6, scale: 1.05 }}
                         style={{
                             display: 'inline-flex',
-                            background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+                            background: 'linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%)',
                             padding: '14px',
                             borderRadius: '20px',
                             marginBottom: '22px',
                         }}
                     >
-                        <Activity size={32} color="#070b0a" strokeWidth={2.5} />
+                        <Activity size={32} color="#1a1012" strokeWidth={2.5} />
                     </motion.div>
                     <h1 style={{
+                        fontFamily: 'var(--font-heading)',
                         fontSize: 'clamp(30px, 3.5vw, 40px)',
                         marginBottom: '8px',
                         letterSpacing: '-0.04em',
-                        fontFamily: 'var(--font-heading)',
-                        fontWeight: '800',
+                        // Premium 2026: display weight 600, not 800.
+                        fontWeight: 600,
                         lineHeight: '1.05',
                     }}>
                         {mode === 'login' ? (
                             <>Welcome <span className="accent" style={{
-                                background: 'linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 50%, var(--primary-light) 100%)',
+                                background: 'linear-gradient(135deg, #f5c48a 0%, #f39a54 50%, #67e8f9 100%)',
                                 backgroundSize: '200% auto',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 backgroundClip: 'text',
                                 animation: 'shimmer 5s linear infinite',
+                                fontFamily: "'Instrument Serif', 'Tiempos Headline', Georgia, serif",
                                 fontStyle: 'italic',
+                                fontWeight: 400,
                                 display: 'inline-block',
                                 paddingRight: '0.12em',
                                 paddingBottom: '0.03em',
                             }}>back</span></>
                         ) : (
                             <>Join the <span className="accent" style={{
-                                background: 'linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 50%, var(--primary-light) 100%)',
+                                background: 'linear-gradient(135deg, #f5c48a 0%, #f39a54 50%, #67e8f9 100%)',
                                 backgroundSize: '200% auto',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 backgroundClip: 'text',
                                 animation: 'shimmer 5s linear infinite',
+                                fontFamily: "'Instrument Serif', 'Tiempos Headline', Georgia, serif",
                                 fontStyle: 'italic',
+                                fontWeight: 400,
                                 display: 'inline-block',
                                 paddingRight: '0.12em',
                                 paddingBottom: '0.03em',
@@ -375,11 +380,10 @@ const Login = ({ login }) => {
                                 {mode === m && (
                                     <motion.span
                                         layoutId="login-pill"
+                                        className="dash-segmented-fill"
                                         style={{
                                             position: 'absolute', inset: 0,
-                                            background: 'linear-gradient(135deg, var(--primary), var(--accent))',
                                             borderRadius: '10px', zIndex: -1,
-                                            boxShadow: '0 8px 22px rgba(96, 165, 250, 0.32)',
                                         }}
                                         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                                     />
@@ -394,20 +398,26 @@ const Login = ({ login }) => {
 
                 {verifying && (
                     <div className="animate-fade-in text-center" style={{
-                        background: 'rgba(96, 165, 250, 0.06)',
-                        border: '1px solid rgba(96, 165, 250, 0.2)',
+                        background: 'rgba(249, 168, 96, 0.06)',
+                        border: '1px solid rgba(249, 168, 96, 0.2)',
                         padding: '18px',
                         marginBottom: '20px',
                         borderRadius: '14px',
                         position: 'relative', zIndex: 2,
-                    }}>
-                        <div style={{
-                            width: '28px', height: '28px', border: '2.5px solid rgba(96, 165, 250, 0.2)',
-                            borderTopColor: 'var(--primary)', borderRadius: '50%',
-                            animation: 'spin 0.8s linear infinite', margin: '0 auto 10px',
+                    }} role="status" aria-live="polite">
+                        <div className="login-spinner" style={{
+                            width: '28px', height: '28px', border: '2.5px solid rgba(249, 168, 96, 0.2)',
+                            borderTopColor: '#f5c48a', borderRadius: '50%',
+                            margin: '0 auto 10px',
                         }} />
-                        <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
-                        <p style={{ color: '#93c5fd', fontSize: '13px', fontWeight: '600', letterSpacing: '0.01em' }}>
+                        <style>{`
+                            .login-spinner { animation: login-spin 0.8s linear infinite; }
+                            @keyframes login-spin { 100% { transform: rotate(360deg); } }
+                            @media (prefers-reduced-motion: reduce) {
+                              .login-spinner { animation: none; opacity: 0.6; }
+                            }
+                        `}</style>
+                        <p style={{ color: '#f5c48a', fontSize: '13px', fontWeight: '600', letterSpacing: '0.01em' }}>
                             {mode === 'login' ? 'Verifying credentials…' : 'Sending confirmation email…'}
                         </p>
                     </div>
@@ -467,21 +477,19 @@ const Login = ({ login }) => {
                         setFocusedField={setFocusedField}
                     />
 
-                    <motion.button
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.97 }}
+                    <button
                         id="submit-button"
                         type="submit"
-                        className="btn-lux btn-announce"
+                        className="px-btn primary lg"
                         disabled={verifying}
                         style={{
-                            width: '100%', marginTop: '12px', padding: '15px',
-                            fontSize: '14.5px', justifyContent: 'center',
+                            width: '100%', marginTop: '12px',
+                            justifyContent: 'center',
                         }}
                     >
                         {verifying ? 'Sending code…' : mode === 'login' ? 'Sign In' : 'Create Account'}
                         {!verifying && <ArrowRight size={17} style={{ marginLeft: '2px' }} strokeWidth={2.5} />}
-                    </motion.button>
+                    </button>
                 </form>
 
                 <div className="login-visual" style={{ textAlign: 'center', marginTop: '32px', position: 'relative', zIndex: '1' }}>
@@ -498,7 +506,7 @@ const Login = ({ login }) => {
                         ))}
                     </div>
                     <p style={{ fontSize: '11px', color: 'var(--text-subtle)', lineHeight: '1.6' }}>
-                        Access signifies agreement to our <a href="#" style={{ fontWeight: '500', color: 'var(--primary-light)' }}>GDPR Policy</a> and <a href="#" style={{ fontWeight: '500', color: 'var(--primary-light)' }}>NDA terms</a>.
+                        Access is governed by <span style={{ fontWeight: 600, color: '#f5c48a' }}>GDPR controls</span> and <span style={{ fontWeight: 600, color: '#f5c48a' }}>NDA terms</span>.
                     </p>
                 </div>
             </motion.div>

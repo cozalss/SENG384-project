@@ -1,560 +1,514 @@
 <div align="center">
 
-<!-- Animated Header Banner -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366f1,50:a855f7,100:06b6d4&height=300&section=header&text=🛡️%20HEALTH%20SHIELD&fontSize=60&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=Where%20Healthcare%20Meets%20Engineering&descAlignY=55&descSize=20&descColor=e0e7ff" width="100%"/>
+# 🩺 HEALTH AI
+
+### _Where verified healthcare meets engineering — a cinematic platform for health-tech partner discovery._
+
+[![Live Demo](https://img.shields.io/badge/▶️_LIVE_DEMO-Open_App-1e90ff?style=for-the-badge&labelColor=0a0a0a)](https://de27omk8jz7if.cloudfront.net/)
+[![SENG384](https://img.shields.io/badge/SENG384-Senior_Project-7c3aed?style=for-the-badge&labelColor=0a0a0a)](#)
+[![Status](https://img.shields.io/badge/status-shipped-22c55e?style=for-the-badge&labelColor=0a0a0a)](#)
 
 <br/>
 
-<!-- Typing SVG -->
-<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=22&duration=3000&pause=1000&color=818CF8&center=true&vCenter=true&multiline=true&repeat=true&width=750&height=100&lines=%F0%9F%A7%AC+European+HealthTech+Innovation+Platform;%F0%9F%94%92+GDPR+Compliant+%7C+NDA+Protected+%7C+.edu+Verified;%F0%9F%9A%80+React+19+%7C+Firebase+%7C+Three.js+%7C+Framer+Motion" alt="Typing SVG" /></a>
-
-<br/><br/>
-
-<!-- Premium Badge Row -->
-<p>
-  <img src="https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
-  <img src="https://img.shields.io/badge/Vite_7-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
-  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase" />
-  <img src="https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white" alt="Three.js" />
-  <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
-</p>
-
-<p>
-  <img src="https://img.shields.io/badge/License-MIT-6366f1?style=flat-square&logo=opensourceinitiative&logoColor=white" />
-  <img src="https://img.shields.io/badge/PRs-Welcome-a855f7?style=flat-square&logo=github&logoColor=white" />
-  <img src="https://img.shields.io/badge/GDPR-Compliant-10b981?style=flat-square&logo=shield&logoColor=white" />
-  <img src="https://img.shields.io/badge/Status-Active-06b6d4?style=flat-square&logo=statuspal&logoColor=white" />
-  <img src="https://img.shields.io/badge/Node-LTS-339933?style=flat-square&logo=node.js&logoColor=white" />
-</p>
+![React](https://img.shields.io/badge/React-19.2-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-7.3-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-Firestore-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Framer Motion](https://img.shields.io/badge/Framer_Motion-12-0055FF?style=for-the-badge&logo=framer&logoColor=white)
+![Three.js](https://img.shields.io/badge/Three.js-0.183-000000?style=for-the-badge&logo=threedotjs&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-4.1-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-S3_+_CloudFront-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
 
 <br/>
 
-> **A competition-grade, ultra-premium platform bridging clinical expertise with technical engineering.**  
-> *Real-time synchronization · Adaptive 3D graphics · Industry-leading UX · GDPR & NDA protections*
+![Landing Page](docs/screenshots/landing_page.png)
 
-<br/>
-
-<!-- 🔥 LIVE SITE CTA — tek tıkla kutucuk -->
-<a href="https://de27omk8jz7if.cloudfront.net/" target="_blank" rel="noopener noreferrer">
-  <img src="https://img.shields.io/badge/%F0%9F%9A%80%20%20LAUNCH%20LIVE%20APP-%20Open%20HEALTH%20AI%20%E2%86%92-22d3ee?style=for-the-badge&labelColor=0b1220&logo=googlechrome&logoColor=white" height="56" alt="Launch HEALTH AI — Live Site" />
-</a>
-
-<br/>
-<sub>🔗 <a href="https://de27omk8jz7if.cloudfront.net/"><code>de27omk8jz7if.cloudfront.net</code></a> &nbsp;·&nbsp; <i>deployed on AWS S3 + CloudFront</i></sub>
-
-<br/><br/>
-
-<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%"/>
 </div>
 
-<br/>
+---
 
-## 🏛️ Table of Contents
+## ✨ What is HEALTH AI?
 
-<details>
-<summary><b>📖 Click to expand</b></summary>
+> **HEALTH AI** is a structured discovery platform that pairs **verified medical professionals** with **engineering teams** to launch health-tech collaborations — through institutional `.edu` registration, NDA-gated project details, scheduled meeting slots, and real-time chat.
 
-- [🌟 Vision](#-vision)
-- [✨ Features](#-features-that-set-us-apart)
-- [🏗️ Architecture](#️-system-architecture)
-- [💻 Tech Stack](#-tech-stack)
-- [📁 Project Structure](#-project-structure)
-- [🚀 Quick Start](#-quick-start)
-- [📱 Pages & Modules](#-pages--modules)
-- [🛡️ Security & Stability](#️-security--stability)
-- [🧪 How It Works](#-how-it-works)
-- [📄 Documentation](#-documentation)
-- [👥 Team Health Shield](#-team-health-shield)
-
-</details>
+Built as a **cinematic, product-style web app** rather than a static landing — every section breathes with Spline 3D, Framer Motion choreography, and a custom liquid-glass design system.
 
 <br/>
-
-## 🌟 Vision
 
 <table>
 <tr>
-<td width="60%">
+<td width="33%" align="center" valign="top">
 
-### The Problem
-
-In today's landscape, **Medical Professionals** identify critical problems every day but lack the technical tools to solve them. Conversely, **Engineers** have the technical power but lack real-world clinical validation.
-
-### The Solution
-
-**Health AI** is the **Bridge.** A secure, NDA-protected marketplace where these two worlds collide to create **life-saving innovations.**
-
-> *"We don't just connect people. We create the conditions for breakthrough collaboration."*
+### 🛡️ Verified Identity
+`.edu` email + 6-digit OTP via EmailJS.<br/>No anonymous accounts.
 
 </td>
-<td width="40%" align="center">
+<td width="33%" align="center" valign="top">
 
-```
-    🏥 Healthcare          🔧 Engineering
-    ┌──────────┐          ┌──────────┐
-    │ Clinical │          │ Technical│
-    │  Needs   │◄────────►│  Power   │
-    │          │          │          │
-    └────┬─────┘          └────┬─────┘
-         │                     │
-         └────────┬────────────┘
-                  │
-           ┌──────┴──────┐
-           │  🛡️ HEALTH  │
-           │   SHIELD    │
-           │  ──────────  │
-           │  Innovation │
-           │  Platform   │
-           └─────────────┘
-```
+### 🤝 NDA-Gated Collaboration
+Confidential project details unlock only after digital NDA acknowledgement.
+
+</td>
+<td width="33%" align="center" valign="top">
+
+### 💬 Real-Time Chat
+Typing indicators, presence, replies, reactions, unread badges — all on Firestore.
+
+</td>
+</tr>
+<tr>
+<td align="center" valign="top">
+
+### 📅 Meeting Slots
+Propose, accept, and decline meeting times directly inside the post workflow.
+
+</td>
+<td align="center" valign="top">
+
+### 🎛️ Admin Oversight
+Metrics, moderation, user management, activity logs, and CSV export.
+
+</td>
+<td align="center" valign="top">
+
+### 🌐 GDPR-Aware
+JSON data export, account deletion, audit trail for every sensitive action.
 
 </td>
 </tr>
 </table>
 
-<br/>
+---
 
-## ✨ Features That Set Us Apart
-
-<div align="center">
-
-| Feature | Description | Status |
-|:---:|:---|:---:|
-| 🌌 **Adaptive 3D DNA Helix** | Custom Three.js scene with 1000+ particles, deep bloom effects, auto-LOD for mobile | ✅ Live |
-| 🖱️ **Interactive Parallax** | Mouse & scroll-responsive 3D background with "window" depth effect | ✅ Live |
-| 💬 **Real-Time Messaging** | Firebase-powered instant chat with typing indicators & message management | ✅ Live |
-| 🔍 **Global Smart Search** | High-performance filtering by domain, country, city, stage & status | ✅ Live |
-| 📱 **Mobile-First Design** | Automatic LOD, responsive grids, hand-tuned for every screen size | ✅ Live |
-| 🎨 **Glassmorphism 2.0** | High-end CSS backdrop filters with modern OS-level transparency | ✅ Live |
-| 🔐 **NDA Protection** | Meetings gated behind NDA acceptance — IP never exposed | ✅ Live |
-| 🇪🇺 **GDPR Compliance** | Right to Erasure, Data Portability (JSON export), minimal data collection | ✅ Live |
-| 🌙 **Theme System** | Dark/Light mode with smooth animated transitions | ✅ Live |
-| 🔔 **Smart Notifications** | Real-time alerts for interest, meetings & status changes | ✅ Live |
-
-</div>
-
-<br/>
-
-<details>
-<summary><b>🌌 Premium Visual Experience (click to expand)</b></summary>
-
-<br/>
-
-- **Adaptive 3D DNA Helix** — A custom-built Three.js scene that dynamically adjusts its complexity based on device performance. Desktop users enjoy 1000+ particles and deep bloom effects, while mobile users get a buttery-smooth, optimized experience.
-  
-- **Interactive Depth (Parallax)** — The entire 3D background responds to mouse and scroll movements, creating a "window" effect that pulls users into the platform.
-
-- **Glassmorphism 2.0** — Every panel uses high-end CSS backdrop filters, providing a professional, semi-transparent feel consistent with modern OS designs.
-
-- **Scroll-Reveal Animations** — Staggered scroll-triggered animations with customizable direction (up, down, left, right, scale) using intersection observers.
-
-- **Mouse-Follow Glow** — Subtle radial gradient glow follows cursor position across the hero section for an immersive feel.
-
-- **Micro-Interactions** — Tilt effects on cards (react-parallax-tilt), spring-based hover animations, and smooth page transitions powered by Framer Motion.
-
-</details>
-
-<details>
-<summary><b>💬 Enterprise Real-Time Messaging (click to expand)</b></summary>
-
-<br/>
-
-- **Instant Synchronization** — Powered by Firebase Firestore, messages appear instantly across devices without page reloads.
-- **Typing Indicators** — Real-time visibility when the other party is typing.
-- **Message Management** — Delete conversations or clear history with a single click.
-- **Avatar Synchronization** — Consistent, professional UI across all messaging surfaces.
-- **Global User Search** — Find conversations or new users instantly.
-
-</details>
-
-<br/>
-
-## 🏗️ System Architecture
-
-```mermaid
-graph TB
-    subgraph Client["🖥️ Client Layer"]
-        UI[React 19 + Vite 7]
-        THREE[Three.js / R3F]
-        FM[Framer Motion]
-        ROUTER[React Router v7]
-    end
-    
-    subgraph Services["⚙️ Service Layer"]
-        AUTH[useAuth Hook]
-        POSTS[usePosts Hook]
-        NOTIF[useNotifications Hook]
-    end
-    
-    subgraph Backend["☁️ Firebase Backend"]
-        FAUTH[Firebase Auth]
-        FSTORE[Cloud Firestore]
-        FHOST[Firebase Hosting]
-    end
-    
-    subgraph Safety["🛡️ Safety Layer"]
-        EB[Global Error Boundary]
-        NS[Network Status Monitor]
-        NDA[NDA Gate System]
-        GDPR[GDPR Compliance Engine]
-    end
-    
-    UI --> Services
-    THREE --> UI
-    FM --> UI
-    ROUTER --> UI
-    Services --> Backend
-    Safety --> UI
-    
-    style Client fill:#1e1b4b,stroke:#6366f1,color:#e0e7ff
-    style Services fill:#1e1b4b,stroke:#a855f7,color:#e0e7ff
-    style Backend fill:#1e1b4b,stroke:#f59e0b,color:#e0e7ff
-    style Safety fill:#1e1b4b,stroke:#10b981,color:#e0e7ff
-```
-
-<br/>
-
-## 💻 Tech Stack
-
-<div align="center">
-
-| Layer | Technology | Purpose |
-|:---:|:---:|:---|
-| ⚛️ **Frontend** | React 19 | Component architecture & state management |
-| ⚡ **Build** | Vite 7 | Next-gen build speeds & HMR |
-| ☁️ **Backend** | Firebase | Auth, Firestore, Hosting |
-| 🎮 **3D Graphics** | Three.js + R3F | Adaptive DNA helix & particle systems |
-| 🎬 **Animation** | Framer Motion | Micro-interactions & page transitions |
-| 🧭 **Routing** | React Router v7 | Client-side navigation |
-| 🎯 **Icons** | Lucide React | Consistent icon system |
-| 🃏 **Effects** | React Parallax Tilt | 3D card hover effects |
-| ✨ **Particles** | tsParticles | Background particle systems |
-| 📧 **Email** | EmailJS | Contact & notification emails |
-| 🎨 **Styling** | Vanilla CSS | Custom design system with global tokens |
-
-</div>
-
-<br/>
-
-## 📁 Project Structure
-
-```
-Seng384/
-├── 📄 index.html                    # Entry point
-├── 📦 package.json                  # Dependencies & scripts
-├── ⚙️ vite.config.js                # Vite configuration
-├── 🔒 .env                          # Environment variables (Firebase keys)
-│
-├── 📁 src/
-│   ├── 🚀 main.jsx                  # React DOM render
-│   ├── 📱 App.jsx                   # Root component + routing
-│   ├── 🎨 index.css                 # Global design system (27KB)
-│   ├── 🔥 firebase.js               # Firebase initialization
-│   ├── 📊 mockData.js               # Development seed data
-│   │
-│   ├── 📁 components/
-│   │   ├── 🧬 HeroDNA.jsx           # Three.js 3D DNA helix (20KB)
-│   │   ├── 🧭 Navbar.jsx            # Navigation bar
-│   │   ├── 🔔 Notifications.jsx     # Real-time notification center
-│   │   ├── 💥 GlobalErrorBoundary   # Crash recovery system
-│   │   ├── 🌐 NetworkStatus.jsx     # Connectivity monitor
-│   │   ├── 🎬 PageTransition.jsx    # Route transition animations
-│   │   ├── 💀 SkeletonLoader.jsx    # Loading state placeholders
-│   │   ├── 🌙 ThemeToggle.jsx       # Dark/Light mode switch
-│   │   └── 🔢 AnimatedCounter.jsx   # Scroll-triggered counters
-│   │
-│   ├── 📁 pages/
-│   │   ├── 🏠 LandingPage.jsx       # Marketing homepage (36KB)
-│   │   ├── 🔑 Login.jsx             # Auth & registration (25KB)
-│   │   ├── 📋 Dashboard.jsx         # Innovator feed (25KB)
-│   │   ├── 📝 CreatePost.jsx        # Announcement wizard (23KB)
-│   │   ├── 🔍 PostDetail.jsx        # Full post view + meetings (50KB)
-│   │   ├── 💬 Chat.jsx              # Real-time messaging (17KB)
-│   │   ├── 👤 Profile.jsx           # User profile & settings
-│   │   ├── 📂 MyPosts.jsx           # User's announcements
-│   │   └── 🛠️ AdminDashboard.jsx    # Admin control panel (25KB)
-│   │
-│   ├── 📁 hooks/
-│   │   ├── 🔐 useAuth.js            # Authentication state
-│   │   ├── 📊 usePosts.js           # Post CRUD & real-time sync
-│   │   └── 🔔 useNotifications.js   # Notification management
-│   │
-│   ├── 📁 routes/
-│   │   └── 🧭 AppRoutes.jsx         # Route definitions
-│   │
-│   └── 📁 services/                 # Firebase service layer
-│
-├── 📁 docs/
-│   ├── 📸 screenshots/              # UI screenshots
-│   ├── 🐍 generate_srs.py           # SRS document generator
-│   ├── 🐍 generate_sdd.py           # SDD document generator
-│   └── 🐍 generate_userguide.py     # User guide generator
-│
-├── 📄 HEALTH_AI_SRS_Document.docx   # Software Requirements Spec
-├── 📄 HEALTH_AI_SDD_Document.docx   # Software Design Document
-└── 📄 HEALTH_AI_User_Guide.docx     # End-user guide
-```
-
-<br/>
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-<table>
-<tr>
-<td>
-
-```
-✅ Node.js (LTS v20+)
-✅ npm or yarn
-✅ Git
-✅ A modern browser
-```
-
-</td>
-<td>
-
-```
-📋 Optional
-   Firebase CLI (for deployment)
-   VS Code + ESLint extension
-```
-
-</td>
-</tr>
-</table>
-
-### Installation
-
-```bash
-# 1️⃣ Clone the repository
-git clone https://github.com/cemozal/Seng384.git
-
-# 2️⃣ Navigate to project directory
-cd Seng384
-
-# 3️⃣ Install dependencies
-npm install
-
-# 4️⃣ Start development server
-npm run dev
-```
-
-### Available Scripts
-
-| Command | Description |
-|:---|:---|
-| `npm run dev` | Start Vite dev server with HMR |
-| `npm run build` | Create optimized production build |
-| `npm run preview` | Preview production build locally |
-| `npm run lint` | Run ESLint code quality checks |
-
-<br/>
-
-## 📱 Pages & Modules
-
-<div align="center">
+## 🗺️ User Journey — From Curious Visitor to Active Partner
 
 ```mermaid
 flowchart LR
-    A["🏠 Landing"] --> B["🔑 Login/Register"]
-    B --> C["📋 Dashboard"]
-    C --> D["📝 Create Post"]
-    C --> E["🔍 Post Detail"]
-    C --> F["💬 Chat"]
-    C --> G["👤 Profile"]
-    C --> H["📂 My Posts"]
-    E --> I["🤝 Meeting Request"]
-    B --> J["🛠️ Admin Panel"]
-    
-    style A fill:#6366f1,stroke:#818cf8,color:#fff
-    style B fill:#a855f7,stroke:#c084fc,color:#fff
-    style C fill:#10b981,stroke:#34d399,color:#fff
-    style D fill:#f59e0b,stroke:#fcd34d,color:#000
-    style E fill:#ec4899,stroke:#f472b6,color:#fff
-    style F fill:#06b6d4,stroke:#22d3ee,color:#fff
-    style G fill:#8b5cf6,stroke:#a78bfa,color:#fff
-    style H fill:#14b8a6,stroke:#2dd4bf,color:#fff
-    style I fill:#f43f5e,stroke:#fb7185,color:#fff
-    style J fill:#ef4444,stroke:#f87171,color:#fff
+    V([👤 Visitor]):::guest --> L[🎬 Cinematic Landing]
+    L --> S{Sign up?}
+    S -->|No| L
+    S -->|Yes| R[📧 .edu Registration]
+    R --> O[🔢 6-digit OTP]
+    O --> D[🏠 Dashboard Feed]
+
+    D --> B[🔍 Browse posts]
+    D --> C[✍️ Create post]
+
+    B --> P[📄 Post Detail]
+    C --> P
+    P --> I[💡 Express Interest]
+    I --> N[🔒 NDA Modal]
+    N -->|Sign| M[📅 Meeting Slots]
+    M -->|Accept| W[🎉 Partner Found]
+    W --> X[💬 Direct Chat]
+
+    classDef guest fill:#1e293b,stroke:#7c3aed,color:#fff,stroke-width:2px
+    classDef default fill:#0f172a,stroke:#1e90ff,color:#e2e8f0,stroke-width:1.5px
 ```
-
-</div>
-
-<br/>
-
-| Page | Key Features |
-|:---|:---|
-| 🏠 **Landing Page** | Hero with 3D DNA, scroll-reveal animations, animated counters, dual-persona cards, workflow timeline |
-| 🔑 **Login / Register** | Role-based auth (Engineer/Healthcare), form validation, animated transitions |
-| 📋 **Dashboard** | Advanced multi-filter search, tilt-effect cards, bookmarks, match explanations, local city matching |
-| 📝 **Create Post** | Step-by-step wizard, domain/stage selectors, expertise requirement builder |
-| 🔍 **Post Detail** | Full announcement view, NDA-gated interest, meeting scheduler, status lifecycle |
-| 💬 **Chat** | Real-time Firebase messaging, typing indicators, conversation management, user discovery |
-| 👤 **Profile** | User settings, GDPR data export (JSON), account deletion, avatar management |
-| 📂 **My Posts** | Personal announcements list, status management, edit/close/delete controls |
-| 🛠️ **Admin Panel** | Platform analytics, user management, content moderation dashboard |
-
-<br/>
-
-## 🛡️ Security & Stability
-
-<div align="center">
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     🛡️ HEALTH SHIELD SAFETY NET                    │
-├──────────────────────┬──────────────────────────────────────────────┤
-│  🌐 Network Heartbeat│  Real-time connectivity detection           │
-│                      │  Stylized "Offline Mode" recovery panel     │
-├──────────────────────┼──────────────────────────────────────────────┤
-│  💥 Error Boundaries │  Global fault interception                  │
-│                      │  Safe recovery screen (no blank pages)      │
-├──────────────────────┼──────────────────────────────────────────────┤
-│  🔐 NDA Protection   │  Project details gated behind NDA           │
-│                      │  No IP exposed without explicit consent     │
-├──────────────────────┼──────────────────────────────────────────────┤
-│  🇪🇺 GDPR Compliance │  Right to Erasure (account deletion)       │
-│                      │  Data Portability (full JSON export)        │
-│                      │  Minimal data collection philosophy         │
-├──────────────────────┼──────────────────────────────────────────────┤
-│  🔒 Auth Security    │  Firebase Auth with .edu email verification │
-│                      │  Role-based access control                  │
-├──────────────────────┼──────────────────────────────────────────────┤
-│  📱 Performance      │  Automatic LOD for 3D scenes                │
-│                      │  60 FPS guaranteed on mobile devices        │
-└──────────────────────┴──────────────────────────────────────────────┘
-```
-
-</div>
-
-<br/>
-
-## 🧪 How It Works
-
-<div align="center">
-
-```
-   ┌─────────┐     ┌───────────┐     ┌───────────┐     ┌──────────┐     ┌───────────┐
-   │  🔐     │     │  📋      │     │  🤝      │     │  📅      │     │  🚀      │
-   │Register │────►│ Post or   │────►│ Express   │────►│ Schedule │────►│Collaborate│
-   │         │     │ Browse    │     │ Interest  │     │ Meeting  │     │          │
-   │ Step 01 │     │ Step 02   │     │ Step 03   │     │ Step 04  │     │ Step 05  │
-   └─────────┘     └───────────┘     └───────────┘     └──────────┘     └───────────┘
-       │                │                  │                 │                │
-    Sign up         Create a           Accept NDA &       Propose time    Mark "Partner
-    with .edu      structured          send message       slots, agree     Found" and
-    email          announcement        to author          on a date        close post
-```
-
-</div>
-
-<br/>
-
-## 📄 Documentation
-
-<div align="center">
-
-| Document | Description | Format |
-|:---:|:---|:---:|
-| 📘 **SRS** | Software Requirements Specification — functional & non-functional requirements | `.docx` |
-| 📗 **SDD** | Software Design Document — architecture, components & data flow | `.docx` |
-| 📙 **User Guide** | End-user documentation with screenshots & step-by-step instructions | `.docx` |
-
-</div>
-
-<br/>
 
 ---
 
-<br/>
+## 🏛️ System Architecture
 
-## 👥 Team Health Shield
+```mermaid
+graph TB
+    subgraph Client["🌐 Browser (Client)"]
+        UI[React 19 + Vite SPA]
+        UI --> Routes[React Router 7<br/>Lazy Routes]
+        Routes --> Pages[Landing • Dashboard • PostDetail<br/>Chat • Profile • Admin]
+        Pages --> Hooks[useAuth • usePosts<br/>useChat • useNotifications]
+        Pages --> Shell[Navbar • CommandPalette<br/>Toasts • Notifications]
+    end
 
-<div align="center">
+    subgraph Services["⚙️ Service Layer"]
+        FS[firestore.js<br/>Data access]
+        ES[emailService.js<br/>OTP + Meetings]
+    end
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:6366f1,100:a855f7&height=2&section=header" width="100%"/>
+    subgraph Cloud["☁️ Cloud"]
+        DB[(🔥 Firebase Firestore<br/>users • posts • chats<br/>notifications • logs)]
+        EMJ[📧 EmailJS API]
+        CDN[🌍 AWS CloudFront]
+        S3[📦 AWS S3 Bucket]
+    end
 
-<br/>
+    Hooks --> FS
+    Hooks --> ES
+    FS <--> DB
+    ES --> EMJ
+    UI -.served by.-> CDN
+    CDN -.origin.-> S3
+
+    style UI fill:#1e293b,stroke:#61DAFB,color:#fff
+    style DB fill:#1e293b,stroke:#FFCA28,color:#fff
+    style CDN fill:#1e293b,stroke:#FF9900,color:#fff
+    style EMJ fill:#1e293b,stroke:#22c55e,color:#fff
+```
+
+---
+
+## 🔐 Authentication & OTP Verification
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant App as React App
+    participant Firestore
+    participant EmailJS
+
+    User->>App: Submit .edu email + password
+    App->>App: Validate institutional domain
+    App->>Firestore: Create user (status: pending)
+    App->>App: Generate 6-digit code
+    App->>EmailJS: Send OTP email
+    EmailJS-->>User: 📧 Verification code
+    User->>App: Enter 6-digit code
+    App->>App: Verify code (TTL 10 min)
+    App->>Firestore: Update status → verified
+    App-->>User: ✅ Welcome to dashboard
+```
+
+---
+
+## 📝 Post Lifecycle — From Draft to Partner Found
+
+```mermaid
+stateDiagram-v2
+    [*] --> Draft: 3-step Wizard
+    Draft --> Published: Submit
+    Published --> Engaged: First Interest
+    Engaged --> NDA_Pending: Author opens detail
+    NDA_Pending --> Meetings: NDA accepted
+    Meetings --> PartnerFound: Slot accepted
+    Published --> Expired: Deadline reached
+    Engaged --> Expired: Deadline reached
+    PartnerFound --> [*]
+    Expired --> [*]
+
+    note right of Draft
+        Wizard collects:
+        domain • stage
+        expertise needs
+        location • confidentiality
+    end note
+
+    note right of NDA_Pending
+        Confidential fields
+        unlock after digital
+        NDA acknowledgement
+    end note
+```
+
+---
+
+## 💬 Real-Time Chat Data Flow
+
+```mermaid
+flowchart LR
+    A[👤 User A] -->|sends| MA[Message]
+    B[👤 User B] -->|sends| MB[Message]
+
+    MA --> CV[(conversations/&#123;id&#125;)]
+    MB --> CV
+    CV --> MS[(messages subcollection)]
+
+    MS -->|onSnapshot| LA[🔴 Live render — A]
+    MS -->|onSnapshot| LB[🔴 Live render — B]
+
+    CV -.typing.-> LA
+    CV -.typing.-> LB
+    CV -.presence.-> LA
+    CV -.presence.-> LB
+
+    style CV fill:#1e293b,stroke:#FFCA28,color:#fff
+    style MS fill:#1e293b,stroke:#FFCA28,color:#fff
+    style LA fill:#0f172a,stroke:#22c55e,color:#fff
+    style LB fill:#0f172a,stroke:#22c55e,color:#fff
+```
+
+---
+
+## 🗄️ Firestore Data Model
+
+```mermaid
+erDiagram
+    USERS ||--o{ POSTS : "authors"
+    USERS ||--o{ INTERESTS : "expresses"
+    USERS ||--o{ CONVERSATIONS : "participates"
+    USERS ||--o{ NOTIFICATIONS : "receives"
+    USERS ||--o{ ACTIVITY_LOGS : "generates"
+
+    POSTS ||--o{ INTERESTS : "has"
+    POSTS ||--o{ MEETINGS : "has"
+
+    CONVERSATIONS ||--o{ MESSAGES : "contains"
+
+    USERS {
+        string uid PK
+        string email
+        string role
+        string status
+        string institution
+        bool online
+        timestamp lastSeen
+    }
+    POSTS {
+        string id PK
+        string authorUid FK
+        string title
+        string domain
+        string stage
+        string status
+        string confidentiality
+        timestamp expiresAt
+    }
+    INTERESTS {
+        string id PK
+        string userUid FK
+        bool ndaAccepted
+        timestamp createdAt
+    }
+    MEETINGS {
+        string id PK
+        timestamp slot
+        string status
+    }
+    CONVERSATIONS {
+        string id PK
+        array members
+        map unreadCounts
+        bool typing
+    }
+    MESSAGES {
+        string id PK
+        string text
+        string replyTo
+        map reactions
+        bool read
+    }
+    NOTIFICATIONS {
+        string id PK
+        string type
+        bool read
+    }
+    ACTIVITY_LOGS {
+        string action
+        string actorUid
+        timestamp at
+    }
+```
+
+---
+
+## 📸 Screenshots
 
 <table>
 <tr>
-<td align="center" width="25%">
-<br/>
-<img src="https://ui-avatars.com/api/?name=Cem+Ozal&background=6366f1&color=fff&size=120&rounded=true&bold=true&font-size=0.40" width="120px" alt="Cem Özal"/>
-<br/><br/>
-<b>Cem Özal</b>
-<br/>
-<sub>💻 Full-Stack Developer</sub>
-<br/><br/>
-<a href="https://github.com/cemozal"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" height="22"/></a>
-<br/><br/>
+<td width="50%" align="center">
+<b>🎬 Landing</b><br/>
+<img src="docs/screenshots/landing_page.png" alt="Landing"/>
 </td>
-<td align="center" width="25%">
-<br/>
-<img src="https://ui-avatars.com/api/?name=Emre+Kurubas&background=a855f7&color=fff&size=120&rounded=true&bold=true&font-size=0.40" width="120px" alt="Emre Kurubaş"/>
-<br/><br/>
-<b>Emre Kurubaş</b>
-<br/>
-<sub>🎨 Frontend & UI/UX</sub>
-<br/><br/>
-<a href="https://github.com"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" height="22"/></a>
-<br/><br/>
+<td width="50%" align="center">
+<b>🏠 Dashboard</b><br/>
+<img src="docs/screenshots/dashboard_page.png" alt="Dashboard"/>
 </td>
-<td align="center" width="25%">
-<br/>
-<img src="https://ui-avatars.com/api/?name=Hasabu+Can+Eltayeb&background=10b981&color=fff&size=120&rounded=true&bold=true&font-size=0.33" width="120px" alt="Hasabu Can Eltayeb"/>
-<br/><br/>
-<b>Hasabu Can Eltayeb</b>
-<br/>
-<sub>☁️ Backend & Firebase</sub>
-<br/><br/>
-<a href="https://github.com"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" height="22"/></a>
-<br/><br/>
+</tr>
+<tr>
+<td align="center">
+<b>✍️ Create Post</b><br/>
+<img src="docs/screenshots/create_post_page.png" alt="Create Post"/>
 </td>
-<td align="center" width="25%">
-<br/>
-<img src="https://ui-avatars.com/api/?name=Sertac+Atac&background=06b6d4&color=fff&size=120&rounded=true&bold=true&font-size=0.40" width="120px" alt="Sertaç Ataç"/>
-<br/><br/>
-<b>Sertaç Ataç</b>
-<br/>
-<sub>📋 QA & Documentation</sub>
-<br/><br/>
-<a href="https://github.com"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" height="22"/></a>
-<br/><br/>
+<td align="center">
+<b>📄 Post Detail</b><br/>
+<img src="docs/screenshots/post_detail_page.png" alt="Post Detail"/>
+</td>
+</tr>
+<tr>
+<td align="center">
+<b>💬 Chat</b><br/>
+<img src="docs/screenshots/chat_page.png" alt="Chat"/>
+</td>
+<td align="center">
+<b>👤 Profile</b><br/>
+<img src="docs/screenshots/profile_page.png" alt="Profile"/>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="center">
+<b>🔐 Login & OTP</b><br/>
+<img src="docs/screenshots/login_page.png" alt="Login" width="60%"/>
 </td>
 </tr>
 </table>
 
-</div>
+---
 
-<br/>
+## 🧰 Tech Stack
+
+| Layer | Tools |
+| --- | --- |
+| 🎨 **Frontend** | React 19 • Vite 7 • React Router 7 |
+| 🎬 **Animation & 3D** | Framer Motion 12 • Three.js • React Three Fiber • Drei • Spline • HLS Video |
+| 🔥 **Data** | Firebase Cloud Firestore (subcollections, real-time listeners) |
+| 📧 **Email** | EmailJS — OTP & meeting-request templates |
+| 💎 **UI System** | Custom liquid-glass CSS • Lucide React icons • PxSelect • Skeletons • Toast provider • Wizard progress |
+| 🧪 **Testing** | Vitest 4 • Testing Library • jsdom |
+| ☁️ **Deployment** | AWS S3 + CloudFront via `deploy.sh` |
+
+---
+
+## 🛣️ Routes
+
+| Route | Access | Purpose |
+| --- | --- | --- |
+| `/` | 🌍 Guest | Cinematic landing experience |
+| `/login` | 🌍 Guest | Login, registration, and OTP verification |
+| `/dashboard` | 🔓 Authenticated | Browse and filter announcements |
+| `/create-post` | 🔓 Authenticated | Publish a collaboration announcement |
+| `/post/:id` | 🔓 Authenticated | View details, NDA, meetings |
+| `/my-posts` | 🔓 Authenticated | Manage own announcements |
+| `/chat` | 🔓 Authenticated | Real-time direct messages |
+| `/profile` | 🔓 Authenticated | Profile, GDPR export, account controls |
+| `/admin` | 👑 Admin only | Users, posts, logs, metrics, CSV export |
+
+---
+
+## 🚀 Deployment Pipeline
+
+```mermaid
+flowchart LR
+    Dev[💻 Local Dev] -->|npm run build| Build[📦 dist/]
+    Build -->|deploy.sh| Sync[🔄 aws s3 sync]
+    Sync -->|long cache| Assets[(📦 S3 — assets/)]
+    Sync -->|no-cache| HTML[(📄 S3 — index.html)]
+    HTML --> Inv[♻️ CloudFront Invalidation]
+    Assets --> CF[🌍 CloudFront Edge]
+    Inv --> CF
+    CF --> Live[🌐 Users Worldwide]
+
+    style Dev fill:#1e293b,stroke:#7c3aed,color:#fff
+    style CF fill:#1e293b,stroke:#FF9900,color:#fff
+    style Live fill:#1e293b,stroke:#22c55e,color:#fff
+```
+
+```bash
+./deploy.sh <bucket-name> <cloudfront-distribution-id>
+```
+
+---
+
+## 🏁 Getting Started
+
+### Prerequisites
+- Node.js **20+** and npm
+- A modern browser
+- _(Optional)_ Firebase project — to point the app at your own database
+- _(Optional)_ EmailJS credentials — for OTP & meeting emails
+
+### Install & Run
+
+```bash
+git clone https://github.com/cozalss/SENG384-project.git
+cd SENG384-project
+npm install
+npm run dev
+```
+
+Vite will print a local URL — usually `http://localhost:5173`.
+
+### Environment Variables
+
+Create a `.env` in the project root:
+
+```bash
+VITE_EMAILJS_SERVICE_ID=your_service_id
+VITE_EMAILJS_TEMPLATE_ID=your_template_id
+VITE_EMAILJS_PUBLIC_KEY=your_public_key
+```
+
+Firebase configuration currently lives in `src/firebase.js`. For production, move keys into environment-managed settings and enforce Firestore security rules.
+
+---
+
+## 📜 Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | 🛠️ Start the Vite development server |
+| `npm run build` | 📦 Create the production build in `dist/` |
+| `npm run preview` | 👀 Preview the production build locally |
+| `npm run lint` | 🧹 Run ESLint against `src/` |
+| `npm run test` | ✅ Run Vitest once |
+| `npm run test:watch` | 🔁 Run Vitest in watch mode |
+
+---
+
+## 📂 Project Structure
+
+```text
+Seng384/
+├── 📄 index.html
+├── ⚙️  vite.config.js
+├── 🚀 deploy.sh
+├── 📚 docs/
+│   ├── 📸 screenshots/
+│   └── 📝 generate_*.py            # SRS / SDD / User Guide generators
+└── 📁 src/
+    ├── 🎨 index.css • liquid-glass.css
+    ├── 🔥 firebase.js
+    ├── 📐 constants/landingData.jsx
+    ├── 🧩 components/
+    │   ├── 🎬 landing/             # Hero • CinematicStage • BentoFeatures…
+    │   ├── 🪟 CommandPalette.jsx
+    │   ├── 🔔 Notifications.jsx
+    │   ├── 🍞 ToastProvider.jsx
+    │   └── 🧭 WizardProgress.jsx
+    ├── 🪝 hooks/                   # useAuth • usePosts • useChat …
+    ├── 📄 pages/                   # Landing • Dashboard • PostDetail …
+    ├── 🛣️  routes/AppRoutes.jsx
+    ├── ⚙️  services/                # firestore.js • emailService.js
+    └── 🧪 test/
+```
+
+---
+
+## 📚 Documentation
+
+The repository ships with the full academic deliverables:
+
+- 📘 `HEALTH_AI_SRS_Document.docx` — Software Requirements Specification
+- 📗 `HEALTH_AI_SDD_Document.docx` — Software Design Document
+- 📕 `HEALTH_AI_User_Guide.docx` — Illustrated user guide
+
+Generators live in `docs/`.
+
+---
+
+## ⚠️ Notes on Scope
+
+This is an **academic prototype** for SENG384. The UI presents GDPR-aware workflows, data export, deletion, NDA acknowledgement, and audit logging — but a production launch should add hardened server-side authentication, formal legal review of NDA/GDPR text, Firestore security rules, rate limiting, and secret management.
+
+---
+
+## 👥 Team — Health Shield
+
+> _SENG384 Software Development 2 — Spring 2026_
+
+| 👤 Member | 🎯 Role |
+| --- | --- |
+| **Cem Özal** | Full-stack development |
+| **Emre Kurubaş** | Frontend & UI/UX |
+| **Hasabu Can Eltayeb** | Backend & Firebase |
+| **Sertaç Ataç** | QA & documentation |
 
 ---
 
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:6366f1,50:a855f7,100:06b6d4&height=2&section=header" width="100%"/>
+### 🌟 Try the live experience
 
-<br/>
+[![Open Live App](https://img.shields.io/badge/▶️_OPEN_HEALTH_AI-Visit_Now-1e90ff?style=for-the-badge&labelColor=0a0a0a&logo=react&logoColor=61DAFB)](https://de27omk8jz7if.cloudfront.net/)
 
-### 🎓 SENG384 — Software Development 2
-
-<sub>Çankaya University · Spring 2026</sub>
-
-<br/>
-
-<img src="https://img.shields.io/badge/Group-Health_Shield-6366f1?style=for-the-badge&logo=shield&logoColor=white" />
-<img src="https://img.shields.io/badge/Course-SENG384-a855f7?style=for-the-badge&logo=bookstack&logoColor=white" />
-<img src="https://img.shields.io/badge/Year-2026-10b981?style=for-the-badge&logo=calendar&logoColor=white" />
-
-<br/><br/>
-
-*Crafted with ❤️ and an obsession for clean code.*
-
-<br/>
-
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366f1,50:a855f7,100:06b6d4&height=120&section=footer" width="100%"/>
+_Built with 🩺 for safer collaboration in health-tech._
 
 </div>

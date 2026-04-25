@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { MessageSquare, UserCircle } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion } from 'framer-motion';
 import { useAnimReady } from '../../hooks/useAnimReady';
 

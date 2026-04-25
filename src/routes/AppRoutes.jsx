@@ -4,11 +4,12 @@ import { AnimatePresence } from 'framer-motion';
 
 import PageTransition from '../components/PageTransition';
 
-// LandingPage and Login stay eager — they are the first paint targets.
-// Authenticated routes are code-split so the main bundle stays lean.
+// LandingPage stays eager — it's the first paint target for unauthenticated
+// visitors. Login is lazy so firebase + emailjs stay out of the landing-page
+// critical path (they are ~100KB+ gzip of JS that the landing does not use).
 import LandingPage from '../pages/LandingPage';
-import Login from '../pages/Login';
 
+const Login = lazy(() => import('../pages/Login'));
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const CreatePost = lazy(() => import('../pages/CreatePost'));
 const PostDetail = lazy(() => import('../pages/PostDetail'));

@@ -1,5 +1,5 @@
 import { Calendar, CheckCircle2, Clock, Edit3, Send, UserCircle, Video, X } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+ 
 import { motion } from 'framer-motion';
 import { useAnimReady } from '../../hooks/useAnimReady';
 
@@ -74,12 +74,12 @@ const WorkflowActionPanel = ({
                 {isAuthor && post.status !== 'CLOSED' && derivedWorkflowState !== 'scheduled' && (
                     <div className="flex-col gap-3">
                         <p className="text-xs text-muted text-center" style={{ lineHeight: '1.6' }}>Close this announcement when a partner is found.</p>
-                        <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }} onClick={onClosePost} className="btn-lux" style={{ width: '100%', padding: '13px', justifyContent: 'center' }}>
+                        <button type="button" onClick={onClosePost} className="px-btn primary" style={{ width: '100%', justifyContent: 'center' }}>
                             <CheckCircle2 size={15} /> Partner Found (Close)
-                        </motion.button>
-                        <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }} onClick={onOpenEdit} className="btn-lux-ghost" style={{ width: '100%', padding: '13px', justifyContent: 'center' }}>
+                        </button>
+                        <button type="button" onClick={onOpenEdit} className="px-btn ghost" style={{ width: '100%', justifyContent: 'center' }}>
                             <Edit3 size={15} /> Edit Announcement
-                        </motion.button>
+                        </button>
 
                         {pendingMeetings.length > 0 && (
                             <div style={{ marginTop: '16px' }}>
@@ -91,8 +91,8 @@ const WorkflowActionPanel = ({
                                             <span style={{ color: 'var(--badge-primary-text)', fontSize: '13px' }}>📅 {m.slot?.label || 'Time slot pending'}</span>
                                         </div>
                                         <div className="flex gap-2">
-                                            <button onClick={() => onRespondMeeting(m.id, 'accepted')} className="btn btn-success" style={{ padding: '8px 12px', fontSize: '12px', flex: 1 }}>Accept</button>
-                                            <button onClick={() => onRespondMeeting(m.id, 'declined')} className="btn btn-secondary" style={{ padding: '8px 12px', fontSize: '12px', flex: 1, color: 'var(--badge-error-text)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>Decline</button>
+                                            <button type="button" onClick={() => onRespondMeeting(m.id, 'accepted')} className="px-btn primary sm" style={{ flex: 1 }}>Accept</button>
+                                            <button type="button" onClick={() => onRespondMeeting(m.id, 'declined')} className="px-btn danger sm" style={{ flex: 1 }}>Decline</button>
                                         </div>
                                     </div>
                                 ))}
@@ -103,9 +103,9 @@ const WorkflowActionPanel = ({
 
                 {canExpressInterest && derivedWorkflowState === 'initial' && (
                     <div className="flex-col gap-3">
-                        <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }} id="express-interest-btn" onClick={onOpenNda} className="btn-lux btn-announce" style={{ width: '100%', padding: '15px', fontSize: '14px', justifyContent: 'center' }}>
-                            <Send size={17} /> Express Interest
-                        </motion.button>
+                        <button type="button" id="express-interest-btn" onClick={onOpenNda} className="px-btn primary lg" style={{ width: '100%', justifyContent: 'center' }}>
+                            <Send size={16} /> Express Interest
+                        </button>
                         <p className="text-xs text-muted text-center" style={{ lineHeight: '1.5' }}>
                             NDA acceptance required before contact
                         </p>
@@ -121,7 +121,7 @@ const WorkflowActionPanel = ({
                         <CheckCircle2 color="#34d399" size={28} style={{ margin: '0 auto 12px' }} />
                         <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--badge-success-text)', fontWeight: '600' }}>Interest Expressed</h3>
                         <p className="text-muted text-xs mb-4" style={{ lineHeight: '1.6' }}>The author has been notified. Propose available time slots for an external meeting.</p>
-                        <button onClick={onProposeMeeting} className="btn btn-primary" style={{ width: '100%', fontSize: '14px', padding: '12px', borderRadius: '12px' }}>
+                        <button type="button" onClick={onProposeMeeting} className="px-btn primary" style={{ width: '100%', justifyContent: 'center' }}>
                             <Calendar size={16} /> Propose Meeting Times
                         </button>
                     </motion.div>
@@ -131,14 +131,14 @@ const WorkflowActionPanel = ({
                     <motion.div
                         initial={animReady ? { opacity: 0, scale: 0.95 } : false}
                         animate={{ opacity: 1, scale: 1 }}
-                        style={{ background: 'rgba(96, 165, 250, 0.06)', border: '1px solid rgba(96, 165, 250, 0.12)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
+                        style={{ background: 'rgba(249, 168, 96, 0.06)', border: '1px solid rgba(249, 168, 96, 0.16)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
                     >
-                        <Clock color="#93c5fd" size={28} style={{ margin: '0 auto 12px' }} />
-                        <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--badge-primary-text)', fontWeight: '600' }}>Meeting Request Sent</h3>
+                        <Clock color="#f5c48a" size={28} style={{ margin: '0 auto 12px' }} />
+                        <h3 style={{ fontSize: '16px', marginBottom: '8px', color: '#f5c48a', fontWeight: 600, fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}>Meeting request sent</h3>
                         <p className="text-muted text-xs mb-4" style={{ lineHeight: '1.6' }}>
                             Waiting for the author to accept your proposed time slot. You will be notified once confirmed.
                         </p>
-                        <div style={{ background: 'var(--panel-base)', padding: '12px', borderRadius: '10px', fontSize: '13px', color: 'var(--badge-primary-text)', marginBottom: '12px' }}>
+                        <div style={{ background: 'rgba(249, 168, 96, 0.08)', padding: '12px', borderRadius: '10px', fontSize: '13px', color: '#f5c48a', marginBottom: '12px' }}>
                             📅 {myMeeting?.slot?.label || selectedSlot?.label || 'Time slot pending'}
                         </div>
                     </motion.div>
@@ -148,15 +148,15 @@ const WorkflowActionPanel = ({
                     <motion.div
                         initial={animReady ? { opacity: 0, scale: 0.95 } : false}
                         animate={{ opacity: 1, scale: 1 }}
-                        style={{ background: 'rgba(239, 68, 68, 0.06)', border: '1px solid rgba(239, 68, 68, 0.15)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
+                        style={{ background: 'rgba(251, 113, 133, 0.06)', border: '1px solid rgba(251, 113, 133, 0.18)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
                     >
-                        <X color="#fca5a5" size={28} style={{ margin: '0 auto 12px' }} />
-                        <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--badge-error-text)', fontWeight: '600' }}>Meeting Declined</h3>
+                        <X color="#fda4af" size={28} style={{ margin: '0 auto 12px' }} />
+                        <h3 style={{ fontSize: '16px', marginBottom: '8px', color: '#fda4af', fontWeight: 600, fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}>Meeting declined</h3>
                         <p className="text-muted text-xs mb-4" style={{ lineHeight: '1.6' }}>
                             The author has declined your proposed meeting time.
                         </p>
-                        <button onClick={onProposeMeeting} className="btn btn-primary" style={{ width: '100%', fontSize: '14px', padding: '12px', borderRadius: '12px' }}>
-                            <Calendar size={16} /> Propose New Time
+                        <button type="button" onClick={onProposeMeeting} className="px-btn primary" style={{ width: '100%', justifyContent: 'center' }}>
+                            <Calendar size={16} /> Propose new time
                         </button>
                     </motion.div>
                 )}
@@ -178,12 +178,12 @@ const WorkflowActionPanel = ({
                             📅 {myMeeting?.slot?.label || selectedSlot?.label || 'Confirmed slot'}
                         </div>
                         {isAuthor && post.status !== 'CLOSED' && (
-                            <button onClick={onClosePost} className="btn btn-secondary" style={{ width: '100%', fontSize: '13px', padding: '10px', borderRadius: '12px', marginBottom: '8px' }}>
+                            <button type="button" onClick={onClosePost} className="px-btn ghost sm" style={{ width: '100%', justifyContent: 'center', marginBottom: '8px' }}>
                                 <CheckCircle2 size={14} /> Mark Partner Found (Close)
                             </button>
                         )}
-                        <a href="https://zoom.us" target="_blank" rel="noreferrer" className="btn btn-accent" style={{ width: '100%', fontSize: '14px', padding: '12px', textDecoration: 'none', borderRadius: '12px' }}>
-                            <Video size={16} /> Open External Meeting
+                        <a href="https://zoom.us" target="_blank" rel="noreferrer" className="px-btn primary" style={{ width: '100%', justifyContent: 'center' }}>
+                            <Video size={16} /> Open external meeting
                         </a>
                     </motion.div>
                 )}

@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-unused-vars
+ 
 import { useScroll, motion, useSpring } from 'framer-motion';
 
 const ReadingProgress = () => {

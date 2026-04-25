@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Bell, X, MessageSquare, Calendar, CheckCircle2, UserPlus, Clock, ShieldAlert } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
@@ -51,31 +52,38 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
     return (
         <div style={{ position: 'relative' }}>
             <motion.button
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.92 }}
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.96 }}
                 id="notifications-bell"
                 aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
                 aria-expanded={isOpen}
                 aria-haspopup="menu"
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
-                    background: isOpen ? 'rgba(96, 165, 250, 0.1)' : 'rgba(7, 11, 10, 0.55)',
-                    border: `1px solid ${isOpen ? 'rgba(96, 165, 250, 0.28)' : 'rgba(255,255,255,0.05)'}`,
+                    background: isOpen ? 'rgba(249, 168, 96, 0.1)' : 'rgba(255, 255, 255, 0.035)',
+                    border: `1px solid ${isOpen ? 'rgba(249, 168, 96, 0.32)' : 'rgba(255,255,255,0.08)'}`,
                     cursor: 'pointer',
-                    color: isOpen ? '#93c5fd' : 'var(--text-muted)',
+                    color: isOpen ? '#f5c48a' : 'var(--text-muted)',
                     padding: '9px',
                     borderRadius: '11px',
-                    transition: 'background 0.25s, border-color 0.25s, color 0.25s',
+                    transition: 'background 160ms var(--ease-smooth), border-color 160ms var(--ease-smooth), color 160ms var(--ease-smooth), box-shadow 160ms var(--ease-smooth)',
                     position: 'relative',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)'
                 }}
-                onMouseOver={(e) => { e.currentTarget.style.color = '#93c5fd'; e.currentTarget.style.background = 'rgba(96, 165, 250, 0.08)'; e.currentTarget.style.borderColor = 'rgba(96, 165, 250, 0.22)'; }}
+                onMouseOver={(e) => {
+                    if (!isOpen) {
+                        e.currentTarget.style.color = '#f5c48a';
+                        e.currentTarget.style.background = 'rgba(249, 168, 96, 0.08)';
+                        e.currentTarget.style.borderColor = 'rgba(249, 168, 96, 0.26)';
+                    }
+                }}
                 onMouseOut={(e) => {
-                    e.currentTarget.style.color = isOpen ? '#93c5fd' : 'var(--text-muted)';
-                    e.currentTarget.style.background = isOpen ? 'rgba(96, 165, 250, 0.1)' : 'rgba(7, 11, 10, 0.55)';
-                    e.currentTarget.style.borderColor = isOpen ? 'rgba(96, 165, 250, 0.28)' : 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.color = isOpen ? '#f5c48a' : 'var(--text-muted)';
+                    e.currentTarget.style.background = isOpen ? 'rgba(249, 168, 96, 0.1)' : 'rgba(255, 255, 255, 0.035)';
+                    e.currentTarget.style.borderColor = isOpen ? 'rgba(249, 168, 96, 0.32)' : 'rgba(255,255,255,0.08)';
                 }}
             >
                 <Bell size={17} />
@@ -100,7 +108,9 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                             className="editorial-panel"
                             style={{
                                 position: 'absolute', top: 'calc(100% + 14px)', right: 0,
-                                width: '420px', maxHeight: '520px', overflowY: 'auto',
+                                width: 'min(420px, calc(100vw - 24px))',
+                                maxHeight: 'min(520px, calc(100vh - 120px))',
+                                overflowY: 'auto',
                                 zIndex: 999, padding: 0,
                                 boxShadow: '0 30px 70px rgba(0,0,0,0.6), 0 0 60px rgba(96, 165, 250, 0.08)'
                             }}
@@ -121,27 +131,69 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                                 </div>
                                 {notifications.length > 0 && (
                                     <motion.button
-                                        whileHover={{ scale: 1.04 }}
+                                        whileHover={{ y: -1 }}
                                         whileTap={{ scale: 0.96 }}
                                         onClick={() => { onDismissAll?.(); }}
                                         style={{
-                                            background: 'none', border: 'none', cursor: 'pointer',
-                                            color: '#93c5fd', fontSize: '12px', fontWeight: '600',
+                                            background: 'rgba(255, 255, 255, 0.04)',
+                                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                                            cursor: 'pointer',
+                                            color: '#f5c48a', fontSize: '11.5px', fontWeight: '600',
                                             fontFamily: 'var(--font-body)',
                                             letterSpacing: '0.01em',
-                                            transition: 'opacity 0.2s'
+                                            transition: 'background 160ms var(--ease-smooth), border-color 160ms var(--ease-smooth)',
+                                            padding: '5px 10px',
+                                            borderRadius: '8px'
                                         }}
                                     >
-                                        Clear All
+                                        Clear all
                                     </motion.button>
                                 )}
                             </div>
 
                             {notifications.length === 0 ? (
-                                <div style={{ padding: '56px 20px', textAlign: 'center' }}>
-                                    <Bell size={36} style={{ margin: '0 auto 14px', opacity: 0.1 }} />
-                                    <p className="text-sm text-muted">No notifications yet</p>
-                                    <p className="text-xs" style={{ color: 'var(--text-subtle)', marginTop: '4px' }}>You'll see updates here when someone interacts with your posts.</p>
+                                <div style={{ position: 'relative', padding: '60px 24px 54px', textAlign: 'center', overflow: 'hidden' }}>
+                                    {/* Subtle aurora glow behind the empty bell — echoes the site's
+                                        amber + teal accent palette so the empty state feels intentional
+                                        instead of "the dropdown loaded but has nothing". */}
+                                    <div aria-hidden="true" style={{
+                                        position: 'absolute', inset: 0, pointerEvents: 'none',
+                                        background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(249, 168, 96, 0.08), transparent 65%), radial-gradient(ellipse 55% 45% at 50% 85%, rgba(34, 211, 238, 0.06), transparent 70%)',
+                                    }} />
+                                    <div style={{
+                                        position: 'relative',
+                                        width: 48, height: 48,
+                                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                        borderRadius: 14,
+                                        background: 'rgba(255, 255, 255, 0.04)',
+                                        border: '1px solid rgba(255, 255, 255, 0.07)',
+                                        marginBottom: 14,
+                                        color: 'var(--text-muted)',
+                                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)'
+                                    }}>
+                                        <Bell size={20} strokeWidth={1.6} />
+                                    </div>
+                                    <p style={{
+                                        position: 'relative',
+                                        fontSize: 14, fontWeight: 600,
+                                        fontFamily: 'var(--font-heading)',
+                                        letterSpacing: '-0.015em',
+                                        color: 'var(--text-main)',
+                                        marginBottom: 6
+                                    }}>You're all caught up</p>
+                                    <p style={{ position: 'relative', fontSize: 12.5, color: 'var(--text-subtle)', maxWidth: 280, margin: '0 auto 14px', lineHeight: 1.55 }}>
+                                        Updates on interests, meetings, and post activity will land here.
+                                    </p>
+                                    {/* Empty-state CTA — premium pattern (Linear, Arc): every empty
+                                        view should nudge the user toward one obvious next action. */}
+                                    <Link
+                                        to="/dashboard"
+                                        onClick={() => setIsOpen(false)}
+                                        className="px-btn sm"
+                                        style={{ position: 'relative' }}
+                                    >
+                                        Explore the feed
+                                    </Link>
                                 </div>
                             ) : (
                                 <div>
