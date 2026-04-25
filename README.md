@@ -20,7 +20,7 @@
 
 <br/>
 
-![Landing Page](docs/screenshots/landing_page.png)
+![Landing Page](docs/screenshots/landing_page.png?v=2)
 
 </div>
 
@@ -306,37 +306,37 @@ erDiagram
 <tr>
 <td width="50%" align="center">
 <b>🎬 Landing</b><br/>
-<img src="docs/screenshots/landing_page.png" alt="Landing"/>
+<img src="docs/screenshots/landing_page.png?v=2" alt="Landing"/>
 </td>
 <td width="50%" align="center">
 <b>🏠 Dashboard</b><br/>
-<img src="docs/screenshots/dashboard_page.png" alt="Dashboard"/>
+<img src="docs/screenshots/dashboard_page.png?v=2" alt="Dashboard"/>
 </td>
 </tr>
 <tr>
 <td align="center">
 <b>✍️ Create Post</b><br/>
-<img src="docs/screenshots/create_post_page.png" alt="Create Post"/>
+<img src="docs/screenshots/create_post_page.png?v=2" alt="Create Post"/>
 </td>
 <td align="center">
 <b>📄 Post Detail</b><br/>
-<img src="docs/screenshots/post_detail_page.png" alt="Post Detail"/>
+<img src="docs/screenshots/post_detail_page.png?v=2" alt="Post Detail"/>
 </td>
 </tr>
 <tr>
 <td align="center">
 <b>💬 Chat</b><br/>
-<img src="docs/screenshots/chat_page.png" alt="Chat"/>
+<img src="docs/screenshots/chat_page.png?v=2" alt="Chat"/>
 </td>
 <td align="center">
 <b>👤 Profile</b><br/>
-<img src="docs/screenshots/profile_page.png" alt="Profile"/>
+<img src="docs/screenshots/profile_page.png?v=2" alt="Profile"/>
 </td>
 </tr>
 <tr>
 <td colspan="2" align="center">
 <b>🔐 Login & OTP</b><br/>
-<img src="docs/screenshots/login_page.png" alt="Login" width="60%"/>
+<img src="docs/screenshots/login_page.png?v=2" alt="Login" width="60%"/>
 </td>
 </tr>
 </table>
