@@ -4,7 +4,7 @@
 
 ### _Where verified healthcare meets engineering — a cinematic platform for health-tech partner discovery._
 
-[![Live Demo](https://img.shields.io/badge/▶️_LIVE_DEMO-Open_App-1e90ff?style=for-the-badge&labelColor=0a0a0a)](https://de27omk8jz7if.cloudfront.net/)
+[![Live Demo](https://img.shields.io/badge/▶️_LIVE_DEMO-Open_App-1e90ff?style=for-the-badge&labelColor=0a0a0a)](https://d3msexomiexgx6.cloudfront.net/)
 [![SENG384](https://img.shields.io/badge/SENG384-Senior_Project-7c3aed?style=for-the-badge&labelColor=0a0a0a)](#)
 [![Status](https://img.shields.io/badge/status-shipped-22c55e?style=for-the-badge&labelColor=0a0a0a)](#)
 
@@ -507,7 +507,7 @@ This is an **academic prototype** for SENG384. The UI presents GDPR-aware workfl
 
 ### 🌟 Try the live experience
 
-[![Open Live App](https://img.shields.io/badge/▶️_OPEN_HEALTH_AI-Visit_Now-1e90ff?style=for-the-badge&labelColor=0a0a0a&logo=react&logoColor=61DAFB)](https://de27omk8jz7if.cloudfront.net/)
+[![Open Live App](https://img.shields.io/badge/▶️_OPEN_HEALTH_AI-Visit_Now-1e90ff?style=for-the-badge&labelColor=0a0a0a&logo=react&logoColor=61DAFB)](https://d3msexomiexgx6.cloudfront.net/)
 
 _Built with 🩺 for safer collaboration in health-tech._
 
