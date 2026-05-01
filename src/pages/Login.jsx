@@ -1,16 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    Activity, Mail, ArrowRight, ArrowLeft, Shield, CheckCircle2, Lock, Eye, EyeOff, Globe,
+    Activity, Mail, ArrowRight, ArrowLeft, Shield, CheckCircle2, Lock, Eye, EyeOff, Globe, Check,
 } from 'lucide-react';
 import { getUserByEmail, emailExists, addUserToFirestore, hashPassword, addActivityLog } from '../services/firestore';
 import { sendConfirmationEmail, generateConfirmationCode } from '../services/emailService';
- 
+
 import { motion, LayoutGroup } from 'framer-motion';
 
 import AuthErrorBanner from './LoginParts/AuthErrorBanner';
 import RegisterFormFields from './LoginParts/RegisterFormFields';
 import OTPVerificationPanel from './LoginParts/OTPVerificationPanel';
+import '../styles/login-cinematic.css';
 
 const INITIAL_FORM_DATA = {
     name: '',
@@ -53,6 +54,24 @@ const Login = ({ login }) => {
         const domain = email.split('@')[1]?.toLowerCase();
         return personalDomains.includes(domain);
     };
+
+    /* Live email validity for the green-check / red-glow feedback. We only
+       _show_ a hard error when the user has typed a complete-looking address
+       (contains "@" and a "."), so they're not punished mid-typing. */
+    const emailLive = useMemo(() => {
+        const value = (formData.email || '').trim().toLowerCase();
+        if (!value) return { state: 'idle' };
+        const looksComplete = /@.+\..+/.test(value);
+        if (!looksComplete) return { state: 'typing' };
+        if (mode === 'register') {
+            if (isPersonalEmail(value)) return { state: 'invalid' };
+            return validateEduEmail(value) ? { state: 'valid' } : { state: 'invalid' };
+        }
+        // Login mode: any well-formed email is "valid" enough to show the check.
+        return { state: 'valid' };
+    }, [formData.email, mode]);
+
+    const passwordValid = (formData.password || '').length >= 6;
 
     const resetToLoginForm = () => {
         setFormData(INITIAL_FORM_DATA);
@@ -430,14 +449,21 @@ const Login = ({ login }) => {
                             id="email-input"
                             type="email"
                             placeholder="Institutional Email (.edu required)"
-                            className="input-lux"
-                            style={{ paddingLeft: '44px' }}
+                            className={`input-lux${emailLive.state === 'invalid' ? ' is-bad-edu' : ''}`}
+                            style={{ paddingLeft: '44px', paddingRight: emailLive.state === 'valid' ? '46px' : '18px' }}
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             onFocus={() => setFocusedField('email')}
                             onBlur={() => setFocusedField(null)}
+                            aria-invalid={emailLive.state === 'invalid'}
                             required
                         />
+                        <span
+                            className={`field-check${emailLive.state === 'valid' ? ' is-valid' : ''}`}
+                            aria-hidden="true"
+                        >
+                            <Check size={12} strokeWidth={3.4} />
+                        </span>
                     </div>
 
                     <div style={inputWrapperStyle()}>
@@ -447,7 +473,7 @@ const Login = ({ login }) => {
                             type={showPassword ? 'text' : 'password'}
                             placeholder="Password"
                             className="input-lux"
-                            style={{ paddingLeft: '44px', paddingRight: '44px' }}
+                            style={{ paddingLeft: '44px', paddingRight: '76px' }}
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             onFocus={() => setFocusedField('password')}
@@ -455,6 +481,13 @@ const Login = ({ login }) => {
                             required
                             minLength={6}
                         />
+                        <span
+                            className={`field-check${passwordValid ? ' is-valid' : ''}`}
+                            aria-hidden="true"
+                            style={{ right: '46px' }}
+                        >
+                            <Check size={12} strokeWidth={3.4} />
+                        </span>
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
