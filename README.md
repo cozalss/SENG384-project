@@ -5,6 +5,7 @@
 ### _Where verified healthcare meets engineering — a cinematic platform for health-tech partner discovery._
 
 [![Live Demo](https://img.shields.io/badge/▶️_LIVE_DEMO-Open_App-1e90ff?style=for-the-badge&labelColor=0a0a0a)](https://d3msexomiexgx6.cloudfront.net/)
+[![Watch the Demo](https://img.shields.io/badge/🎬_WATCH_DEMO-YouTube-FF0000?style=for-the-badge&labelColor=0a0a0a)](https://www.youtube.com/watch?v=ybA2jERxw7I)
 [![SENG384](https://img.shields.io/badge/SENG384-Senior_Project-7c3aed?style=for-the-badge&labelColor=0a0a0a)](#)
 [![Status](https://img.shields.io/badge/status-shipped-22c55e?style=for-the-badge&labelColor=0a0a0a)](#)
 
@@ -21,6 +22,31 @@
 <br/>
 
 ![Landing Page](docs/screenshots/landing_page.png?v=2)
+
+<br/>
+
+## 🎬 Watch the 5-Minute Demo
+
+<a href="https://www.youtube.com/watch?v=ybA2jERxw7I">
+  <img src="https://img.youtube.com/vi/ybA2jERxw7I/maxresdefault.jpg" alt="HEALTH AI — 5-minute demo walkthrough" width="80%" />
+</a>
+
+<br/>
+<br/>
+
+[![▶️ Click to play on YouTube](https://img.shields.io/badge/▶️_PLAY_ON_YOUTUBE-FF0000?style=for-the-badge&logo=youtube&logoColor=white&labelColor=0a0a0a)](https://www.youtube.com/watch?v=ybA2jERxw7I)
+
+> **A guided tour through every feature** — `.edu` registration, post lifecycle, NDA-gated content, meeting workflow, admin panel, and GDPR controls — narrated end-to-end in under five minutes.
+
+| Scene | Timestamp | What you'll see |
+|---|---|---|
+| 🎬 Opening | 0:00 | Cinematic landing with Spline 3D cube wall |
+| 🛡️ Registration & Login | 0:10 | `.edu` validation, role selection, OTP |
+| 📝 Post Management | 0:55 | Wizard, Save as Draft → Publish → Active |
+| 🔍 Search & Filters | 2:00 | Live search, multi-filter, clear filters |
+| 🤝 Meeting Workflow | 2:30 | Express interest → NDA → slot → accept |
+| 🎛️ Admin Panel | 3:40 | Users, posts, logs, CSV export |
+| 🌐 Profile & GDPR | 4:40 | Edit, export JSON, delete account flow |
 
 </div>
 
