@@ -1,9 +1,8 @@
-import { useRef, useMemo } from 'react';
+import { useRef } from 'react';
 import { ArrowLeft, ArrowRight, Mail, RefreshCw, Shield } from 'lucide-react';
-
+ 
 import { motion } from 'framer-motion';
 import AuthErrorBanner from './AuthErrorBanner';
-import '../../styles/login-cinematic.css';
 
 const OTPVerificationPanel = ({
     pendingUser,
@@ -21,15 +20,6 @@ const OTPVerificationPanel = ({
     const maskedEmail = pendingUser
         ? pendingUser.email.replace(/(.{2}).+(@.+)/, '$1***$2')
         : '';
-
-    // When all six digits are present we tag the row with `otp-all-filled`
-    // so each cell does the staggered green ripple defined in
-    // login-cinematic.css. Pure presentational signal — submit logic
-    // still gates on confirmCode equality in the parent.
-    const allFilled = useMemo(
-        () => enteredCode.length === 6 && enteredCode.every(d => /^\d$/.test(d)),
-        [enteredCode]
-    );
 
     const handleDigitChange = (index, value) => {
         const digit = value.replace(/\D/g, '').slice(-1);
@@ -192,7 +182,6 @@ const OTPVerificationPanel = ({
 
                 <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     <motion.div
-                        className={allFilled ? 'otp-all-filled' : ''}
                         style={{ display: 'flex', gap: 'clamp(6px, 2vw, 10px)', justifyContent: 'center' }}
                         role="group"
                         aria-label="6-digit verification code"

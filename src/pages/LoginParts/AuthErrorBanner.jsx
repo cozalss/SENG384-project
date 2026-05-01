@@ -7,13 +7,11 @@ const AuthErrorBanner = ({ error, variant = 'form' }) => {
             <AnimatePresence mode="wait">
                 {error && (
                     <motion.div
-                        key={error}
-                        className="auth-error-banner"
+                        key="err"
                         initial={{ opacity: 0, y: -8, height: 0 }}
                         animate={{ opacity: 1, y: 0, height: 'auto' }}
                         exit={{ opacity: 0, y: -8, height: 0 }}
                         role="alert"
-                        aria-live="polite"
                         style={{
                             background: 'rgba(239,68,68,0.08)',
                             border: '1px solid rgba(239,68,68,0.15)',
@@ -37,15 +35,11 @@ const AuthErrorBanner = ({ error, variant = 'form' }) => {
         <AnimatePresence mode="wait">
             {error && (
                 <motion.div
-                    /* keying by error text replays the underline animation each
-                       time the message changes (e.g. .edu → personal email). */
-                    key={error}
-                    className="auth-error-banner"
+                    key="error"
                     initial={{ opacity: 0, y: -8, height: 0 }}
                     animate={{ opacity: 1, y: 0, height: 'auto' }}
                     exit={{ opacity: 0, y: -8, height: 0 }}
                     role="alert"
-                    aria-live="polite"
                     style={{
                         background: 'rgba(239, 68, 68, 0.06)',
                         border: '1px solid rgba(239, 68, 68, 0.22)',
