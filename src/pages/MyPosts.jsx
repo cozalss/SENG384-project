@@ -30,7 +30,7 @@ const MyPostsStatCard = ({ icon: Icon, label, value, tone, index }) => {
     );
 };
 
-const MyPostRow = ({ post, status, expiryState, animReady, index, onStatusChange, onDelete }) => {
+const MyPostRow = ({ post, status, expiryState, animReady, index, onStatusChange, onDelete, lifecycleStages, getLifecycleStep }) => {
     const expiryTone = expiryState === 'expired'
         ? { bg: 'rgba(251, 113, 133, 0.1)', border: 'rgba(251, 113, 133, 0.26)', ink: '#fda4af', label: 'Expired' }
         : expiryState === 'soon'
@@ -54,6 +54,32 @@ const MyPostRow = ({ post, status, expiryState, animReady, index, onStatusChange
                         <span className={`pill ${status.cls}`}>{status.label}</span>
                         <span className="pill pill-dim">{post.domain}</span>
                     </div>
+
+                    {/* Lifecycle journey — Draft → Active → Meeting → Partner */}
+                    {lifecycleStages && getLifecycleStep && (
+                        <div
+                            className={`lifecycle-track ${post.status === 'Expired' ? 'is-stalled' : ''}`}
+                            role="progressbar"
+                            aria-valuemin={0}
+                            aria-valuemax={lifecycleStages.length - 1}
+                            aria-valuenow={getLifecycleStep(post.status)}
+                            aria-label="Announcement lifecycle"
+                        >
+                            {lifecycleStages.map((stageLabel, i) => {
+                                const step = getLifecycleStep(post.status);
+                                const state = i < step ? 'done' : i === step ? 'current' : 'upcoming';
+                                return (
+                                    <span key={stageLabel} className={`lifecycle-step state-${state}`}>
+                                        <span className="lifecycle-dot" />
+                                        {i < lifecycleStages.length - 1 && <span className="lifecycle-bar" />}
+                                        <span className="lifecycle-label">
+                                            {stageLabel === 'CLOSED' ? 'Partner' : stageLabel === 'Meeting Scheduled' ? 'Meeting' : stageLabel}
+                                        </span>
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    )}
 
                     <Link to={`/post/${post.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                         <h2 style={{
@@ -177,6 +203,19 @@ const MyPosts = ({ posts, user, updatePostStatus }) => {
         if (status === 'Draft') return { label: status, cls: 'pill-amber' };
         if (status === 'Expired') return { label: status, cls: 'pill-amber' };
         return { label: status, cls: 'pill-cyan' };
+    };
+
+    /* Lifecycle journey for an announcement. Authors see at a glance how far
+       the post has progressed toward partnership. Expired posts get a fade
+       treatment but still show the journey up to where they got. */
+    const lifecycleStages = ['Draft', 'Active', 'Meeting Scheduled', 'CLOSED'];
+    const getLifecycleStep = (status) => {
+        if (status === 'Draft') return 0;
+        if (status === 'Active') return 1;
+        if (status === 'Meeting Scheduled') return 2;
+        if (status === 'CLOSED') return 3;
+        if (status === 'Expired') return 1; // got published, then ran out
+        return 0;
     };
 
     const tabs = ['All', 'Draft', 'Active', 'Meeting Scheduled', 'CLOSED', 'Expired'];
@@ -369,6 +408,8 @@ const MyPosts = ({ posts, user, updatePostStatus }) => {
                                     index={index}
                                     onStatusChange={handleStatusChange}
                                     onDelete={handleDelete}
+                                    lifecycleStages={lifecycleStages}
+                                    getLifecycleStep={getLifecycleStep}
                                 />
                             );
                         })}

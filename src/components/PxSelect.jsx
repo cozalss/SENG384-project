@@ -29,6 +29,10 @@ const PxSelect = ({
     id,
     className = '',
     ariaLabel,
+    /** Optional: when truthy, the trigger renders a small green accent dot in
+     *  its corner. Use this to signal "this filter has a non-default value
+     *  applied" so users can scan the bar at a glance. */
+    isActive = false,
 }) => {
     const [open, setOpen] = useState(false);
     const [activeIdx, setActiveIdx] = useState(() => Math.max(0, options.findIndex(o => o.value === value)));
@@ -110,7 +114,7 @@ const PxSelect = ({
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 aria-label={ariaLabel}
-                className={`px-select-trigger ${size} ${open ? 'is-open' : ''} ${className}`}
+                className={`px-select-trigger ${size} ${open ? 'is-open' : ''} ${isActive ? 'is-filter-active' : ''} ${className}`}
                 onClick={() => {
                     if (open) setOpen(false);
                     else openMenu();
@@ -131,6 +135,7 @@ const PxSelect = ({
                 >
                     <ChevronDown size={14} strokeWidth={2.2} />
                 </motion.span>
+                {isActive && <span className="px-select-active-dot" aria-hidden="true" />}
             </button>
 
             {typeof document !== 'undefined' && createPortal(
