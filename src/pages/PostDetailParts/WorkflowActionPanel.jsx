@@ -1,7 +1,43 @@
-import { Calendar, CheckCircle2, Clock, Edit3, Loader2, MessageSquare, Send, ShieldCheck, UserCircle, Users, Video, X } from 'lucide-react';
+import { Calendar, CheckCircle2, Clock, Edit3, Send, UserCircle, Video, X } from 'lucide-react';
 
 import { motion } from 'framer-motion';
 import { useAnimReady } from '../../hooks/useAnimReady';
+import '../../styles/login-cinematic.css';
+
+/* Map the post's derivedWorkflowState (managed by PostDetail.jsx) to the
+   4-step indicator. The states a viewer can be in:
+     initial          → step 0 (Interested) is "active"
+     interested       → step 1 (NDA) just completed, step 2 (Meeting) "active"
+     meeting-requested→ step 2 still active (waiting on author)
+     declined         → step 2 active but no progress (visual neutral)
+     scheduled        → step 3 (Accepted) is "active" / done
+   For the post author the panel shows different content above, but the
+   progress beacon stays accurate either way. */
+const WORKFLOW_STEPS = [
+    { key: 'interested', label: 'Interested' },
+    { key: 'nda',        label: 'NDA'        },
+    { key: 'meeting',    label: 'Meeting'    },
+    { key: 'accepted',   label: 'Accepted'   },
+];
+
+const computeStepStates = (state) => {
+    // Returns one of 'done' | 'active' | 'idle' per step.
+    const idx = (() => {
+        switch (state) {
+            case 'initial':           return 0;
+            case 'interested':        return 2;   // NDA + interest done, meeting active
+            case 'meeting-requested': return 2;
+            case 'declined':          return 2;
+            case 'scheduled':         return 3;
+            default:                  return 0;
+        }
+    })();
+    return WORKFLOW_STEPS.map((s, i) => {
+        if (i < idx) return { ...s, status: 'done' };
+        if (i === idx) return { ...s, status: 'active' };
+        return { ...s, status: 'idle' };
+    });
+};
 
 const WorkflowActionPanel = ({
     post,
@@ -12,18 +48,21 @@ const WorkflowActionPanel = ({
     myMeeting,
     selectedSlot,
     pendingMeetings,
-    interests = [],
-    meetings = [],
-    respondingMeetingId = null,
     onClosePost,
     onOpenEdit,
     onRespondMeeting,
-    onCancelMeeting,
     onOpenNda,
     onProposeMeeting,
-    onMessageInterested,
 }) => {
     const animReady = useAnimReady();
+    const steps = computeStepStates(derivedWorkflowState);
+    /* The progress indicator only makes sense for the engineer/HCP viewer
+       once they have started the journey OR can start it. Hide for the
+       author's own posts (they see pending requests instead) and for closed
+       posts where the journey is over. */
+    const showProgress = !isAuthor && post.status !== 'CLOSED' && (
+        canExpressInterest || derivedWorkflowState !== 'initial'
+    );
 
     return (
         <motion.div
@@ -56,9 +95,9 @@ const WorkflowActionPanel = ({
             </div>
 
             <div style={{
-                background: 'var(--detail-info-bg, rgba(7, 11, 10, 0.5))',
+                background: 'rgba(7, 11, 10, 0.5)',
                 borderRadius: '14px', padding: '18px',
-                border: '1px solid var(--detail-info-border, rgba(255,255,255,0.05))'
+                border: '1px solid rgba(255,255,255,0.05)'
             }}>
                 <div className="mb-3">
                     <span className="input-lux-label" style={{ marginBottom: '4px' }}>Collaboration Type</span>
@@ -66,11 +105,39 @@ const WorkflowActionPanel = ({
                 </div>
                 <div>
                     <span className="input-lux-label" style={{ marginBottom: '4px' }}>Data Sharing Level</span>
-                    <span className="font-semibold" style={{ fontSize: '13.5px', color: isConfidential ? 'var(--badge-error-text)' : 'var(--brand-soft-text, #93c5fd)', letterSpacing: '-0.01em' }}>
+                    <span className="font-semibold" style={{ fontSize: '13.5px', color: isConfidential ? '#fca5a5' : '#93c5fd', letterSpacing: '-0.01em' }}>
                         {isConfidential ? 'NDA Required' : 'Public Information'}
                     </span>
                 </div>
             </div>
+
+            {showProgress && (
+                <motion.div
+                    className="workflow-progress"
+                    initial={animReady ? { opacity: 0, y: 8 } : false}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.18 }}
+                    role="list"
+                    aria-label="Collaboration progress"
+                    style={{ marginTop: '20px' }}
+                >
+                    {steps.map((s, i) => (
+                        <div key={s.key} className={`workflow-step is-${s.status}`} role="listitem">
+                            <span
+                                className={`workflow-dot is-${s.status}`}
+                                aria-hidden="true"
+                            />
+                            <span className="workflow-step-label">{s.label}</span>
+                            {i < steps.length - 1 && (
+                                <span
+                                    className={`workflow-line${s.status === 'done' ? ' is-done' : ''}`}
+                                    aria-hidden="true"
+                                />
+                            )}
+                        </div>
+                    ))}
+                </motion.div>
+            )}
 
             <div style={{ marginTop: '24px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px' }}>
                 {/* Author control panel. Hidden when the post is CLOSED or when the
@@ -88,158 +155,21 @@ const WorkflowActionPanel = ({
 
                         {pendingMeetings.length > 0 && (
                             <div style={{ marginTop: '16px' }}>
-                                <h4 style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>
-                                    <Calendar size={11} style={{ display: 'inline', marginRight: 6, verticalAlign: '-1px' }} />
-                                    Pending Meeting Requests
-                                </h4>
-                                {pendingMeetings.map(m => {
-                                    const isResponding = respondingMeetingId === m.id;
-                                    return (
-                                        <div key={m.id} style={{ background: 'var(--panel-lighter)', padding: '16px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border)' }}>
-                                            <div style={{ fontSize: '14px', marginBottom: '12px', lineHeight: '1.4' }}>
-                                                <strong style={{ color: 'var(--primary-light)' }}>{m.proposedByName || 'A collaborator'}</strong> requested meeting slot:<br/>
-                                                <span style={{ color: 'var(--badge-primary-text)', fontSize: '13px' }}>📅 {m.slot?.label || 'Time slot pending'}</span>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onRespondMeeting(m.id, 'accepted')}
-                                                    className="px-btn primary sm"
-                                                    disabled={isResponding}
-                                                    style={{ flex: 1 }}
-                                                >
-                                                    {isResponding ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <CheckCircle2 size={13} />}
-                                                    Accept
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onRespondMeeting(m.id, 'declined')}
-                                                    className="px-btn danger sm"
-                                                    disabled={isResponding}
-                                                    style={{ flex: 1 }}
-                                                >
-                                                    <X size={13} /> Decline
-                                                </button>
-                                            </div>
+                                <h4 style={{ fontSize: '13px', color: 'var(--text-main)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pending Requests</h4>
+                                {pendingMeetings.map(m => (
+                                    <div key={m.id} style={{ background: 'var(--panel-lighter)', padding: '16px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border)' }}>
+                                        <div style={{ fontSize: '14px', marginBottom: '12px', lineHeight: '1.4' }}>
+                                            <strong style={{ color: 'var(--primary-light)' }}>{m.proposedByName || 'A collaborator'}</strong> requested meeting slot:<br/>
+                                            <span style={{ color: 'var(--badge-primary-text)', fontSize: '13px' }}>📅 {m.slot?.label || 'Time slot pending'}</span>
                                         </div>
-                                    );
-                                })}
+                                        <div className="flex gap-2">
+                                            <button type="button" onClick={() => onRespondMeeting(m.id, 'accepted')} className="px-btn primary sm" style={{ flex: 1 }}>Accept</button>
+                                            <button type="button" onClick={() => onRespondMeeting(m.id, 'declined')} className="px-btn danger sm" style={{ flex: 1 }}>Decline</button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         )}
-                    </div>
-                )}
-
-                {/* Author's view of who has expressed interest. Surfaces their
-                    custom message, NDA acknowledgement, and gives one-click
-                    access to chat — independent of meeting status, so the
-                    author can engage with anyone interested even before a
-                    meeting is proposed. */}
-                {isAuthor && interests.length > 0 && (
-                    <div style={{ marginTop: pendingMeetings.length > 0 ? '20px' : '16px' }}>
-                        <h4 style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>
-                            <Users size={11} style={{ display: 'inline', marginRight: 6, verticalAlign: '-1px' }} />
-                            Interested Parties · {interests.length}
-                        </h4>
-                        <div className="flex-col" style={{ gap: '10px' }}>
-                            {interests.map((it, idx) => {
-                                if (!it) return null;
-                                const userMeetings = meetings.filter(m => m && m.proposedBy === it.userId);
-                                const accepted = userMeetings.find(m => m.status === 'accepted');
-                                const pending = userMeetings.find(m => m.status === 'pending');
-                                const declined = userMeetings.find(m => m.status === 'declined');
-                                const initial = (it.userName || '?').trim().charAt(0).toUpperCase();
-                                return (
-                                    <motion.div
-                                        key={it.id || `${it.userId}-${idx}`}
-                                        initial={animReady ? { opacity: 0, x: 6 } : false}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ duration: 0.2, delay: Math.min(idx * 0.04, 0.2) }}
-                                        style={{
-                                            background: 'var(--panel-lighter)',
-                                            border: '1px solid var(--border)',
-                                            borderRadius: '12px',
-                                            padding: '14px',
-                                        }}
-                                    >
-                                        <div className="flex items-center gap-3" style={{ marginBottom: it.message ? '10px' : '0' }}>
-                                            <div style={{
-                                                width: '34px', height: '34px', borderRadius: '11px',
-                                                background: 'var(--brand-gradient, linear-gradient(135deg, var(--primary), var(--accent)))',
-                                                color: 'var(--fg-on-accent)', fontWeight: 800, fontSize: '14px',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                flexShrink: 0,
-                                                boxShadow: 'var(--brand-avatar-shadow, 0 6px 14px rgba(96, 165, 250, 0.25))'
-                                            }}>{initial}</div>
-                                            <div style={{ minWidth: 0, flex: 1 }}>
-                                                <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-main)', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                    {it.userName || 'Anonymous'}
-                                                </div>
-                                                <div style={{ fontSize: '11px', color: 'var(--text-subtle)', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                                                    {it.userRole && <span>{it.userRole}</span>}
-                                                    {it.ndaAccepted && (
-                                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: '#6ee7b7' }}>
-                                                            <ShieldCheck size={10} /> NDA
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            {onMessageInterested && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onMessageInterested(it)}
-                                                    aria-label={`Message ${it.userName || 'this collaborator'}`}
-                                                    style={{
-                                                        background: 'var(--brand-soft-bg, rgba(96, 165, 250, 0.1))',
-                                                        border: '1px solid var(--brand-soft-border, rgba(96, 165, 250, 0.25))',
-                                                        color: 'var(--brand-soft-text, #93c5fd)',
-                                                        padding: '7px 11px',
-                                                        borderRadius: '9px',
-                                                        cursor: 'pointer',
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        gap: 5,
-                                                        fontSize: '12px',
-                                                        fontWeight: 600,
-                                                        flexShrink: 0,
-                                                    }}
-                                                >
-                                                    <MessageSquare size={12} /> Message
-                                                </button>
-                                            )}
-                                        </div>
-                                        {it.message && (
-                                            <div style={{
-                                                fontSize: '12.5px',
-                                                color: 'var(--text-muted)',
-                                                lineHeight: 1.55,
-                                                background: 'var(--detail-info-bg, rgba(7, 11, 10, 0.4))',
-                                                padding: '10px 12px',
-                                                borderRadius: '9px',
-                                                borderLeft: '2px solid var(--brand-soft-border, rgba(96, 165, 250, 0.4))',
-                                                marginBottom: (pending || accepted || declined) ? '10px' : 0,
-                                            }}>
-                                                "{it.message}"
-                                            </div>
-                                        )}
-                                        {accepted && (
-                                            <div style={{ fontSize: '11.5px', color: 'var(--badge-success-text)', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                                                <CheckCircle2 size={11} /> Meeting confirmed · {accepted.slot?.label}
-                                            </div>
-                                        )}
-                                        {!accepted && pending && (
-                                            <div style={{ fontSize: '11.5px', color: 'var(--brand-soft-text)', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                                                <Clock size={11} /> Meeting pending · {pending.slot?.label}
-                                            </div>
-                                        )}
-                                        {!accepted && !pending && declined && (
-                                            <div style={{ fontSize: '11.5px', color: '#fda4af', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                                                <X size={11} /> You declined · {declined.slot?.label}
-                                            </div>
-                                        )}
-                                    </motion.div>
-                                );
-                            })}
-                        </div>
                     </div>
                 )}
 
@@ -273,26 +203,16 @@ const WorkflowActionPanel = ({
                     <motion.div
                         initial={animReady ? { opacity: 0, scale: 0.95 } : false}
                         animate={{ opacity: 1, scale: 1 }}
-                        style={{ background: 'var(--brand-soft-bg)', border: '1px solid var(--brand-soft-border)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
+                        style={{ background: 'rgba(249, 168, 96, 0.06)', border: '1px solid rgba(249, 168, 96, 0.16)', padding: '24px', borderRadius: '14px', textAlign: 'center' }}
                     >
-                        <Clock color="var(--brand-soft-text)" size={28} style={{ margin: '0 auto 12px' }} />
-                        <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--brand-soft-text)', fontWeight: 600, fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}>Meeting request sent</h3>
+                        <Clock color="#f5c48a" size={28} style={{ margin: '0 auto 12px' }} />
+                        <h3 style={{ fontSize: '16px', marginBottom: '8px', color: '#f5c48a', fontWeight: 600, fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}>Meeting request sent</h3>
                         <p className="text-muted text-xs mb-4" style={{ lineHeight: '1.6' }}>
                             Waiting for the author to accept your proposed time slot. You will be notified once confirmed.
                         </p>
-                        <div style={{ background: 'var(--interactive-row-hover-bg)', padding: '12px', borderRadius: '10px', fontSize: '13px', color: 'var(--brand-soft-text)', marginBottom: '12px' }}>
+                        <div style={{ background: 'rgba(249, 168, 96, 0.08)', padding: '12px', borderRadius: '10px', fontSize: '13px', color: '#f5c48a', marginBottom: '12px' }}>
                             📅 {myMeeting?.slot?.label || selectedSlot?.label || 'Time slot pending'}
                         </div>
-                        {onCancelMeeting && (
-                            <button
-                                type="button"
-                                onClick={onCancelMeeting}
-                                className="px-btn ghost sm"
-                                style={{ width: '100%', justifyContent: 'center' }}
-                            >
-                                <X size={14} /> Cancel meeting request
-                            </button>
-                        )}
                     </motion.div>
                 )}
 
@@ -315,19 +235,52 @@ const WorkflowActionPanel = ({
 
                 {derivedWorkflowState === 'scheduled' && (
                     <motion.div
-                        initial={animReady ? { opacity: 0, scale: 0.95 } : false}
+                        className="workflow-confirmed"
+                        initial={animReady ? { opacity: 0, scale: 0.94 } : false}
                         animate={{ opacity: 1, scale: 1 }}
-                        style={{ background: 'rgba(34, 211, 238, 0.06)', border: '1px solid rgba(34, 211, 238, 0.15)', padding: '20px', borderRadius: '14px', textAlign: 'center' }}
+                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                        style={{ padding: '24px 22px', borderRadius: '16px', textAlign: 'center', position: 'relative' }}
                     >
-                        <div className="flex items-center justify-center gap-2 mb-2">
-                            <Video color="#67e8f9" size={20} />
-                            <h3 style={{ fontSize: '15px', color: 'var(--badge-accent-text)', margin: 0, fontWeight: '600' }}>Meeting Confirmed</h3>
-                        </div>
-                        <p className="text-muted text-xs mb-4" style={{ margin: 0, lineHeight: '1.6' }}>
+                        <motion.div
+                            initial={animReady ? { scale: 0.4, rotate: -20, opacity: 0 } : false}
+                            animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                            transition={{ duration: 0.55, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
+                            style={{
+                                width: '52px', height: '52px', borderRadius: '50%',
+                                background: 'linear-gradient(135deg, hsl(119 99% 46%), hsl(119 99% 56%))',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                margin: '0 auto 12px',
+                                boxShadow: '0 12px 32px hsla(119, 99%, 46%, 0.45)',
+                            }}
+                        >
+                            <CheckCircle2 size={28} color="#070b0a" strokeWidth={2.6} />
+                        </motion.div>
+                        <h3 style={{
+                            fontSize: '17px',
+                            color: 'hsl(119 99% 56%)',
+                            margin: '0 0 4px',
+                            fontWeight: 700,
+                            fontFamily: 'var(--font-heading)',
+                            letterSpacing: '-0.02em',
+                        }}>Meeting Confirmed</h3>
+                        <p className="text-muted text-xs mb-4" style={{ margin: '0 0 14px', lineHeight: '1.6' }}>
                             Meet externally via Zoom/Teams. No recordings stored on platform.
                         </p>
-                        <div style={{ background: 'var(--panel-base)', padding: '12px', borderRadius: '10px', fontSize: '13px', color: 'var(--badge-accent-text)', marginBottom: '12px' }}>
-                            📅 {myMeeting?.slot?.label || selectedSlot?.label || 'Confirmed slot'}
+                        <div style={{
+                            background: 'rgba(7, 11, 10, 0.5)',
+                            border: '1px solid hsla(119, 99%, 46%, 0.22)',
+                            padding: '12px 14px',
+                            borderRadius: '11px',
+                            fontSize: '13px',
+                            color: 'hsl(119 99% 56%)',
+                            marginBottom: '14px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontWeight: 600,
+                            letterSpacing: '-0.005em',
+                        }}>
+                            <Calendar size={13} /> {myMeeting?.slot?.label || selectedSlot?.label || 'Confirmed slot'}
                         </div>
                         {isAuthor && post.status !== 'CLOSED' && (
                             <button type="button" onClick={onClosePost} className="px-btn ghost sm" style={{ width: '100%', justifyContent: 'center', marginBottom: '8px' }}>

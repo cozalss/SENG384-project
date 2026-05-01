@@ -1,1241 +1,607 @@
-/* =====================================================================
-   Login — cinematic split-screen
-   ---------------------------------------------------------------------
-   The login page is laid out as a 2-column "threshold": cinematic stage
-   on the left, auth card on the right. On narrow viewports the stage
-   collapses to a compact header above the card.
+/* =============================================================
+   login-cinematic.css
+   -------------------------------------------------------------
+   Shared "ceremonial moment" primitives used by the auth screens
+   and the post-detail action surfaces (NDA modal, meeting slots,
+   workflow panel, edit modal). All effects respect prefers-
+   reduced-motion via the @media block at the bottom.
 
-   See LoginCinematicSide.jsx for the component logic.
-   ===================================================================== */
+   Brand neon green for "validated / active / rewarding" states:
+       --neon: hsl(119 99% 46%)
+       --neon-soft: hsl(119 99% 56%)
+   ============================================================= */
 
-.login-shell {
-    position: relative;
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: minmax(0, 1.28fr) minmax(420px, 0.92fr);
-    gap: 0;
-    overflow: hidden;
-    isolation: isolate;
-    background:
-        linear-gradient(118deg, rgba(34, 211, 102, 0.07), transparent 24%, rgba(34, 211, 238, 0.045) 62%, rgba(245, 158, 11, 0.035)),
-        radial-gradient(ellipse 60% 60% at 20% 30%, rgba(34, 211, 102, 0.08), transparent 70%),
-        radial-gradient(ellipse 60% 60% at 80% 80%, rgba(34, 211, 238, 0.06), transparent 70%),
-        linear-gradient(180deg, hsl(160 30% 4%), hsl(160 30% 6%));
+:root {
+    --neon: hsl(119 99% 46%);
+    --neon-soft: hsl(119 99% 56%);
+    --neon-glow: hsla(119, 99%, 46%, 0.42);
+    --neon-glow-soft: hsla(119, 99%, 56%, 0.18);
+    --error-glow: rgba(239, 68, 68, 0.32);
 }
 
-.login-shell-grain {
+/* ---------- Field validation: tiny green check at right ---------- */
+.field-check {
     position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.04;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml;utf8,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 240px 240px;
-}
-
-/* ============================================================
-   LEFT — CINEMATIC STAGE
-   ============================================================ */
-
-.lcs-root {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: clamp(2.5rem, 5vw, 4rem) clamp(1.5rem, 4vw, 3rem);
-    overflow: hidden;
-    border-right: 1px solid rgba(255, 255, 255, 0.04);
-    z-index: 2;
-    background:
-        linear-gradient(112deg, rgba(255, 255, 255, 0.035), transparent 18%, rgba(34, 211, 238, 0.035) 74%, transparent),
-        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 92px),
-        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 78px);
-}
-
-.lcs-root::before {
-    /* Vignette at the seam between stage and form */
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: -1px;
-    width: 80px;
-    pointer-events: none;
-    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.18));
-    z-index: 1;
-}
-
-.lcs-root::after {
-    content: '';
-    position: absolute;
-    inset: 7% 5% 7% 7%;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 8px;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.62;
-    box-shadow:
-        inset 0 0 54px rgba(34, 211, 102, 0.045),
-        0 0 80px rgba(34, 211, 238, 0.045);
-    mask-image:
-        linear-gradient(90deg, black 0 44px, transparent 44px calc(100% - 44px), black calc(100% - 44px)),
-        linear-gradient(180deg, black 0 44px, transparent 44px calc(100% - 44px), black calc(100% - 44px));
-    -webkit-mask-image:
-        linear-gradient(90deg, black 0 44px, transparent 44px calc(100% - 44px), black calc(100% - 44px)),
-        linear-gradient(180deg, black 0 44px, transparent 44px calc(100% - 44px), black calc(100% - 44px));
-    mask-composite: intersect;
-    -webkit-mask-composite: source-in;
-}
-
-.lcs-letterbox {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: clamp(34px, 6vh, 58px);
-    z-index: 5;
-    pointer-events: none;
-    background:
-        linear-gradient(180deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.48), transparent),
-        linear-gradient(90deg, rgba(34, 211, 102, 0.14), transparent 46%, rgba(34, 211, 238, 0.10));
-}
-
-.lcs-letterbox--top { top: 0; }
-.lcs-letterbox--bottom {
-    bottom: 0;
-    transform: rotate(180deg);
-}
-
-.lcs-data-curtain {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    opacity: 0.5;
-    mask-image: linear-gradient(90deg, transparent, black 14%, black 78%, transparent);
-    -webkit-mask-image: linear-gradient(90deg, transparent, black 14%, black 78%, transparent);
-}
-
-.lcs-data-curtain span {
-    position: absolute;
-    left: var(--left);
-    top: -80px;
-    width: 1px;
-    height: var(--height);
-    background: linear-gradient(180deg, transparent, rgba(34, 211, 238, 0.55), rgba(34, 211, 102, 0.3), transparent);
-    box-shadow: 0 0 10px rgba(34, 211, 238, 0.34);
-    animation: lcs-data-fall 5.4s linear infinite;
-    animation-delay: var(--delay);
-}
-
-@keyframes lcs-data-fall {
-    from { transform: translateY(-12vh); opacity: 0; }
-    12%  { opacity: 0.75; }
-    to   { transform: translateY(118vh); opacity: 0; }
-}
-
-.lcs-helix {
-    position: absolute;
-    top: 3%;
-    right: 5%;
-    width: min(24vw, 260px);
-    height: 94%;
-    z-index: 1;
-    opacity: 0.58;
-    filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.24));
-    animation: lcs-helix-float 8s ease-in-out infinite;
-}
-
-@keyframes lcs-helix-float {
-    0%, 100% { transform: translateY(-10px) rotate(-1deg); }
-    50%      { transform: translateY(12px) rotate(1deg); }
-}
-
-/* Vertical scan line — sweeps once on enter, then loops gently. */
-.lcs-scan {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: linear-gradient(180deg, transparent, hsl(119 99% 56%) 30%, hsl(119 99% 56%) 70%, transparent);
-    box-shadow: 0 0 14px hsl(119 99% 56%);
-    opacity: 0.5;
-    animation: lcs-scan-sweep 7s ease-in-out infinite;
-    z-index: 2;
-    pointer-events: none;
-}
-@keyframes lcs-scan-sweep {
-    0%   { left: -2%; opacity: 0; }
-    8%   { opacity: 0.55; }
-    50%  { left: 102%; opacity: 0.55; }
-    58%  { opacity: 0; }
-    100% { left: 102%; opacity: 0; }
-}
-
-.lcs-light {
-    position: absolute;
-    pointer-events: none;
-    z-index: 0;
-}
-.lcs-light--top {
-    top: -10%;
-    left: 10%;
-    width: 70%;
-    height: 50%;
-    background: radial-gradient(ellipse 50% 60% at 50% 50%, rgba(34, 211, 102, 0.10), transparent 70%);
-}
-.lcs-light--bottom {
-    bottom: -15%;
-    right: -10%;
-    width: 60%;
-    height: 50%;
-    background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(34, 211, 238, 0.06), transparent 70%);
-}
-
-.lcs-ambient-ecg {
-    position: absolute;
-    bottom: 22%;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: 80px;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.5;
-}
-@keyframes lcs-ecg-drift {
-    0%   { stroke-dashoffset: 3000; }
-    100% { stroke-dashoffset: 0; }
-}
-
-.lcs-stage {
-    position: relative;
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    max-width: 460px;
-    flex: 1;
-    justify-content: center;
-}
-
-/* ---- Eyebrow ---- */
-
-.lcs-eyebrow {
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%) scale(0.6);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 5px 12px;
-    border-radius: 999px;
-    background: rgba(34, 211, 102, 0.06);
-    border: 1px solid rgba(34, 211, 102, 0.18);
-    color: hsl(119 80% 70%);
-    font-family: 'Sora', 'Inter', sans-serif;
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    margin-bottom: 28px;
-}
-.lcs-eyebrow-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: hsl(119 99% 56%);
-    box-shadow: 0 0 8px hsl(119 99% 56%);
-    animation: lcs-eyebrow-pulse 2.4s ease-in-out infinite;
-}
-@keyframes lcs-eyebrow-pulse {
-    0%, 100% { box-shadow: 0 0 6px hsl(119 99% 56%); }
-    50%      { box-shadow: 0 0 14px hsl(119 99% 56%); }
+    justify-content: center;
+    color: #070b0a;
+    background: var(--neon-soft);
+    box-shadow: 0 0 0 4px hsla(119, 99%, 56%, 0.14), 0 4px 16px var(--neon-glow);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* ---- Monogram ---- */
-
-.lcs-monogram {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: clamp(180px, 24vw, 240px);
-    height: clamp(180px, 24vw, 240px);
-    margin-bottom: 18px;
-}
-.lcs-monogram svg {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
+.field-check.is-valid {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
 }
 
-.lcs-orbit-ring {
-    position: absolute;
-    inset: 11%;
-    border-radius: 50%;
-    border: 1px solid rgba(34, 211, 102, 0.18);
-    box-shadow: 0 0 28px rgba(34, 211, 102, 0.08);
-    animation: lcs-orbit-ring 18s linear infinite;
+.field-check svg {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    animation: check-stroke 380ms cubic-bezier(0.22, 1, 0.36, 1) 80ms forwards;
 }
 
-.lcs-orbit-ring--b {
-    inset: 1%;
-    border-color: rgba(34, 211, 238, 0.14);
-    animation-duration: 24s;
-    animation-direction: reverse;
+@keyframes check-stroke {
+    to { stroke-dashoffset: 0; }
 }
 
-.lcs-orbit-ring--c {
-    inset: 23%;
-    border-style: dashed;
-    border-color: rgba(245, 158, 11, 0.18);
-    animation-duration: 13s;
-}
-
-@keyframes lcs-orbit-ring {
-    to { transform: rotate(360deg); }
-}
-
-/* ---- Wordmark ---- */
-
-.lcs-wordmark {
-    font-family: 'Sora', 'Inter', sans-serif;
-    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
-    font-weight: 700;
-    letter-spacing: 0;
-    color: hsl(0 0% 96%);
-    text-transform: uppercase;
-    margin-bottom: 16px;
-}
-.lcs-wordmark span {
-    color: hsl(119 99% 56%);
-    text-shadow: 0 0 18px rgba(34, 211, 102, 0.45);
-}
-
-.lcs-command-strip {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    width: min(100%, 520px);
-    margin: 0 0 22px;
-}
-
-.lcs-command-metric {
-    min-width: 0;
-    padding: 9px 10px;
-    border-radius: 8px;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
-        rgba(8, 13, 12, 0.54);
-    border: 1px solid rgba(255, 255, 255, 0.10);
+/* ---------- Field error: red underglow + settle ---------- */
+.input-lux.is-bad-edu {
+    border-color: rgba(239, 68, 68, 0.55) !important;
     box-shadow:
-        0 16px 36px rgba(0, 0, 0, 0.26),
-        inset 0 1px 0 rgba(255, 255, 255, 0.07);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    text-align: left;
+        0 0 0 3px rgba(239, 68, 68, 0.16),
+        0 18px 38px -10px var(--error-glow) !important;
+    animation: edu-shake 480ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
-.lcs-command-metric svg {
-    color: hsl(119 99% 60%);
-    margin-bottom: 6px;
+@keyframes edu-shake {
+    0%, 100% { transform: translateX(0); }
+    15% { transform: translateX(-5px); }
+    30% { transform: translateX(4px); }
+    45% { transform: translateX(-3px); }
+    60% { transform: translateX(2px); }
+    75% { transform: translateX(-1px); }
 }
 
-.lcs-command-metric span,
-.lcs-command-metric strong {
-    display: block;
-    font-family: 'Sora', sans-serif;
+/* Error banner gets a slow underline glow + soft pulse on enter. */
+.auth-error-banner {
+    position: relative;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
-.lcs-command-metric span {
-    color: rgba(255, 255, 255, 0.52);
-    font-size: 9.5px;
-    font-weight: 600;
+.auth-error-banner::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.55), transparent);
+    animation: err-underline 1.6s ease-out 1;
 }
 
-.lcs-command-metric strong {
-    margin-top: 2px;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 12px;
-    font-weight: 800;
+@keyframes err-underline {
+    0% { transform: translateX(-100%); opacity: 0; }
+    25% { opacity: 1; }
+    100% { transform: translateX(100%); opacity: 0; }
 }
 
-/* ---- Mission line ---- */
-
-.lcs-mission {
-    margin: 0 0 36px;
-    font-family: 'Sora', sans-serif;
-    font-size: clamp(0.95rem, 1.4vw, 1.05rem);
-    line-height: 1.65;
-    color: rgba(255, 255, 255, 0.62);
-    font-weight: 300;
-    letter-spacing: 0;
-}
-.lcs-mission em {
-    font-family: 'Instrument Serif', Georgia, serif;
-    font-style: italic;
-    font-weight: 400;
-    color: hsl(119 99% 60%);
-    font-size: 1.15em;
-}
-
-/* ---- Rotating trust beat ---- */
-
-.lcs-beat-frame {
-    position: relative;
-    width: 100%;
-    min-height: 96px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 8px;
-}
-.lcs-beat {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 14px 18px;
-    border-radius: 14px;
-    background: linear-gradient(180deg, rgba(20, 22, 28, 0.7), rgba(10, 14, 12, 0.8));
-    border: 1px solid rgba(34, 211, 102, 0.14);
+/* ---------- Segmented control ink-fill enhancement ---------- */
+.dash-segmented-fill {
+    background: linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%);
     box-shadow:
-        0 22px 50px -22px rgba(0, 0, 0, 0.55),
-        0 0 50px -16px rgba(34, 211, 102, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    text-align: left;
-    width: 100%;
+        0 8px 22px -8px rgba(249, 168, 96, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.18);
 }
-.lcs-beat-icon {
-    width: 32px;
-    height: 32px;
+
+.segmented-tab {
+    transition: color 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- OTP "all six filled" green ripple ---------- */
+.otp-all-filled input {
+    border-color: var(--neon-soft) !important;
+    background: hsla(119, 99%, 46%, 0.08) !important;
+    box-shadow: 0 0 0 3px hsla(119, 99%, 46%, 0.14), 0 8px 24px var(--neon-glow-soft) !important;
+    animation: otp-ripple 720ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.otp-all-filled input:nth-child(1) { animation-delay: 0ms; }
+.otp-all-filled input:nth-child(2) { animation-delay: 60ms; }
+.otp-all-filled input:nth-child(3) { animation-delay: 120ms; }
+.otp-all-filled input:nth-child(4) { animation-delay: 180ms; }
+.otp-all-filled input:nth-child(5) { animation-delay: 240ms; }
+.otp-all-filled input:nth-child(6) { animation-delay: 300ms; }
+
+@keyframes otp-ripple {
+    0% { transform: translateY(0) scale(1); }
+    40% { transform: translateY(-3px) scale(1.04); }
+    100% { transform: translateY(0) scale(1); }
+}
+
+/* ---------- NDA modal — lit legal scroll, ceremonial entrance ---------- */
+.nda-legal-scroll {
+    position: relative;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 22px 24px 22px 24px;
+    background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(96, 165, 250, 0.05), transparent 70%),
+        rgba(7, 11, 10, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    color: var(--text-main);
+    font-size: 14px;
+    line-height: 1.78;
+    letter-spacing: -0.005em;
+    /* Top + bottom fade — text "emerges" from the panel edges. */
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
+            mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.nda-legal-scroll::-webkit-scrollbar { width: 6px; }
+.nda-legal-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 3px;
+}
+
+.nda-legal-scroll p + p { margin-top: 14px; }
+
+/* Custom checkbox with stroke draw — replaces lucide CheckCircle2 fill. */
+.nda-check {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
     flex-shrink: 0;
-    border-radius: 9px;
-    background: rgba(34, 211, 102, 0.10);
-    border: 1px solid rgba(34, 211, 102, 0.32);
-    color: hsl(119 99% 60%);
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 2px solid var(--text-subtle);
+    background: transparent;
+    transition:
+        background 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    margin-top: 2px;
 }
-.lcs-beat-body {
+
+.nda-check.is-checked {
+    border-color: var(--neon);
+    background: var(--neon);
+    box-shadow:
+        0 0 0 4px hsla(119, 99%, 46%, 0.14),
+        0 8px 22px var(--neon-glow);
+}
+
+.nda-check svg {
+    width: 16px;
+    height: 16px;
+    stroke: #070b0a;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    stroke-dasharray: 22;
+    stroke-dashoffset: 22;
+    transition: stroke-dashoffset 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nda-check.is-checked svg {
+    stroke-dashoffset: 0;
+}
+
+/* Accept button — ink-fill from left → right on hover. */
+.nda-accept-btn {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.nda-accept-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--neon) 0%, var(--neon-soft) 100%);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: -1;
+    border-radius: inherit;
+}
+
+.nda-accept-btn:not(:disabled):hover::before {
+    transform: scaleX(1);
+}
+
+.nda-accept-btn:not(:disabled):hover {
+    color: #070b0a !important;
+    border-color: var(--neon) !important;
+}
+
+.nda-accept-btn.is-locked {
+    pointer-events: none;
+    color: #070b0a !important;
+    background: linear-gradient(135deg, var(--neon) 0%, var(--neon-soft) 100%) !important;
+    border-color: var(--neon) !important;
+    box-shadow: 0 10px 28px var(--neon-glow), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.nda-accept-btn.is-locked::before {
+    transform: scaleX(1);
+}
+
+/* "Stamp" pulse on lock. */
+.nda-stamp-burst {
+    animation: nda-stamp 520ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes nda-stamp {
+    0% { transform: scale(1); }
+    35% { transform: scale(0.96); }
+    70% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+}
+
+/* ---------- Meeting slots: day-grouped, selected ribbon ---------- */
+.slot-day-header {
+    grid-column: 1 / -1;
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-}
-.lcs-beat-label {
-    font-family: 'Sora', sans-serif;
-    font-size: 10.5px;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: hsl(119 80% 72%);
-}
-.lcs-beat-text {
-    font-family: 'Sora', sans-serif;
-    font-size: 12.5px;
-    font-weight: 400;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.78);
-    letter-spacing: 0;
+    color: var(--text-subtle);
+    margin-top: 4px;
 }
 
-.lcs-beat-dots {
-    display: flex;
-    gap: 6px;
+.slot-day-header:not(:first-child) {
     margin-top: 18px;
 }
-.lcs-beat-dot {
-    width: 18px;
-    height: 2px;
-    border-radius: 2px;
-    background: rgba(255, 255, 255, 0.1);
-    transition: background 0.4s var(--ease-out-quint, cubic-bezier(0.22, 1, 0.36, 1));
-}
-.lcs-beat-dot.is-active {
-    background: hsl(119 99% 56%);
-    box-shadow: 0 0 8px rgba(34, 211, 102, 0.5);
+
+.slot-day-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent);
 }
 
-/* ---- Footer ---- */
-
-.lcs-footer {
+.slot-card {
     position: relative;
-    z-index: 3;
+    overflow: hidden;
+    padding: 14px 16px;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition:
+        background 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.slot-card:hover {
+    background: rgba(96, 165, 250, 0.06);
+    border-color: rgba(96, 165, 250, 0.24);
+    transform: translateY(-2px);
+}
+
+.slot-card:focus-visible {
+    outline: 2px solid var(--neon-soft);
+    outline-offset: 2px;
+}
+
+.slot-card-time {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    letter-spacing: -0.01em;
+}
+
+.slot-card-meta {
+    font-size: 11.5px;
+    color: var(--text-subtle);
+    letter-spacing: 0.005em;
+}
+
+.slot-card.is-selected {
+    background: hsla(119, 99%, 46%, 0.08);
+    border-color: hsla(119, 99%, 46%, 0.42);
+    box-shadow:
+        0 0 0 1px hsla(119, 99%, 46%, 0.18),
+        0 18px 38px -16px var(--neon-glow);
+    transform: translateY(-1px);
+    animation: slot-pulse 2.4s ease-in-out infinite;
+}
+
+.slot-card.is-selected .slot-card-time {
+    color: var(--neon-soft);
+}
+
+@keyframes slot-pulse {
+    0%, 100% { box-shadow: 0 0 0 1px hsla(119, 99%, 46%, 0.18), 0 18px 38px -16px var(--neon-glow); }
+    50%      { box-shadow: 0 0 0 1px hsla(119, 99%, 46%, 0.32), 0 22px 44px -14px hsla(119, 99%, 46%, 0.55); }
+}
+
+/* Ribbon — corner triangle that snaps in when selected. */
+.slot-card-ribbon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 28px 28px 0;
+    border-color: transparent var(--neon) transparent transparent;
+    opacity: 0;
+    transform: translate(8px, -8px);
+    transition: opacity 220ms ease, transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.slot-card.is-selected .slot-card-ribbon {
+    opacity: 1;
+    transform: translate(0, 0);
+}
+
+.slot-card-ribbon::after {
+    /* tiny check mark on the ribbon */
+    content: '';
+    position: absolute;
+    top: 4px;
+    right: -22px;
+    width: 8px;
+    height: 4px;
+    border-left: 2px solid #070b0a;
+    border-bottom: 2px solid #070b0a;
+    transform: rotate(-45deg);
+}
+
+/* ---------- Workflow progress beacon ---------- */
+.workflow-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(7, 11, 10, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.workflow-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.workflow-dot {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    flex-shrink: 0;
+    transition: background 240ms ease, box-shadow 240ms ease;
+}
+
+.workflow-dot.is-done {
+    background: var(--neon-soft);
+    box-shadow: 0 0 0 3px hsla(119, 99%, 46%, 0.16);
+}
+
+.workflow-dot.is-active {
+    background: var(--neon);
+    box-shadow: 0 0 0 4px hsla(119, 99%, 46%, 0.18);
+    animation: beacon 1.8s ease-in-out infinite;
+}
+
+.workflow-dot.is-active::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid var(--neon);
+    animation: beacon-ring 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes beacon {
+    0%, 100% { box-shadow: 0 0 0 4px hsla(119, 99%, 46%, 0.18); }
+    50%      { box-shadow: 0 0 0 7px hsla(119, 99%, 46%, 0.10); }
+}
+
+@keyframes beacon-ring {
+    0%   { opacity: 0.7; transform: scale(0.7); }
+    100% { opacity: 0;   transform: scale(2.0); }
+}
+
+.workflow-step-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.workflow-step.is-done .workflow-step-label,
+.workflow-step.is-active .workflow-step-label {
+    color: var(--text-main);
+}
+
+.workflow-line {
+    height: 2px;
+    flex: 0.6;
+    min-width: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    transition: background 320ms ease;
+}
+
+.workflow-line.is-done {
+    background: linear-gradient(90deg, var(--neon-soft), hsla(119, 99%, 56%, 0.4));
+}
+
+/* ---------- Workflow Confirmed celebratory state ---------- */
+.workflow-confirmed {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, hsla(119, 99%, 46%, 0.10), hsla(119, 99%, 56%, 0.04)) !important;
+    border-color: hsla(119, 99%, 46%, 0.32) !important;
+}
+
+.workflow-confirmed::before {
+    content: '';
+    position: absolute;
+    inset: -50% -10% auto -10%;
+    height: 220%;
+    background: radial-gradient(ellipse 60% 40% at 50% 0%, hsla(119, 99%, 56%, 0.18), transparent 70%);
+    pointer-events: none;
+    animation: confirmed-bloom 1.6s cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+
+@keyframes confirmed-bloom {
+    0% { opacity: 0; transform: scale(0.6); }
+    60% { opacity: 1; }
+    100% { opacity: 0.6; transform: scale(1); }
+}
+
+/* ---------- Char counter — fills green, warns red ---------- */
+.char-counter {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
-    max-width: 460px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    margin-top: 24px;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+    color: var(--text-subtle);
 }
-.lcs-footer-key,
-.lcs-footer-meta {
-    font-family: 'Sora', sans-serif;
-    font-size: 10.5px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    color: rgba(255, 255, 255, 0.45);
+
+.char-counter-bar {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+    position: relative;
+}
+
+.char-counter-bar-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--neon-soft);
+    border-radius: 2px;
+    transform-origin: left center;
+    transition: width 260ms cubic-bezier(0.22, 1, 0.36, 1), background 240ms ease;
+}
+
+.char-counter.is-warn .char-counter-bar-fill { background: #fcd34d; }
+.char-counter.is-warn { color: #fcd34d; }
+.char-counter.is-near .char-counter-bar-fill { background: #fca5a5; }
+.char-counter.is-near { color: #fca5a5; }
+
+/* ---------- Save ripple ---------- */
+.save-ripple-host {
+    position: relative;
+    overflow: hidden;
+}
+
+.save-ripple {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: hsla(119, 99%, 56%, 0.45);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: save-ripple 720ms cubic-bezier(0.22, 1, 0.36, 1) 1 forwards;
+}
+
+@keyframes save-ripple {
+    0%   { opacity: 0.7; transform: translate(-50%, -50%) scale(0.6); }
+    100% { opacity: 0;   transform: translate(-50%, -50%) scale(28); }
+}
+
+/* ---------- Author card — hand-arranged badge ---------- */
+.author-role-badge {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
+    padding: 2px 7px;
+    margin-top: 3px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(96, 165, 250, 0.10);
+    border: 1px solid rgba(96, 165, 250, 0.22);
+    color: #93c5fd;
 }
-.lcs-footer-key svg { color: hsl(119 99% 60%); }
-.lcs-footer-meta { letter-spacing: 0.06em; font-size: 10px; }
 
-/* ============================================================
-   RIGHT — FORM PANE
-   ============================================================ */
+.author-role-badge.is-engineer {
+    background: rgba(34, 211, 238, 0.10);
+    border-color: rgba(34, 211, 238, 0.22);
+    color: #67e8f9;
+}
 
-.login-pane {
-    position: relative;
-    z-index: 2;
+.author-role-badge.is-pro {
+    background: hsla(119, 99%, 46%, 0.10);
+    border-color: hsla(119, 99%, 46%, 0.22);
+    color: var(--neon-soft);
+}
+
+.author-meta-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: clamp(2.5rem, 5vw, 4rem) clamp(1.5rem, 4vw, 3rem);
-    background:
-        radial-gradient(ellipse 60% 50% at 100% 0%, rgba(34, 211, 102, 0.05), transparent 65%),
-        radial-gradient(ellipse 50% 50% at 100% 100%, rgba(34, 211, 238, 0.04), transparent 70%),
-        linear-gradient(135deg, rgba(10, 14, 12, 0.6), rgba(6, 10, 8, 0.85));
-    border-left: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.login-pane::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-        linear-gradient(116deg, transparent 0 34%, rgba(255, 255, 255, 0.045) 44%, transparent 54%),
-        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 84px);
-    opacity: 0.7;
-    mask-image: linear-gradient(90deg, transparent, black 26%, black 100%);
-    -webkit-mask-image: linear-gradient(90deg, transparent, black 26%, black 100%);
-}
-
-.login-pane::after {
-    content: '';
-    position: absolute;
-    top: 10%;
-    bottom: 10%;
-    left: 0;
-    width: 1px;
-    pointer-events: none;
-    background: linear-gradient(180deg, transparent, rgba(34, 211, 102, 0.58), rgba(34, 211, 238, 0.30), transparent);
-    box-shadow: 0 0 24px rgba(34, 211, 102, 0.35);
-}
-
-.login-pane .editorial-panel {
-    background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.055), transparent 28%, rgba(34, 211, 238, 0.035)),
-        linear-gradient(180deg, rgba(14, 18, 18, 0.78), rgba(6, 8, 9, 0.72));
-    border-color: rgba(255, 255, 255, 0.085);
-}
-
-.login-pane .editorial-panel::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-        linear-gradient(90deg, transparent, rgba(34, 211, 102, 0.055), transparent 68%),
-        repeating-linear-gradient(0deg, transparent 0 31px, rgba(255, 255, 255, 0.025) 31px 32px);
-    opacity: 0.5;
-    mix-blend-mode: screen;
-}
-
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-
-@media (max-width: 1100px) {
-    .login-shell {
-        grid-template-columns: minmax(0, 1.05fr) minmax(390px, 1fr);
-    }
-
-    .lcs-helix { opacity: 0.38; }
-}
-
-@media (max-width: 860px) {
-    .login-shell {
-        grid-template-columns: 1fr;
-    }
-    .lcs-root {
-        padding: 36px 24px 28px;
-        border-right: 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    }
-    .lcs-root::before { display: none; }
-    .lcs-root::after,
-    .lcs-letterbox,
-    .lcs-data-curtain,
-    .lcs-helix {
-        display: none;
-    }
-    .lcs-monogram {
-        width: 140px;
-        height: 140px;
-        margin-bottom: 12px;
-    }
-    .lcs-command-strip {
-        max-width: 460px;
-        margin-bottom: 16px;
-    }
-    .lcs-mission { margin-bottom: 22px; }
-    .lcs-ambient-ecg { display: none; }
-    .lcs-footer { display: none; }
-    .login-pane { border-left: 0; padding: 32px 20px 56px; }
-}
-
-@media (max-width: 520px) {
-    .lcs-monogram { width: 110px; height: 110px; }
-    .lcs-wordmark { font-size: 1.5rem; margin-bottom: 10px; }
-    .lcs-command-strip { display: none; }
-    .lcs-mission { font-size: 12.5px; margin-bottom: 16px; }
-    .lcs-beat-frame { min-height: 80px; }
-    .lcs-beat { padding: 10px 14px; gap: 10px; }
-    .lcs-beat-icon { width: 28px; height: 28px; }
-    .lcs-beat-text { font-size: 11.5px; }
-}
-
-/* ============================================================
-   REDUCED MOTION
-   ============================================================ */
-
-@media (prefers-reduced-motion: reduce) {
-    .lcs-scan,
-    .lcs-eyebrow-dot,
-    .lcs-ambient-ecg path,
-    .lcs-data-curtain span,
-    .lcs-helix,
-    .lcs-orbit-ring {
-        animation: none !important;
-    }
-    .lcs-scan { display: none; }
-}
-
-/* 1. Canvas Aurora Background */
-.login-shell canvas#aurora {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    opacity: 0.35;
-    mix-blend-mode: screen;
-    pointer-events: none;
-}
-
-/* 3. Holographic Form Kartı (Işık Yansıması) */
-.editorial-panel {
-    position: relative;
-    overflow: hidden;
-    transform-style: preserve-3d;
-    transition: transform 0.1s ease-out;
-}
-
-.editorial-panel::before {
-    content: '';
-    position: absolute;
-    inset: -50%;
-    background: radial-gradient(
-        circle at var(--mx, 50%) var(--my, 50%), 
-        rgba(34, 211, 102, 0.15) 0%, 
-        transparent 60%
-    );
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-    mix-blend-mode: overlay;
-    z-index: 10;
-}
-
-.editorial-panel:hover::before {
-    opacity: 1;
-}
-
-/* 5. Manyetik Inputlar ve Butonlar */
-.login-pane input.px-input {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.login-pane input.px-input:focus {
-    border-color: rgba(34, 211, 102, 0.5);
-    box-shadow: 
-        0 0 0 3px rgba(34, 211, 102, 0.1),
-        0 0 20px rgba(34, 211, 102, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateY(-1px);
-}
-
-.login-pane button.px-btn {
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.login-pane button.px-btn::after {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 50%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transform: skewX(-20deg);
-    transition: left 0.5s;
-}
-
-.login-pane button.px-btn:hover::after {
-    left: 150%;
-}
-
-/* 7. Cinematic Entry Sequence */
-.lcs-root > *:not(.lcs-scan):not(.lcs-light) {
-    opacity: 0;
-    transform: translateY(30px);
-    animation: cinematic-enter 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.lcs-eyebrow { animation-delay: 0.2s; }
-.lcs-monogram { animation-delay: 0.4s; }
-.lcs-wordmark { animation-delay: 0.6s; }
-.lcs-command-strip { animation-delay: 0.8s; }
-.lcs-mission { animation-delay: 1.0s; }
-.lcs-beat-frame { animation-delay: 1.2s; }
-.lcs-beat-dots { animation-delay: 1.3s; }
-.lcs-footer { animation-delay: 1.4s; }
-.lcs-helix { animation-delay: 0.5s; opacity: 0; }
-.lcs-data-curtain { animation-delay: 0.3s; opacity: 0; }
-.lcs-ambient-ecg { animation-delay: 0.7s; opacity: 0; }
-
-@keyframes cinematic-enter {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.lcs-scan {
-    animation: lcs-scan-intro 3s ease-out,
-               lcs-scan-sweep 7s ease-in-out infinite 3s;
-}
-
-@keyframes lcs-scan-intro {
-    0% { left: -2%; opacity: 0; }
-    50% { left: 50%; opacity: 0.8; }
-    100% { left: 102%; opacity: 0; }
-}
-
-/* For particle trail */
-.login-particle {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 100;
-    animation: login-particle-fade 0.8s forwards;
-    background: hsl(119 99% 56%);
-    box-shadow: 0 0 8px hsl(119 99% 56%);
-}
-
-@keyframes login-particle-fade {
-    0% { transform: scale(1); opacity: 0.8; }
-    100% { transform: scale(0.1); opacity: 0; }
-}
-
-/* ==========================================================================
-   Apex cinematic upgrades — wordmark sweep, live monitoring, breathing
-   metric cards, form-side polish.
-   ========================================================================== */
-
-/* Per-character wordmark with a brand-green glow that sweeps left-to-right
-   on a long cycle. Each character has its own animation-delay derived from
-   --char-i, so the "light beam" reads as travelling through the word rather
-   than every letter pulsing at once. */
-.lcs-wordmark--swept {
-    display: inline-flex;
-    align-items: center;
-    gap: 0;
-}
-.lcs-wordmark--swept .lcs-wordmark-char {
-    display: inline-block;
-    transition: text-shadow 0.6s ease;
-    text-shadow: 0 0 0 transparent;
-    animation: lcs-wordmark-sweep 6s linear infinite;
-    animation-delay: calc(var(--char-i) * 0.12s);
-    will-change: text-shadow;
-}
-.lcs-wordmark--swept .lcs-wordmark-accent {
-    color: hsl(119 99% 56%);
-}
-.lcs-wordmark--swept .lcs-wordmark-accent .lcs-wordmark-char {
-    /* The accent half ("AI") rides the same sweep but with a slightly
-       different filter so the green glow registers more strongly there. */
-    animation-name: lcs-wordmark-sweep-accent;
-}
-@keyframes lcs-wordmark-sweep {
-    0%, 75%, 100% { text-shadow: 0 0 0 transparent; }
-    85%           { text-shadow: 0 0 14px rgba(255, 255, 255, 0.55), 0 0 28px rgba(34, 211, 102, 0.25); }
-}
-@keyframes lcs-wordmark-sweep-accent {
-    0%, 75%, 100% { text-shadow: 0 0 12px rgba(34, 211, 102, 0.55); }
-    85%           { text-shadow: 0 0 22px rgba(34, 211, 102, 1), 0 0 44px rgba(34, 211, 102, 0.55); }
-}
-
-/* Command metric strip — subtle border breathing so the cards read as
-   "monitor cards" not static UI chrome. Each metric desyncs slightly via
-   :nth-child so the field never pulses in unison. */
-.lcs-command-metric--alive {
-    position: relative;
-    overflow: hidden;
-}
-.lcs-command-metric--alive::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    border: 1px solid rgba(34, 211, 102, 0.22);
-    opacity: 0;
-    animation: lcs-card-breathe 3.6s ease-in-out infinite;
-}
-.lcs-command-metric--alive:nth-child(2)::after { animation-delay: -1.2s; }
-.lcs-command-metric--alive:nth-child(3)::after { animation-delay: -2.4s; }
-@keyframes lcs-card-breathe {
-    0%, 100% { opacity: 0; }
-    50%      { opacity: 0.7; }
-}
-
-/* Live indicator dot — used inside the "Live" metric value. Pulses
-   independently from the parent breath so the eye reads it as the
-   signal source rather than part of the card shell. */
-.lcs-command-value {
-    display: inline-flex;
-    align-items: center;
     gap: 6px;
-    font-variant-numeric: tabular-nums;
-    /* Tabular numerals keep the trust-score figure from horizontally
-       jittering as it micro-fluctuates between "99.7" and "99.9". */
+    font-size: 11px;
+    color: var(--text-subtle);
+    margin-top: 4px;
+    letter-spacing: 0.005em;
 }
-.lcs-command-value--live { color: hsl(119 99% 60%); }
-.lcs-live-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: hsl(119 99% 56%);
-    box-shadow: 0 0 8px hsl(119 99% 56%);
-    transition: opacity 0.4s ease;
+
+.author-meta-row svg {
     flex-shrink: 0;
+    opacity: 0.7;
 }
 
-/* ----- Form side polish — applied via global selectors that match the
-   existing Login.jsx markup so we don't have to thread new className props
-   through the form. */
-
-/* Sign-in / Create account submit button — adds a slow brand-green shine
-   sweep so the primary CTA always reads as the live next step. */
-#submit-button {
-    position: relative;
-    overflow: hidden;
-}
-#submit-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -150%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(
-        100deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.18) 45%,
-        rgba(34, 211, 102, 0.32) 50%,
-        rgba(255, 255, 255, 0.18) 55%,
-        transparent 100%
-    );
-    transform: skewX(-18deg);
-    animation: lcs-cta-shine 5.5s ease-in-out infinite;
-    animation-delay: 1.2s;
-    pointer-events: none;
-}
-@keyframes lcs-cta-shine {
-    0%, 70%, 100% { left: -150%; }
-    85%           { left: 150%; }
-}
-
-/* Input focus — animated brand-green border ring that breathes once when
-   the field gains focus. The focused field becomes the only "alive" element
-   in the form so the user's eye stays on the active step. */
-.editorial-panel .px-input:focus {
-    outline: none;
-    border-color: rgba(34, 211, 102, 0.55);
-    box-shadow:
-        0 0 0 1px rgba(34, 211, 102, 0.55),
-        0 0 14px rgba(34, 211, 102, 0.20),
-        inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    animation: lcs-input-focus 1.4s ease-out;
-}
-@keyframes lcs-input-focus {
-    0%   { box-shadow: 0 0 0 0 rgba(34, 211, 102, 0.55), 0 0 0 rgba(34, 211, 102, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.04); }
-    40%  { box-shadow: 0 0 0 4px rgba(34, 211, 102, 0.18), 0 0 22px rgba(34, 211, 102, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.04); }
-    100% { box-shadow: 0 0 0 1px rgba(34, 211, 102, 0.55), 0 0 14px rgba(34, 211, 102, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.04); }
-}
-
-/* Step indicator badge ("Step 1 · Identify") — tiny pulse on the green
-   leading dot so the active step reads as live. */
-.editorial-panel [class*="step"] span:first-child,
-.editorial-panel > div span[style*="border-radius: 50%"] {
-    animation: lcs-step-dot 2.4s ease-in-out infinite;
-}
-@keyframes lcs-step-dot {
-    0%, 100% { opacity: 0.7; transform: scale(0.85); }
-    50%      { opacity: 1;   transform: scale(1.15); }
-}
-
-/* Reduced-motion: kill all the apex sweeps & breaths cleanly. */
+/* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
-    .lcs-wordmark--swept .lcs-wordmark-char,
-    .lcs-command-metric--alive::after,
-    #submit-button::before,
-    .editorial-panel .px-input:focus,
-    .editorial-panel [class*="step"] span:first-child {
-        animation: none !important;
-    }
-}
-
-/* ==========================================================================
-   LIGHT THEME OVERRIDES
-   --------------------------------------------------------------------------
-   Flips dark-only surfaces, glows, and white-on-dark text to a polished
-   warm off-white treatment when :root[data-theme="light"] is active.
-   Brand greens / cyans are intentionally preserved.
-   ========================================================================== */
-
-/* ---- Shell + ambient atmosphere ---- */
-:root[data-theme="light"] .login-shell {
-    background:
-        linear-gradient(118deg, rgba(34, 211, 102, 0.05), transparent 24%, rgba(34, 211, 238, 0.035) 62%, rgba(245, 158, 11, 0.025)),
-        radial-gradient(ellipse 60% 60% at 20% 30%, rgba(34, 211, 102, 0.05), transparent 70%),
-        radial-gradient(ellipse 60% 60% at 80% 80%, rgba(34, 211, 238, 0.04), transparent 70%),
-        linear-gradient(180deg, #f6f5f0, #ecebe4);
-}
-:root[data-theme="light"] .login-shell-grain {
-    opacity: 0.05;
-    mix-blend-mode: multiply;
-}
-
-/* ---- Cinematic stage chassis ---- */
-:root[data-theme="light"] .lcs-root {
-    border-right: 1px solid rgba(15, 18, 22, 0.08);
-    background:
-        linear-gradient(112deg, rgba(15, 18, 22, 0.02), transparent 18%, rgba(34, 211, 238, 0.025) 74%, transparent),
-        repeating-linear-gradient(90deg, rgba(15, 18, 22, 0.035) 0 1px, transparent 1px 92px),
-        repeating-linear-gradient(0deg, rgba(15, 18, 22, 0.025) 0 1px, transparent 1px 78px);
-}
-:root[data-theme="light"] .lcs-root::before {
-    background: linear-gradient(90deg, transparent, rgba(15, 18, 22, 0.08));
-}
-:root[data-theme="light"] .lcs-root::after {
-    border: 1px solid rgba(15, 18, 22, 0.10);
-    box-shadow:
-        inset 0 0 54px rgba(34, 211, 102, 0.035),
-        0 0 80px rgba(34, 211, 238, 0.03);
-}
-
-/* ---- Letterbox + scan ---- */
-:root[data-theme="light"] .lcs-letterbox {
-    background:
-        linear-gradient(180deg, rgba(20, 30, 40, 0.18), rgba(20, 30, 40, 0.08), transparent),
-        linear-gradient(90deg, rgba(34, 211, 102, 0.10), transparent 46%, rgba(34, 211, 238, 0.07));
-}
-:root[data-theme="light"] .lcs-scan { opacity: 0.35; }
-
-/* ---- Wordmark + text ---- */
-:root[data-theme="light"] .lcs-wordmark {
-    color: #15181d;
-}
-:root[data-theme="light"] .lcs-wordmark--swept .lcs-wordmark-char {
-    text-shadow: 0 0 0 transparent;
-}
-
-/* ---- Command metric cards ---- */
-:root[data-theme="light"] .lcs-command-metric {
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.82)),
-        rgba(255, 255, 255, 0.86);
-    border: 1px solid rgba(15, 18, 22, 0.10);
-    box-shadow:
-        0 14px 30px rgba(20, 30, 40, 0.10),
-        inset 0 1px 0 rgba(255, 255, 255, 0.7);
-}
-:root[data-theme="light"] .lcs-command-metric span {
-    color: #6b7484;
-}
-:root[data-theme="light"] .lcs-command-metric strong {
-    color: #15181d;
-}
-:root[data-theme="light"] .lcs-command-metric--alive::after {
-    border: 1px solid rgba(34, 211, 102, 0.28);
-}
-
-/* ---- Mission line ---- */
-:root[data-theme="light"] .lcs-mission {
-    color: #444b56;
-}
-
-/* ---- Trust beat ---- */
-:root[data-theme="light"] .lcs-beat {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.82));
-    border: 1px solid rgba(34, 211, 102, 0.22);
-    box-shadow:
-        0 18px 40px -22px rgba(20, 30, 40, 0.18),
-        0 0 50px -16px rgba(34, 211, 102, 0.10),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-:root[data-theme="light"] .lcs-beat-label {
-    color: hsl(119 60% 32%);
-}
-:root[data-theme="light"] .lcs-beat-text {
-    color: #15181d;
-}
-:root[data-theme="light"] .lcs-beat-dot {
-    background: rgba(15, 18, 22, 0.14);
-}
-
-/* ---- Footer ---- */
-:root[data-theme="light"] .lcs-footer {
-    border-top: 1px solid rgba(15, 18, 22, 0.10);
-}
-:root[data-theme="light"] .lcs-footer-key,
-:root[data-theme="light"] .lcs-footer-meta {
-    color: #6b7484;
-}
-
-/* ---- Form pane ---- */
-:root[data-theme="light"] .login-pane {
-    background:
-        radial-gradient(ellipse 60% 50% at 100% 0%, rgba(34, 211, 102, 0.05), transparent 65%),
-        radial-gradient(ellipse 50% 50% at 100% 100%, rgba(34, 211, 238, 0.04), transparent 70%),
-        linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(246, 245, 240, 0.65));
-    border-left: 1px solid rgba(15, 18, 22, 0.08);
-}
-:root[data-theme="light"] .login-pane::before {
-    background:
-        linear-gradient(116deg, transparent 0 34%, rgba(15, 18, 22, 0.03) 44%, transparent 54%),
-        repeating-linear-gradient(90deg, rgba(15, 18, 22, 0.025) 0 1px, transparent 1px 84px);
-}
-:root[data-theme="light"] .login-pane .editorial-panel {
-    background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.72) 28%, rgba(34, 211, 238, 0.025)),
-        rgba(255, 255, 255, 0.86);
-    border-color: rgba(15, 18, 22, 0.10);
-    box-shadow:
-        0 30px 70px -28px rgba(20, 30, 40, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-}
-:root[data-theme="light"] .login-pane .editorial-panel::after {
-    background:
-        linear-gradient(90deg, transparent, rgba(34, 211, 102, 0.04), transparent 68%),
-        repeating-linear-gradient(0deg, transparent 0 31px, rgba(15, 18, 22, 0.03) 31px 32px);
-    mix-blend-mode: multiply;
-}
-
-/* ---- Inputs + buttons ---- */
-:root[data-theme="light"] .login-pane input.px-input {
-    background: rgba(255, 255, 255, 0.86);
-    border: 1px solid rgba(15, 18, 22, 0.12);
-    color: #15181d;
-}
-:root[data-theme="light"] .login-pane input.px-input:focus {
-    border-color: rgba(34, 211, 102, 0.6);
-    background: rgba(255, 255, 255, 0.96);
-    box-shadow:
-        0 0 0 3px rgba(34, 211, 102, 0.10),
-        0 0 18px rgba(34, 211, 102, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-/* ---- Aurora canvas tone-down (full-light page reads better cooler) ---- */
-:root[data-theme="light"] .login-shell canvas#aurora {
-    opacity: 0.18;
-    mix-blend-mode: multiply;
-}
-
-/* ---- Responsive border parity ---- */
-@media (max-width: 860px) {
-    :root[data-theme="light"] .lcs-root {
-        border-right: 0;
-        border-bottom: 1px solid rgba(15, 18, 22, 0.10);
-    }
-    :root[data-theme="light"] .login-pane { border-left: 0; }
-}
-
-/* ==========================================================================
-   LIGHT THEME - porcelain login finish
-   ========================================================================== */
-
-:root[data-theme="light"] .login-shell {
-    background:
-        linear-gradient(118deg, rgba(13, 150, 103, 0.045), transparent 30%, rgba(11, 138, 160, 0.05) 72%, transparent),
-        linear-gradient(180deg, #fbfdfe 0%, #f4faf8 48%, #eef6f4 100%);
-}
-
-:root[data-theme="light"] .login-shell canvas#aurora {
-    opacity: 0.12;
-    mix-blend-mode: multiply;
-}
-
-:root[data-theme="light"] .login-shell-grain {
-    opacity: 0.035;
-}
-
-:root[data-theme="light"] .lcs-root {
-    background:
-        linear-gradient(118deg, rgba(13, 150, 103, 0.055), transparent 28%, rgba(11, 138, 160, 0.055) 72%, transparent),
-        linear-gradient(90deg, rgba(18, 45, 48, 0.026) 1px, transparent 1px),
-        linear-gradient(0deg, rgba(18, 45, 48, 0.018) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(239, 247, 246, 0.72));
-    background-size: auto, 72px 72px, 72px 72px, auto;
-    border-right-color: rgba(18, 45, 48, 0.1);
-}
-
-:root[data-theme="light"] .lcs-root::after {
-    border-color: rgba(18, 45, 48, 0.11);
-    box-shadow:
-        inset 0 0 60px rgba(13, 150, 103, 0.04),
-        0 0 80px rgba(11, 138, 160, 0.045);
-}
-
-:root[data-theme="light"] .lcs-letterbox {
-    background:
-        linear-gradient(180deg, rgba(18, 45, 48, 0.1), rgba(18, 45, 48, 0.045), transparent),
-        linear-gradient(90deg, rgba(13, 150, 103, 0.09), transparent 46%, rgba(11, 138, 160, 0.07));
-}
-
-:root[data-theme="light"] .lcs-eyebrow {
-    background: rgba(255, 255, 255, 0.72);
-    border-color: rgba(13, 150, 103, 0.24);
-    color: #08784f;
-    box-shadow:
-        0 8px 18px -14px rgba(18, 45, 48, 0.26),
-        inset 0 1px 0 rgba(255, 255, 255, 0.86);
-}
-
-:root[data-theme="light"] .lcs-wordmark {
-    color: #0c1417;
-    text-shadow: none;
-}
-
-:root[data-theme="light"] .lcs-wordmark span {
-    color: #0c1417;
-    text-shadow: none;
-}
-
-:root[data-theme="light"] .lcs-wordmark--swept .lcs-wordmark-accent,
-:root[data-theme="light"] .lcs-wordmark--swept .lcs-wordmark-accent .lcs-wordmark-char {
-    color: #08784f;
-}
-
-:root[data-theme="light"] .lcs-wordmark--swept .lcs-wordmark-char {
-    animation-name: lcs-wordmark-sweep-light;
-}
-
-:root[data-theme="light"] .lcs-wordmark--swept .lcs-wordmark-accent .lcs-wordmark-char {
-    animation-name: lcs-wordmark-sweep-accent-light;
-}
-
-@keyframes lcs-wordmark-sweep-light {
-    0%, 75%, 100% { text-shadow: 0 0 0 transparent; }
-    85% { text-shadow: 0 0 12px rgba(255, 255, 255, 0.7), 0 0 20px rgba(11, 138, 160, 0.16); }
-}
-
-@keyframes lcs-wordmark-sweep-accent-light {
-    0%, 75%, 100% { text-shadow: 0 0 0 transparent; }
-    85% { text-shadow: 0 0 16px rgba(13, 150, 103, 0.34), 0 0 30px rgba(11, 138, 160, 0.16); }
-}
-
-:root[data-theme="light"] .lcs-command-metric,
-:root[data-theme="light"] .lcs-beat {
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 252, 251, 0.9));
-    border-color: rgba(18, 45, 48, 0.11);
-    box-shadow:
-        0 1px 2px rgba(18, 45, 48, 0.04),
-        0 14px 32px -24px rgba(18, 45, 48, 0.24),
-        inset 0 1px 0 rgba(255, 255, 255, 0.86);
-}
-
-:root[data-theme="light"] .lcs-mission {
-    color: #41515a;
-}
-
-:root[data-theme="light"] .lcs-mission em,
-:root[data-theme="light"] .lcs-beat-label,
-:root[data-theme="light"] .lcs-footer-key {
-    color: #08784f;
-}
-
-:root[data-theme="light"] .lcs-beat-text,
-:root[data-theme="light"] .lcs-command-metric strong {
-    color: #0c1417;
-}
-
-:root[data-theme="light"] .login-pane {
-    background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.56), rgba(241, 249, 248, 0.72)),
-        linear-gradient(118deg, rgba(13, 150, 103, 0.035), transparent 38%, rgba(11, 138, 160, 0.04));
-    border-left-color: rgba(18, 45, 48, 0.1);
-}
-
-:root[data-theme="light"] .login-pane::before {
-    background:
-        linear-gradient(116deg, transparent 0 34%, rgba(18, 45, 48, 0.026) 44%, transparent 54%),
-        linear-gradient(90deg, rgba(18, 45, 48, 0.02) 1px, transparent 1px);
-    background-size: auto, 84px 84px;
-}
-
-:root[data-theme="light"] .login-pane .editorial-panel {
-    background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(248, 252, 251, 0.88));
-    border-color: rgba(18, 45, 48, 0.11);
-    box-shadow:
-        0 1px 2px rgba(18, 45, 48, 0.06),
-        0 34px 78px -32px rgba(18, 45, 48, 0.28),
-        0 56px 120px -58px rgba(11, 138, 160, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
-}
-
-:root[data-theme="light"] .login-pane .editorial-panel::after {
-    background:
-        linear-gradient(118deg, rgba(13, 150, 103, 0.045), transparent 38%, rgba(11, 138, 160, 0.045)),
-        linear-gradient(0deg, transparent 0 31px, rgba(18, 45, 48, 0.022) 31px 32px);
-    mix-blend-mode: multiply;
-}
-
-:root[data-theme="light"] .login-pane input.px-input {
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 252, 251, 0.92));
-    border-color: rgba(18, 45, 48, 0.12);
-    color: #0c1417;
-}
-
-:root[data-theme="light"] .login-pane input.px-input:focus {
-    border-color: rgba(13, 150, 103, 0.52);
-    box-shadow:
-        0 0 0 3px rgba(13, 150, 103, 0.12),
-        0 12px 28px -18px rgba(8, 120, 79, 0.32),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9);
-}
-
-:root[data-theme="light"] .login-pane .segmented-control {
-    background: rgba(18, 45, 48, 0.055);
-    border-color: rgba(18, 45, 48, 0.1);
+    .input-lux.is-bad-edu { animation: none; }
+    .auth-error-banner::after { animation: none; opacity: 0; }
+    .otp-all-filled input { animation: none; }
+    .nda-stamp-burst { animation: none; }
+    .slot-card.is-selected { animation: none; }
+    .workflow-dot.is-active { animation: none; }
+    .workflow-dot.is-active::after { animation: none; opacity: 0; }
+    .workflow-confirmed::before { animation: none; opacity: 0.6; }
+    .save-ripple { animation: none; opacity: 0; }
+    .field-check svg { animation: none; stroke-dashoffset: 0; }
+    .nda-check svg { transition: none; }
+    .nda-accept-btn::before { transition: none; }
 }
