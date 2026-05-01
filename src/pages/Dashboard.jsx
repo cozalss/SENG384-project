@@ -1,13 +1,13 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
     Search, Plus, MapPin, Calendar, Filter, Sparkles, ArrowUpRight,
     Bookmark, BookmarkCheck, LayoutDashboard, Brain, HeartPulse,
     Stethoscope, FlaskConical, Dna, Microscope, Cpu, Activity,
-    Layers, MessageSquare, TrendingUp, FileText, Flame, Clock, Users
+    Layers, MessageSquare, TrendingUp, FileText, Flame, Clock, Users, X
 } from 'lucide-react';
 import AnimatedCounter from '../components/AnimatedCounter';
- 
+
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { useAnimReady } from '../hooks/useAnimReady';
 import { useToast } from '../hooks/useToast';
@@ -52,6 +52,29 @@ const domainAccent = (domain = '') => {
 const MS_PER_DAY = 86400000;
 const INITIAL_DASHBOARD_NOW = Date.now();
 
+/* FlipNumber — animates a numeric digit transition with a vertical roll.
+   Used for the "10 results" pill so the count change is felt, not just read.
+   Falls back to a plain swap if reduced-motion is on. */
+const FlipNumber = ({ value }) => {
+    const str = String(value);
+    return (
+        <span className="flip-number">
+            <AnimatePresence mode="popLayout" initial={false}>
+                <motion.span
+                    key={str}
+                    initial={{ y: 8, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -8, opacity: 0 }}
+                    transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+                    className="flip-number-digit"
+                >
+                    {str}
+                </motion.span>
+            </AnimatePresence>
+        </span>
+    );
+};
+
 const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
     const animReady = useAnimReady();
     const toast = useToast();
@@ -67,10 +90,19 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
         location.state?.feedType === 'saved' ? 'saved' : 'all'
     );
     const [now, setNow] = useState(INITIAL_DASHBOARD_NOW);
+    /* When a card is freshly bookmarked, briefly remember its id so we can
+       render a one-shot particle-burst animation. Auto-clears via timeout so
+       the burst doesn't replay on rerenders. */
+    const [burstId, setBurstId] = useState(null);
+    const burstTimerRef = useRef(null);
 
     useEffect(() => {
         const id = window.setInterval(() => setNow(Date.now()), 60000);
         return () => window.clearInterval(id);
+    }, []);
+
+    useEffect(() => () => {
+        if (burstTimerRef.current) window.clearTimeout(burstTimerRef.current);
     }, []);
 
     const savedPostIds = useMemo(() => user?.savedPosts || [], [user?.savedPosts]);
@@ -87,6 +119,12 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
         toast.success(wasSaved ? 'Removed from saved' : 'Saved to bookmarks', {
             title: wasSaved ? 'Unsaved' : 'Saved'
         });
+        if (!wasSaved) {
+            // Trigger a brief particle burst confirmation on the saved card.
+            setBurstId(postId);
+            if (burstTimerRef.current) window.clearTimeout(burstTimerRef.current);
+            burstTimerRef.current = window.setTimeout(() => setBurstId(null), 700);
+        }
     };
 
     const allDomains = useMemo(() => ['All', ...new Set(posts.map(p => p.domain))], [posts]);
@@ -94,6 +132,25 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
     const countries = useMemo(() => ['All', ...new Set(posts.map(p => p.country).filter(Boolean))], [posts]);
     const cities = useMemo(() => ['All', ...new Set(posts.map(p => p.city).filter(Boolean))], [posts]);
     const statuses = ['All', 'Active', 'Meeting Scheduled', 'CLOSED', 'Expired'];
+
+    // True when the user has narrowed the feed beyond the default state.
+    // 'Active' is the default for status, so non-default means anything else.
+    const hasActiveFilters =
+        searchTerm !== '' ||
+        filterDomain !== 'All' ||
+        filterStage !== 'All' ||
+        filterCountry !== 'All' ||
+        filterCity !== 'All' ||
+        filterStatus !== 'Active';
+
+    const clearAllFilters = () => {
+        setSearchTerm('');
+        setFilterDomain('All');
+        setFilterStage('All');
+        setFilterCountry('All');
+        setFilterCity('All');
+        setFilterStatus('Active');
+    };
 
     const filteredPosts = useMemo(() => {
         return posts.filter(post => {
@@ -168,7 +225,16 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
     };
 
     return (
-        <div className="animate-fade-in" style={{ paddingBottom: '100px' }}>
+        <div className="animate-fade-in dash-page-shell" style={{ paddingBottom: '100px' }}>
+            {/* Ambient aurora wash — sits behind the hero + stat strip at ~8%
+                opacity so it reads as mood, not decoration. Below z=0 so cards
+                always render crisply on top. */}
+            <div className="dash-ambient-aurora" aria-hidden="true">
+                <span className="dash-ambient-blob a" />
+                <span className="dash-ambient-blob b" />
+                <span className="dash-ambient-blob c" />
+            </div>
+
             {/* ===== COMPACT HERO ===== */}
             <motion.section
                 initial={animReady ? { opacity: 0, y: 24 } : false}
@@ -273,8 +339,12 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <div className="dash-result-pill">
-                            <Filter size={11} /> {filteredPosts.length} {filteredPosts.length === 1 ? 'result' : 'results'}
+                        <div className="dash-result-pill" aria-live="polite">
+                            <Filter size={11} />
+                            <FlipNumber value={filteredPosts.length} />
+                            <span style={{ marginLeft: 4 }}>
+                                {filteredPosts.length === 1 ? 'result' : 'results'}
+                            </span>
                         </div>
                     </div>
 
@@ -310,11 +380,11 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
 
                 <div className="filter-row" style={{ marginTop: 12 }}>
                     {[
-                        { id: 'domain', value: filterDomain, setter: setFilterDomain, opts: allDomains, label: 'Domain' },
-                        { id: 'stage', value: filterStage, setter: setFilterStage, opts: stages, label: 'Stage' },
-                        { id: 'country', value: filterCountry, setter: setFilterCountry, opts: countries, label: 'Country' },
-                        { id: 'city', value: filterCity, setter: setFilterCity, opts: cities, label: 'City' },
-                        { id: 'status', value: filterStatus, setter: setFilterStatus, opts: statuses, label: 'Status' },
+                        { id: 'domain', value: filterDomain, setter: setFilterDomain, opts: allDomains, label: 'Domain', defaultVal: 'All' },
+                        { id: 'stage', value: filterStage, setter: setFilterStage, opts: stages, label: 'Stage', defaultVal: 'All' },
+                        { id: 'country', value: filterCountry, setter: setFilterCountry, opts: countries, label: 'Country', defaultVal: 'All' },
+                        { id: 'city', value: filterCity, setter: setFilterCity, opts: cities, label: 'City', defaultVal: 'All' },
+                        { id: 'status', value: filterStatus, setter: setFilterStatus, opts: statuses, label: 'Status', defaultVal: 'Active' },
                     ].map(f => (
                         <PxSelect
                             key={f.id}
@@ -325,8 +395,27 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                             value={f.value}
                             onChange={f.setter}
                             options={f.opts.map(o => ({ value: o, label: o }))}
+                            isActive={f.value !== f.defaultVal}
                         />
                     ))}
+
+                    <AnimatePresence>
+                        {hasActiveFilters && (
+                            <motion.button
+                                key="clear-filters"
+                                type="button"
+                                onClick={clearAllFilters}
+                                className="dash-clear-filters"
+                                initial={animReady ? { opacity: 0, scale: 0.92, x: -6 } : false}
+                                animate={{ opacity: 1, scale: 1, x: 0 }}
+                                exit={{ opacity: 0, scale: 0.92, x: -6 }}
+                                transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+                                aria-label="Clear all filters"
+                            >
+                                <X size={12} strokeWidth={2.4} /> Clear filters
+                            </motion.button>
+                        )}
+                    </AnimatePresence>
                 </div>
             </motion.div>
 
@@ -477,15 +566,12 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                                     {post.explanation}
                                                 </p>
 
-                                                {/* Match ribbon — only if relevant */}
+                                                {/* Match ribbon — only if relevant. Leading green dot pulses
+                                                    softly to draw the eye when the card matches the user's
+                                                    profile (same city, complementary role). */}
                                                 {getMatchExplanation(post) && (
-                                                    <div style={{
-                                                        display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                                        color: '#f5c48a', fontSize: '11.5px', fontWeight: '600',
-                                                        letterSpacing: '0.04em',
-                                                        textTransform: 'uppercase',
-                                                        alignSelf: 'flex-start'
-                                                    }}>
+                                                    <div className="match-ribbon">
+                                                        <span className="match-ribbon-dot" aria-hidden="true" />
                                                         <Sparkles size={12} /> Match · {getMatchExplanation(post)}
                                                     </div>
                                                 )}
@@ -548,16 +634,25 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                         {/* Bookmark float button moved OUTSIDE of the Link */}
                                         <button
                                             onClick={(e) => toggleBookmark(e, post.id)}
-                                            className={`bookmark-float ${isSaved ? 'saved' : ''}`}
+                                            className={`bookmark-float ${isSaved ? 'saved' : ''} ${burstId === post.id ? 'is-bursting' : ''}`}
                                             aria-label={isSaved ? 'Remove bookmark' : 'Save project'}
-                                            style={{ 
-                                                position: 'absolute', 
-                                                top: '24px', 
+                                            style={{
+                                                position: 'absolute',
+                                                top: '24px',
                                                 right: '24px',
-                                                zIndex: 10 
+                                                zIndex: 10
                                             }}
                                         >
                                             {isSaved ? <BookmarkCheck size={17} fill="currentColor" /> : <Bookmark size={17} />}
+                                            {/* Particle burst — six radiating sparks confirm the save action.
+                                                CSS-only via a single .is-bursting class for perf. */}
+                                            {burstId === post.id && (
+                                                <span className="bookmark-burst" aria-hidden="true">
+                                                    {[0, 1, 2, 3, 4, 5].map(i => (
+                                                        <span key={i} className={`burst-spark s${i}`} />
+                                                    ))}
+                                                </span>
+                                            )}
                                         </button>
                                     </div>
                                 </motion.div>
