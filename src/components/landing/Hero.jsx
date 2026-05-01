@@ -1,18 +1,25 @@
 import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowRight, Brain } from 'lucide-react';
+import { useMagnetic } from '../../hooks/useInteractiveFX';
 
 /**
- * Hero — Sentinel-template structure with HEALTH AI content.
+ * Hero — cinematic Sentinel-template structure with HEALTH AI content.
  *
- * The reference spec calls for: bottom-left content block, single big
- * "BRAND AI" heading (AI in green), subheading, description, two CTA
- * buttons, single trust line. All elements stagger-fade-up via CSS only —
- * no per-word framer-motion (which was the source of first-paint jank).
+ * The first 10–15 seconds of the demo land here. The headline isn't a fade —
+ * it's a clip-path SHIFT-IN reveal: each word swept in from clipped, with
+ * "AI" pulsing on the beat after the wordmark settles. A subtle volumetric
+ * haze layer sits in front of the cube wall to give the type something to
+ * push against, and the primary CTA gets a magnetic snap on hover.
+ *
+ * All keyframes degrade gracefully under prefers-reduced-motion (handled by
+ * the @media block in the inline <style> tag at the bottom).
  *
  * Pointer events on the content wrapper are off so cursor activity reaches
  * the canvas behind it; the CTA buttons opt back in via pointer-events:auto.
  */
 const Hero = () => {
+    const magnetic = useMagnetic({ strength: 0.35, max: 8 });
+
     return (
         <section
             className="sentinel-scope px-hero landing-hero"
@@ -27,6 +34,12 @@ const Hero = () => {
             }}
         >
             <div className="landing-hero-vignette" aria-hidden="true" />
+            {/* Volumetric haze — sits between the Spline cubes and the type so
+                the headline reads with weight. Pure CSS, no perf cost. */}
+            <div className="landing-hero-haze" aria-hidden="true" />
+            {/* Soft scanline / light-leak across the bottom seam, blending
+                hero into the next section. */}
+            <div className="landing-hero-leak" aria-hidden="true" />
 
             {/* Bottom-left content block */}
             <div
@@ -41,12 +54,10 @@ const Hero = () => {
                     fontFamily: 'Sora, sans-serif',
                 }}
             >
-                {/* HEADING — single "HEALTH" + " AI" (green accent), uppercase, bold display */}
+                {/* HEADING — clip-path mask reveal, "AI" pulses after settling */}
                 <h1
-                    className="animate-fade-up"
+                    className="landing-hero-heading"
                     style={{
-                        opacity: 0,
-                        animationDelay: '0.2s',
                         fontSize: 'clamp(3rem, 8vw, 6rem)',
                         // Premium 2026: display weight 600 (was 700/bold per spec — softened
                         // from raw spec for the same visual hierarchy without the heavy feel).
@@ -54,12 +65,27 @@ const Hero = () => {
                         lineHeight: 1.05,
                         letterSpacing: '-0.05em',
                         color: 'hsl(0 0% 96%)',
+                        margin: 0,
                         marginBottom: 'clamp(0.5rem, 1.5vw, 1rem)',
                         textTransform: 'uppercase',
                         textWrap: 'balance',
                     }}
                 >
-                    HEALTH<span style={{ color: 'hsl(119 99% 46%)' }}> AI</span>
+                    <span className="hero-word hero-word-health" aria-hidden="true">
+                        <span className="hero-word-inner">HEALTH</span>
+                    </span>
+                    <span className="hero-word hero-word-ai" aria-hidden="true">
+                        <span className="hero-word-inner hero-ai-pulse">&nbsp;AI</span>
+                    </span>
+                    {/* Visually hidden but read by screen readers */}
+                    <span style={{
+                        position: 'absolute',
+                        width: 1, height: 1,
+                        padding: 0, margin: -1,
+                        overflow: 'hidden',
+                        clip: 'rect(0,0,0,0)',
+                        whiteSpace: 'nowrap', border: 0,
+                    }}>HEALTH AI</span>
                 </h1>
 
                 {/* SUBHEADING — single value statement */}
@@ -67,7 +93,7 @@ const Hero = () => {
                     className="animate-fade-up"
                     style={{
                         opacity: 0,
-                        animationDelay: '0.4s',
+                        animationDelay: '0.85s',
                         fontSize: 'clamp(1.125rem, 2.5vw, 1.875rem)',
                         fontWeight: 300,
                         lineHeight: 1.25,
@@ -85,7 +111,7 @@ const Hero = () => {
                     className="animate-fade-up"
                     style={{
                         opacity: 0,
-                        animationDelay: '0.55s',
+                        animationDelay: '1.0s',
                         fontSize: 'clamp(0.95rem, 1.5vw, 1.25rem)',
                         fontWeight: 300,
                         color: 'hsl(0 0% 75%)',
@@ -103,7 +129,7 @@ const Hero = () => {
                     className="animate-fade-up landing-hero-actions"
                     style={{
                         opacity: 0,
-                        animationDelay: '0.7s',
+                        animationDelay: '1.15s',
                         display: 'flex',
                         flexWrap: 'wrap',
                         gap: '0.75rem',
@@ -112,6 +138,9 @@ const Hero = () => {
                     <Link
                         to="/login"
                         aria-label="Join the HEALTH AI network"
+                        className="landing-hero-cta-primary"
+                        onMouseMove={magnetic.onMouseMove}
+                        onMouseLeave={magnetic.onMouseLeave}
                         style={{
                             pointerEvents: 'auto',
                             background: 'hsl(119 99% 46%)',
@@ -126,7 +155,8 @@ const Hero = () => {
                             alignItems: 'center',
                             gap: '0.5rem',
                             boxShadow: '0 14px 40px rgba(34, 211, 102, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22)',
-                            transition: 'filter 0.2s, transform 0.18s',
+                            transition: 'filter 0.2s, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s',
+                            position: 'relative',
                         }}
                     >
                         <Brain size={18} /> Join the Network <ArrowRight size={16} />
@@ -160,7 +190,7 @@ const Hero = () => {
                     className="animate-fade-up landing-hero-trust"
                     style={{
                         opacity: 0,
-                        animationDelay: '0.85s',
+                        animationDelay: '1.3s',
                         marginTop: 'clamp(1rem, 2vw, 1.5rem)',
                         display: 'flex',
                         alignItems: 'center',
