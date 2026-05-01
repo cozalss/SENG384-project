@@ -107,23 +107,25 @@ const UserMenu = ({ user, logout }) => {
                     gap: '10px',
                     padding: '4px 12px 4px 4px',
                     borderRadius: '999px',
-                    background: open ? 'var(--brand-soft-bg)' : 'var(--hl-faint)',
-                    border: `1px solid ${open ? 'var(--brand-soft-border)' : 'var(--border)'}`,
+                    background: open ? 'var(--brand-soft-bg)' : 'rgba(255, 255, 255, 0.06)',
+                    border: `1px solid ${open ? 'var(--brand-soft-border)' : 'rgba(255, 255, 255, 0.14)'}`,
                     cursor: 'pointer',
                     color: 'var(--text-main)',
                     transition: 'background 180ms cubic-bezier(0.32, 0.72, 0, 1), border-color 180ms cubic-bezier(0.32, 0.72, 0, 1)',
                     fontFamily: 'var(--font-body)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)'
+                    boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+                    backdropFilter: 'blur(14px)',
+                    WebkitBackdropFilter: 'blur(14px)',
                 }}
                 onMouseOver={(e) => {
                     if (open) return;
-                    e.currentTarget.style.background = 'var(--interactive-row-hover-bg)';
-                    e.currentTarget.style.borderColor = 'var(--brand-soft-border)';
+                    e.currentTarget.style.background = 'rgba(34, 211, 102, 0.10)';
+                    e.currentTarget.style.borderColor = 'rgba(34, 211, 102, 0.35)';
                 }}
                 onMouseOut={(e) => {
                     if (open) return;
-                    e.currentTarget.style.background = 'var(--hl-faint)';
-                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.14)';
                 }}
             >
                 {/* Avatar — amber for engineer, emerald for clinician (mirrors Profile) */}
