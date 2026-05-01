@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 /**
  * BigTextReveal — premium per-line clip-path mask reveal (Awwwards 2026).
@@ -6,7 +6,12 @@ import { motion } from 'framer-motion';
  * Each line of the headline is wrapped in an overflow-hidden clip and the
  * inner span animates `clipPath: inset(0 0 100% 0) → inset(0)` on enter,
  * with a slight `y` translate for the "rising into view" feel. Lines stagger
- * by 80ms. Pair with a variable-font weight tween on enter (500 → 600).
+ * by 80ms.
+ *
+ * The emphasis line ("isn't luck —", italic serif green) gets glyph-level
+ * stagger so it lands like punctuation — each letter rises a beat after the
+ * one before. Higher-class than mass-line reveal, and it directs the eye to
+ * the green peak of the section.
  */
 const HEADLINE_LINES = [
     { text: 'Health-tech innovation', emphasis: false },
@@ -32,16 +37,64 @@ const containerVariant = {
     },
 };
 
-const RevealLine = ({ children, emphasis }) => (
-    <span
-        style={{
-            display: 'block',
-            overflow: 'hidden',
-            paddingBottom: '0.06em', // descenders
-            paddingTop: '0.02em',
-            lineHeight: 1.1,
-        }}
-    >
+const glyphContainerVariant = {
+    hidden: {},
+    visible: {
+        transition: {
+            staggerChildren: 0.022,
+            delayChildren: 0.05,
+        },
+    },
+};
+
+const glyphVariant = {
+    hidden: { y: '110%', opacity: 0 },
+    visible: {
+        y: 0,
+        opacity: 1,
+        transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+    },
+};
+
+const RevealLine = ({ children, emphasis, glyphStagger }) => {
+    // For glyph-stagger, the inner is a row of per-character motion spans.
+    // For plain line reveal, the inner is a single block whose clip-path animates.
+    const inner = glyphStagger ? (
+        <motion.span
+            variants={glyphContainerVariant}
+            style={{
+                display: 'inline-flex',
+                color: 'hsl(119 99% 56%)',
+                fontFamily: "'Instrument Serif', Georgia, serif",
+                fontStyle: 'italic',
+                fontWeight: 400,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+            }}
+        >
+            {[...children].map((ch, i) => (
+                <span
+                    key={i}
+                    style={{
+                        display: 'inline-block',
+                        overflow: 'hidden',
+                        // Preserve spaces — without this, leading/trailing
+                        // spaces collapse and "isn't luck —" loses its breath.
+                        whiteSpace: 'pre',
+                        paddingBottom: '0.06em',
+                        paddingTop: '0.04em',
+                    }}
+                >
+                    <motion.span
+                        variants={glyphVariant}
+                        style={{ display: 'inline-block' }}
+                    >
+                        {ch}
+                    </motion.span>
+                </span>
+            ))}
+        </motion.span>
+    ) : (
         <motion.span
             variants={lineVariant}
             style={{
@@ -58,10 +111,26 @@ const RevealLine = ({ children, emphasis }) => (
         >
             {children}
         </motion.span>
-    </span>
-);
+    );
+
+    return (
+        <span
+            style={{
+                display: 'block',
+                overflow: 'hidden',
+                paddingBottom: '0.06em',
+                paddingTop: '0.02em',
+                lineHeight: 1.1,
+            }}
+        >
+            {inner}
+        </span>
+    );
+};
 
 const BigTextReveal = () => {
+    const prefersReduced = useReducedMotion();
+
     return (
         <section
             style={{
@@ -71,8 +140,6 @@ const BigTextReveal = () => {
             }}
         >
             <div style={{ maxWidth: '1080px', margin: '0 auto' }}>
-                {/* Eyebrow chip removed — SectionLabel ("01 — The Premise") now
-                    handles the section identifier with much less vertical cost. */}
                 <motion.h2
                     initial="hidden"
                     whileInView="visible"
@@ -86,7 +153,14 @@ const BigTextReveal = () => {
                     }}
                 >
                     {HEADLINE_LINES.map((line, i) => (
-                        <RevealLine key={i} emphasis={line.emphasis}>
+                        <RevealLine
+                            key={i}
+                            emphasis={line.emphasis}
+                            // Glyph-stagger only on the emphasis line, and only
+                            // when motion is allowed. Reduced-motion users get
+                            // the static line variant.
+                            glyphStagger={line.emphasis && !prefersReduced}
+                        >
                             {line.text}
                         </RevealLine>
                     ))}
