@@ -1,7 +1,43 @@
 import { Calendar, CheckCircle2, Clock, Edit3, Send, UserCircle, Video, X } from 'lucide-react';
- 
+
 import { motion } from 'framer-motion';
 import { useAnimReady } from '../../hooks/useAnimReady';
+import '../../styles/login-cinematic.css';
+
+/* Map the post's derivedWorkflowState (managed by PostDetail.jsx) to the
+   4-step indicator. The states a viewer can be in:
+     initial          → step 0 (Interested) is "active"
+     interested       → step 1 (NDA) just completed, step 2 (Meeting) "active"
+     meeting-requested→ step 2 still active (waiting on author)
+     declined         → step 2 active but no progress (visual neutral)
+     scheduled        → step 3 (Accepted) is "active" / done
+   For the post author the panel shows different content above, but the
+   progress beacon stays accurate either way. */
+const WORKFLOW_STEPS = [
+    { key: 'interested', label: 'Interested' },
+    { key: 'nda',        label: 'NDA'        },
+    { key: 'meeting',    label: 'Meeting'    },
+    { key: 'accepted',   label: 'Accepted'   },
+];
+
+const computeStepStates = (state) => {
+    // Returns one of 'done' | 'active' | 'idle' per step.
+    const idx = (() => {
+        switch (state) {
+            case 'initial':           return 0;
+            case 'interested':        return 2;   // NDA + interest done, meeting active
+            case 'meeting-requested': return 2;
+            case 'declined':          return 2;
+            case 'scheduled':         return 3;
+            default:                  return 0;
+        }
+    })();
+    return WORKFLOW_STEPS.map((s, i) => {
+        if (i < idx) return { ...s, status: 'done' };
+        if (i === idx) return { ...s, status: 'active' };
+        return { ...s, status: 'idle' };
+    });
+};
 
 const WorkflowActionPanel = ({
     post,
@@ -19,6 +55,14 @@ const WorkflowActionPanel = ({
     onProposeMeeting,
 }) => {
     const animReady = useAnimReady();
+    const steps = computeStepStates(derivedWorkflowState);
+    /* The progress indicator only makes sense for the engineer/HCP viewer
+       once they have started the journey OR can start it. Hide for the
+       author's own posts (they see pending requests instead) and for closed
+       posts where the journey is over. */
+    const showProgress = !isAuthor && post.status !== 'CLOSED' && (
+        canExpressInterest || derivedWorkflowState !== 'initial'
+    );
 
     return (
         <motion.div
@@ -66,6 +110,34 @@ const WorkflowActionPanel = ({
                     </span>
                 </div>
             </div>
+
+            {showProgress && (
+                <motion.div
+                    className="workflow-progress"
+                    initial={animReady ? { opacity: 0, y: 8 } : false}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.18 }}
+                    role="list"
+                    aria-label="Collaboration progress"
+                    style={{ marginTop: '20px' }}
+                >
+                    {steps.map((s, i) => (
+                        <div key={s.key} className={`workflow-step is-${s.status}`} role="listitem">
+                            <span
+                                className={`workflow-dot is-${s.status}`}
+                                aria-hidden="true"
+                            />
+                            <span className="workflow-step-label">{s.label}</span>
+                            {i < steps.length - 1 && (
+                                <span
+                                    className={`workflow-line${s.status === 'done' ? ' is-done' : ''}`}
+                                    aria-hidden="true"
+                                />
+                            )}
+                        </div>
+                    ))}
+                </motion.div>
+            )}
 
             <div style={{ marginTop: '24px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px' }}>
                 {/* Author control panel. Hidden when the post is CLOSED or when the
@@ -163,19 +235,52 @@ const WorkflowActionPanel = ({
 
                 {derivedWorkflowState === 'scheduled' && (
                     <motion.div
-                        initial={animReady ? { opacity: 0, scale: 0.95 } : false}
+                        className="workflow-confirmed"
+                        initial={animReady ? { opacity: 0, scale: 0.94 } : false}
                         animate={{ opacity: 1, scale: 1 }}
-                        style={{ background: 'rgba(34, 211, 238, 0.06)', border: '1px solid rgba(34, 211, 238, 0.15)', padding: '20px', borderRadius: '14px', textAlign: 'center' }}
+                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                        style={{ padding: '24px 22px', borderRadius: '16px', textAlign: 'center', position: 'relative' }}
                     >
-                        <div className="flex items-center justify-center gap-2 mb-2">
-                            <Video color="#67e8f9" size={20} />
-                            <h3 style={{ fontSize: '15px', color: 'var(--badge-accent-text)', margin: 0, fontWeight: '600' }}>Meeting Confirmed</h3>
-                        </div>
-                        <p className="text-muted text-xs mb-4" style={{ margin: 0, lineHeight: '1.6' }}>
+                        <motion.div
+                            initial={animReady ? { scale: 0.4, rotate: -20, opacity: 0 } : false}
+                            animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                            transition={{ duration: 0.55, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
+                            style={{
+                                width: '52px', height: '52px', borderRadius: '50%',
+                                background: 'linear-gradient(135deg, hsl(119 99% 46%), hsl(119 99% 56%))',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                margin: '0 auto 12px',
+                                boxShadow: '0 12px 32px hsla(119, 99%, 46%, 0.45)',
+                            }}
+                        >
+                            <CheckCircle2 size={28} color="#070b0a" strokeWidth={2.6} />
+                        </motion.div>
+                        <h3 style={{
+                            fontSize: '17px',
+                            color: 'hsl(119 99% 56%)',
+                            margin: '0 0 4px',
+                            fontWeight: 700,
+                            fontFamily: 'var(--font-heading)',
+                            letterSpacing: '-0.02em',
+                        }}>Meeting Confirmed</h3>
+                        <p className="text-muted text-xs mb-4" style={{ margin: '0 0 14px', lineHeight: '1.6' }}>
                             Meet externally via Zoom/Teams. No recordings stored on platform.
                         </p>
-                        <div style={{ background: 'var(--panel-base)', padding: '12px', borderRadius: '10px', fontSize: '13px', color: 'var(--badge-accent-text)', marginBottom: '12px' }}>
-                            📅 {myMeeting?.slot?.label || selectedSlot?.label || 'Confirmed slot'}
+                        <div style={{
+                            background: 'rgba(7, 11, 10, 0.5)',
+                            border: '1px solid hsla(119, 99%, 46%, 0.22)',
+                            padding: '12px 14px',
+                            borderRadius: '11px',
+                            fontSize: '13px',
+                            color: 'hsl(119 99% 56%)',
+                            marginBottom: '14px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontWeight: 600,
+                            letterSpacing: '-0.005em',
+                        }}>
+                            <Calendar size={13} /> {myMeeting?.slot?.label || selectedSlot?.label || 'Confirmed slot'}
                         </div>
                         {isAuthor && post.status !== 'CLOSED' && (
                             <button type="button" onClick={onClosePost} className="px-btn ghost sm" style={{ width: '100%', justifyContent: 'center', marginBottom: '8px' }}>
