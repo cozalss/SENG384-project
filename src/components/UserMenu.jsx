@@ -128,18 +128,23 @@ const UserMenu = ({ user, logout }) => {
                     e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.14)';
                 }}
             >
-                {/* Avatar — amber for engineer, emerald for clinician (mirrors Profile) */}
+                {/* Avatar — role-coded gradient (violet for engineer, cyan for clinician). */}
                 <span style={{
                     position: 'relative',
                     width: '30px', height: '30px',
                     borderRadius: '999px',
-                    background: 'var(--brand-gradient)',
+                    background: user?.role === 'Healthcare Professional'
+                        ? 'linear-gradient(135deg, hsl(190 90% 55%) 0%, hsl(180 75% 45%) 100%)'
+                        : 'linear-gradient(135deg, hsl(265 85% 65%) 0%, hsl(280 75% 50%) 100%)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '13px', fontWeight: 700, color: 'var(--fg-on-accent)',
+                    fontSize: '13px', fontWeight: 700, color: '#ffffff',
                     fontFamily: 'var(--font-heading)',
                     letterSpacing: '-0.02em',
-                    boxShadow: 'var(--brand-avatar-shadow)',
-                    flexShrink: 0
+                    boxShadow: user?.role === 'Healthcare Professional'
+                        ? '0 6px 18px rgba(34, 211, 238, 0.35), inset 0 1px 0 rgba(255,255,255,0.25)'
+                        : '0 6px 18px rgba(167, 139, 250, 0.35), inset 0 1px 0 rgba(255,255,255,0.25)',
+                    flexShrink: 0,
+                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
                 }}>
                     {initial}
                     {/* Online status dot — emerald for "available" semantics regardless of role */}
