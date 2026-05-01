@@ -2,8 +2,11 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Cpu, Stethoscope, Activity, Rocket, ArrowRight, CheckCircle2 } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
+import { useMagnetic } from '../../hooks/useInteractiveFX';
 
 const FinalCTA = ({ isMobile }) => {
+    const magnetic = useMagnetic({ strength: 0.3, max: 10 });
+
     return (
         <section id="final-cta" className="container px-cta-section" style={{
             maxWidth: '1000px',
@@ -11,7 +14,10 @@ const FinalCTA = ({ isMobile }) => {
             marginTop: isMobile ? '40px' : '64px',
             marginBottom: isMobile ? '64px' : '88px',
             padding: isMobile ? '0 16px' : '0 24px',
+            position: 'relative',
         }}>
+            {/* Pulsing aura — sits behind the card and breathes. Held note. */}
+            <div className="landing-final-cta-aura" aria-hidden="true" />
             <ScrollReveal direction="scale">
                 <div style={{
                     position: 'relative',
@@ -105,10 +111,13 @@ const FinalCTA = ({ isMobile }) => {
                             <Link
                                 to="/login"
                                 className="btn btn-accent"
+                                onMouseMove={magnetic.onMouseMove}
+                                onMouseLeave={magnetic.onMouseLeave}
                                 style={{
                                     padding: isMobile ? '14px 30px' : '18px 48px',
                                     fontSize: isMobile ? '15px' : '17px', borderRadius: '16px',
-                                    boxShadow: '0 12px 40px rgba(96, 165, 250, 0.45), 0 0 80px rgba(34, 211, 238, 0.2)'
+                                    boxShadow: '0 12px 40px rgba(96, 165, 250, 0.45), 0 0 80px rgba(34, 211, 238, 0.2)',
+                                    transition: 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), filter 0.2s, box-shadow 0.25s',
                                 }}
                             >
                                 <Rocket size={20} /> Create Account <ArrowRight size={18} />
