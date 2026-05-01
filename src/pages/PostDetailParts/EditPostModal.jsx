@@ -1,8 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CheckCircle2, Edit3, X } from 'lucide-react';
- 
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAnimReady } from '../../hooks/useAnimReady';
+import '../../styles/login-cinematic.css';
+
+const TITLE_MAX = 120;
+const TITLE_WARN = 100;
+const TITLE_NEAR = 115;
 
 const EditPostModal = ({
     open,
@@ -16,6 +21,12 @@ const EditPostModal = ({
     onResetSaved,
 }) => {
     const animReady = useAnimReady();
+
+    /* Save button ripple — purely visual feedback. We render at most one ripple
+       at a time (keyed by counter) so AnimatePresence cleans up after the
+       720ms keyframe. */
+    const [rippleKey, setRippleKey] = useState(0);
+    const lastTriggered = useRef(0);
 
     // Auto-close after successful save (was previously an unguarded setTimeout).
     useEffect(() => {
@@ -32,6 +43,25 @@ const EditPostModal = ({
         onResetSaved();
     };
 
+    const handleSaveClick = () => {
+        // Throttle simultaneous double-clicks visually.
+        const now = Date.now();
+        if (now - lastTriggered.current > 200) {
+            setRippleKey(k => k + 1);
+            lastTriggered.current = now;
+        }
+        onSave();
+    };
+
+    const titleLen = (title || '').length;
+    const titleClamp = Math.min(titleLen, TITLE_MAX);
+    const titlePct = Math.min(100, Math.round((titleClamp / TITLE_MAX) * 100));
+    const counterClass = titleLen >= TITLE_NEAR
+        ? 'is-near'
+        : titleLen >= TITLE_WARN
+            ? 'is-warn'
+            : '';
+
     return (
         <AnimatePresence>
             {open && (
@@ -39,7 +69,8 @@ const EditPostModal = ({
                     <motion.div
                         initial={animReady ? { opacity: 0, scale: 0.92, y: 20 } : false}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.92, y: 20 }}
+                        exit={{ opacity: 0, scale: 0.94, y: 16 }}
+                        transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
                         className="glass-panel modal-content"
                         style={{ borderRadius: '24px', maxWidth: '600px', margin: 'auto' }}
                         role="dialog"
@@ -74,21 +105,58 @@ const EditPostModal = ({
                             </motion.div>
                         )}
 
-                        <div className="flex-col gap-6 mb-10">
+                        <div className="flex-col gap-6 mb-8">
                             <div className="flex-col gap-2">
                                 <label htmlFor="edit-post-title" className="text-sm font-semibold color-muted">Protocol Title</label>
-                                <input id="edit-post-title" type="text" className="input-field" style={{ borderRadius: '16px' }} value={title} onChange={(e) => onChangeTitle(e.target.value)} />
+                                <input
+                                    id="edit-post-title"
+                                    type="text"
+                                    className="input-field"
+                                    style={{ borderRadius: '14px' }}
+                                    value={title}
+                                    onChange={(e) => onChangeTitle(e.target.value)}
+                                    maxLength={TITLE_MAX}
+                                    aria-describedby="edit-title-counter"
+                                />
+                                <div
+                                    id="edit-title-counter"
+                                    className={`char-counter ${counterClass}`}
+                                    aria-live="polite"
+                                >
+                                    <span className="char-counter-bar">
+                                        <span
+                                            className="char-counter-bar-fill"
+                                            style={{ width: `${titlePct}%` }}
+                                        />
+                                    </span>
+                                    <span style={{ fontVariantNumeric: 'tabular-nums', minWidth: '54px', textAlign: 'right' }}>
+                                        {titleLen} / {TITLE_MAX}
+                                    </span>
+                                </div>
                             </div>
                             <div className="flex-col gap-2">
                                 <label htmlFor="edit-post-desc" className="text-sm font-semibold color-muted">Clinical Context</label>
-                                <textarea id="edit-post-desc" className="input-field" style={{ minHeight: '140px', borderRadius: '16px' }} value={description} onChange={(e) => onChangeDescription(e.target.value)} />
+                                <textarea id="edit-post-desc" className="input-field" style={{ minHeight: '140px', borderRadius: '14px' }} value={description} onChange={(e) => onChangeDescription(e.target.value)} />
                             </div>
                         </div>
 
                         <div className="px-modal-footer">
                             <button type="button" className="px-btn ghost" onClick={handleCloseClick}>Cancel</button>
-                            <button type="button" className="px-btn primary" onClick={onSave}>
+                            <button
+                                type="button"
+                                className="px-btn primary save-ripple-host"
+                                onClick={handleSaveClick}
+                            >
                                 <CheckCircle2 size={16} /> Save changes
+                                <AnimatePresence>
+                                    {rippleKey > 0 && (
+                                        <span
+                                            key={rippleKey}
+                                            className="save-ripple"
+                                            aria-hidden="true"
+                                        />
+                                    )}
+                                </AnimatePresence>
                             </button>
                         </div>
                     </motion.div>
