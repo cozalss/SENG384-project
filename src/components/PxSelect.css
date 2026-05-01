@@ -43,6 +43,29 @@
 .px-select-trigger.sm { height: 32px; padding: 0 10px; font-size: 12px; }
 .px-select-trigger.md { /* default */ }
 
+/* Subtle "this filter has a non-default value" indicator. Brand-green dot
+   in the upper-right corner — picks up on the HEALTH AI neon accent. */
+.px-select-trigger.is-filter-active {
+    border-color: rgba(34, 211, 238, 0.32);
+    background-color: rgba(34, 211, 238, 0.05);
+}
+
+.px-select-active-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: hsl(119, 99%, 56%);
+    box-shadow:
+        0 0 0 2px rgba(7, 11, 10, 0.85),
+        0 0 8px hsl(119, 99%, 46%);
+    pointer-events: none;
+}
+
+.px-select-trigger { position: relative; }
+
 .px-select-value {
     flex: 1;
     min-width: 0;
