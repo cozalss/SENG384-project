@@ -122,27 +122,27 @@ export const WizardMockup = () => {
    ============================================================ */
 const FEED_POSTS = [
     {
-        title: 'Real-time neurosurgical decision-support',
-        author: 'Dr. M. Köhler · Charité Berlin',
+        title: 'AI support tool for clinic intake workflow',
+        author: 'Healthcare Professional · New York',
         domain: 'AI Diagnostics',
         stage: 'Prototype',
-        loc: 'Berlin, DE',
+        loc: 'New York, US',
         hours: 14,
     },
     {
-        title: 'Continuous glucose wearable — clinical pilot needed',
-        author: 'Eng. R. Tanaka · ETH Zürich',
+        title: 'Patient follow-up dashboard needs frontend support',
+        author: 'Engineer / Developer · London',
         domain: 'Wearable Tech',
         stage: 'Pilot',
-        loc: 'Zürich, CH',
+        loc: 'London, UK',
         hours: 31,
     },
     {
-        title: 'Federated radiology model · cross-site validation',
-        author: 'Dr. A. Bensaid · CHU Lille',
+        title: 'Radiology workflow idea looking for ML review',
+        author: 'Healthcare Professional · Izmir',
         domain: 'AI Diagnostics',
         stage: 'Concept',
-        loc: 'Lille, FR',
+        loc: 'Izmir, TR',
         hours: 62,
     },
 ];
@@ -162,7 +162,7 @@ export const FeedMockup = () => (
                     Pilot
                 </span>
                 <span className="px-mock-filter-pill" style={{ fontFamily: BARLOW }}>
-                    <MapPin size={12} strokeWidth={1.8} /> Europe
+                    <MapPin size={12} strokeWidth={1.8} /> Turkey
                 </span>
             </div>
 
@@ -269,9 +269,9 @@ export const NDAMockup = () => {
    "Meeting Scheduled". Visualises the off-platform handoff.
    ============================================================ */
 const SLOTS = [
-    { day: 'Mon · 28 Apr', time: '10:00', tz: 'Europe/Berlin' },
-    { day: 'Tue · 29 Apr', time: '14:00', tz: 'Europe/Berlin', selected: true },
-    { day: 'Wed · 30 Apr', time: '16:00', tz: 'Europe/Berlin' },
+    { day: 'Slot A', time: '10:00', tz: 'America/New_York' },
+    { day: 'Slot B', time: '14:00', tz: 'America/New_York', selected: true },
+    { day: 'Slot C', time: '16:00', tz: 'America/New_York' },
 ];
 
 export const SlotsMockup = () => (
@@ -307,9 +307,8 @@ export const SlotsMockup = () => (
 
             <div className="px-mock-slots-foot" style={{ fontFamily: BARLOW }}>
                 <Globe2 size={12} strokeWidth={1.8} />
-                <span>Take it on Zoom, Teams, or in person — the platform never stores the call.</span>
+                <span>Continue on Zoom, Teams, or in person; the app keeps only the meeting request status.</span>
             </div>
         </div>
     </BrowserChrome>
 );
-

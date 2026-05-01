@@ -44,6 +44,26 @@ const CommandPalette = ({ posts = [], user }) => {
         return () => clearTimeout(t);
     }, [open]);
 
+    // Body scroll lock while the palette is open. Without this, the page
+    // scrolls underneath the modal which breaks the modal expectation and the
+    // focus-trap semantics. We restore the previous overflow value on close
+    // so we don't clobber any other component's lock.
+    useEffect(() => {
+        if (!open) return;
+        const prevOverflow = document.body.style.overflow;
+        const prevPaddingRight = document.body.style.paddingRight;
+        // Reserve the scrollbar gutter so the layout doesn't jump on lock.
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        document.body.style.overflow = 'hidden';
+        if (scrollbarWidth > 0) {
+            document.body.style.paddingRight = `${scrollbarWidth}px`;
+        }
+        return () => {
+            document.body.style.overflow = prevOverflow;
+            document.body.style.paddingRight = prevPaddingRight;
+        };
+    }, [open]);
+
     const actions = useMemo(() => [
         { id: 'new-post', label: 'New Announcement', hint: 'Publish a collaboration request', icon: <Plus size={16} />, path: '/create-post', group: 'Quick Actions', accent: true }
     ], []);
@@ -132,8 +152,8 @@ const CommandPalette = ({ posts = [], user }) => {
                     gap: '10px',
                     padding: '8px 8px 8px 14px',
                     borderRadius: '11px',
-                    background: 'rgba(255, 255, 255, 0.035)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    background: 'var(--hl-faint)',
+                    border: '1px solid var(--border)',
                     cursor: 'pointer',
                     color: 'var(--text-muted)',
                     fontSize: '12.5px',
@@ -143,13 +163,13 @@ const CommandPalette = ({ posts = [], user }) => {
                     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)'
                 }}
                 onMouseOver={(e) => {
-                    e.currentTarget.style.background = 'rgba(249, 168, 96, 0.08)';
-                    e.currentTarget.style.borderColor = 'rgba(249, 168, 96, 0.26)';
-                    e.currentTarget.style.color = '#f5c48a';
+                    e.currentTarget.style.background = 'var(--interactive-row-hover-bg)';
+                    e.currentTarget.style.borderColor = 'var(--brand-soft-border)';
+                    e.currentTarget.style.color = 'var(--brand-soft-text)';
                 }}
                 onMouseOut={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.035)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                    e.currentTarget.style.background = 'var(--hl-faint)';
+                    e.currentTarget.style.borderColor = 'var(--border)';
                     e.currentTarget.style.color = 'var(--text-muted)';
                 }}
             >
@@ -161,8 +181,8 @@ const CommandPalette = ({ posts = [], user }) => {
                         display: 'inline-flex', alignItems: 'center', gap: '2px',
                         padding: '2px 7px',
                         borderRadius: '6px',
-                        background: 'rgba(255,255,255,0.04)',
-                        border: '1px solid rgba(255,255,255,0.06)',
+                        background: 'var(--hl-faint)',
+                        border: '1px solid var(--border)',
                         fontSize: '10px',
                         fontWeight: '700',
                         letterSpacing: '0.05em',
@@ -185,7 +205,7 @@ const CommandPalette = ({ posts = [], user }) => {
                                 onClick={closePalette}
                                 style={{
                                     position: 'fixed', inset: 0, zIndex: 9998,
-                                    background: 'rgba(3, 7, 10, 0.75)',
+                                    background: 'var(--bg-glass-strong, rgba(3, 7, 10, 0.75))',
                                     backdropFilter: 'blur(14px)',
                                     WebkitBackdropFilter: 'blur(14px)'
                                 }}
@@ -212,7 +232,7 @@ const CommandPalette = ({ posts = [], user }) => {
                                     zIndex: 9999,
                                     padding: 0,
                                     overflow: 'hidden',
-                                    boxShadow: '0 50px 120px rgba(0, 0, 0, 0.6), 0 0 100px rgba(96, 165, 250, 0.14)'
+                                    boxShadow: 'var(--floating-panel-shadow, 0 50px 120px rgba(0, 0, 0, 0.6), 0 0 100px rgba(96, 165, 250, 0.14))'
                                 }}
                             >
                             {/* Search input header */}
@@ -221,10 +241,10 @@ const CommandPalette = ({ posts = [], user }) => {
                                 alignItems: 'center',
                                 gap: '14px',
                                 padding: '18px 22px',
-                                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                borderBottom: '1px solid var(--border)',
                                 position: 'relative'
                             }}>
-                                <Search size={18} color="#93c5fd" strokeWidth={2.2} />
+                                <Search size={18} color="var(--brand-icon, #93c5fd)" strokeWidth={2.2} />
                                 <input
                                     ref={inputRef}
                                     type="text"
@@ -249,8 +269,8 @@ const CommandPalette = ({ posts = [], user }) => {
                                 <kbd style={{
                                     display: 'inline-flex', alignItems: 'center', gap: '4px',
                                     padding: '4px 8px', borderRadius: '7px',
-                                    background: 'rgba(255,255,255,0.04)',
-                                    border: '1px solid rgba(255,255,255,0.06)',
+                                    background: 'var(--hl-faint)',
+                                    border: '1px solid var(--border)',
                                     fontSize: '10px', fontWeight: '700',
                                     color: 'var(--text-subtle)',
                                     fontFamily: 'var(--font-body)'
@@ -297,8 +317,8 @@ const CommandPalette = ({ posts = [], user }) => {
                                                             width: '100%',
                                                             padding: '11px 14px',
                                                             borderRadius: '11px',
-                                                            background: active ? 'rgba(96, 165, 250, 0.08)' : 'transparent',
-                                                            border: `1px solid ${active ? 'rgba(96, 165, 250, 0.2)' : 'transparent'}`,
+                                                            background: active ? 'var(--interactive-row-hover-bg, rgba(96, 165, 250, 0.08))' : 'transparent',
+                                                            border: `1px solid ${active ? 'var(--brand-soft-border, rgba(96, 165, 250, 0.2))' : 'transparent'}`,
                                                             color: active ? 'var(--text-main)' : 'var(--text-muted)',
                                                             cursor: 'pointer',
                                                             fontFamily: 'var(--font-body)',
@@ -309,9 +329,9 @@ const CommandPalette = ({ posts = [], user }) => {
                                                         <span style={{
                                                             width: '32px', height: '32px',
                                                             borderRadius: '10px',
-                                                            background: item.accent ? 'linear-gradient(135deg, var(--primary), var(--accent))' : 'rgba(255,255,255,0.04)',
-                                                            border: `1px solid ${item.accent ? 'transparent' : 'rgba(255,255,255,0.05)'}`,
-                                                            color: item.accent ? '#070b0a' : (active ? '#93c5fd' : 'var(--text-muted)'),
+                                                            background: item.accent ? 'var(--brand-gradient, linear-gradient(135deg, var(--primary), var(--accent)))' : 'var(--hl-faint)',
+                                                            border: `1px solid ${item.accent ? 'transparent' : 'var(--border)'}`,
+                                                            color: item.accent ? 'var(--fg-on-accent)' : (active ? 'var(--brand-soft-text, #93c5fd)' : 'var(--text-muted)'),
                                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                             flexShrink: 0,
                                                             transition: 'color 0.15s'
@@ -342,7 +362,7 @@ const CommandPalette = ({ posts = [], user }) => {
                                                             </div>
                                                         </span>
                                                         {active && (
-                                                            <span style={{ color: '#93c5fd', display: 'flex', flexShrink: 0 }}>
+                                                            <span style={{ color: 'var(--brand-soft-text, #93c5fd)', display: 'flex', flexShrink: 0 }}>
                                                                 <ArrowRight size={14} />
                                                             </span>
                                                         )}
@@ -357,8 +377,8 @@ const CommandPalette = ({ posts = [], user }) => {
                             {/* Footer hints */}
                             <div style={{
                                 padding: '10px 22px',
-                                borderTop: '1px solid rgba(255,255,255,0.05)',
-                                background: 'rgba(7, 11, 10, 0.4)',
+                                borderTop: '1px solid var(--border)',
+                                background: 'var(--bg-overlay)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '18px',
@@ -370,14 +390,14 @@ const CommandPalette = ({ posts = [], user }) => {
                                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                                     <kbd style={{
                                         padding: '2px 6px', borderRadius: '5px',
-                                        background: 'rgba(255,255,255,0.04)',
-                                        border: '1px solid rgba(255,255,255,0.06)',
+                                        background: 'var(--hl-faint)',
+                                        border: '1px solid var(--border)',
                                         fontSize: '10px', fontWeight: '700', color: 'var(--text-muted)'
                                     }}>↑</kbd>
                                     <kbd style={{
                                         padding: '2px 6px', borderRadius: '5px',
-                                        background: 'rgba(255,255,255,0.04)',
-                                        border: '1px solid rgba(255,255,255,0.06)',
+                                        background: 'var(--hl-faint)',
+                                        border: '1px solid var(--border)',
                                         fontSize: '10px', fontWeight: '700', color: 'var(--text-muted)'
                                     }}>↓</kbd>
                                     Navigate
@@ -385,8 +405,8 @@ const CommandPalette = ({ posts = [], user }) => {
                                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                                     <kbd style={{
                                         padding: '2px 6px', borderRadius: '5px',
-                                        background: 'rgba(255,255,255,0.04)',
-                                        border: '1px solid rgba(255,255,255,0.06)',
+                                        background: 'var(--hl-faint)',
+                                        border: '1px solid var(--border)',
                                         fontSize: '10px', fontWeight: '700', color: 'var(--text-muted)',
                                         display: 'inline-flex', alignItems: 'center'
                                     }}>
@@ -396,7 +416,7 @@ const CommandPalette = ({ posts = [], user }) => {
                                 </span>
                                 <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                                     Powered by
-                                    <span style={{ color: '#93c5fd', fontWeight: '700', letterSpacing: '0.08em' }}>HEALTHAI</span>
+                                    <span style={{ color: 'var(--brand-soft-text, #93c5fd)', fontWeight: '700', letterSpacing: '0.08em' }}>HEALTHAI</span>
                                 </span>
                             </div>
                             </motion.div>

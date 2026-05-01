@@ -1,17 +1,24 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Activity, FileText, LayoutDashboard, UserCircle, Shield, MessageSquare } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, LayoutGroup } from 'framer-motion';
 import Notifications from './Notifications';
 import CommandPalette from './CommandPalette';
 import UserMenu from './UserMenu';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = ({ user, logout, notifications, dismissNotification, dismissAllNotifications, posts = [] }) => {
     const location = useLocation();
     const [scrolled, setScrolled] = useState(false);
+    const scrolledRef = useRef(false);
 
     useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 20);
+        const handleScroll = () => {
+            const next = window.scrollY > 20;
+            if (scrolledRef.current === next) return;
+            scrolledRef.current = next;
+            setScrolled(next);
+        };
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
@@ -88,6 +95,7 @@ const Navbar = ({ user, logout, notifications, dismissNotification, dismissAllNo
                     <div className="px-nav-actions">
                         <span className="px-nav-divider" aria-hidden="true" />
                         <CommandPalette posts={posts} user={user} />
+                        <ThemeToggle />
                         <Notifications
                             notifications={notifications || []}
                             onDismiss={dismissNotification}

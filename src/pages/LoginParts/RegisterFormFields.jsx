@@ -12,7 +12,7 @@ const iconStyle = (field, focusedField) => ({
     top: '50%',
     left: '16px',
     transform: 'translateY(-50%)',
-    color: focusedField === field ? '#f5c48a' : 'var(--text-subtle)',
+    color: focusedField === field ? 'hsl(119 99% 60%)' : 'var(--text-subtle)',
     transition: 'color 0.3s ease',
 });
 

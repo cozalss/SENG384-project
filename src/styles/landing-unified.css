@@ -1,0 +1,672 @@
+/* Shared landing cinema layer.
+   Keeps the whole page in the hero's clinical ECG language without adding
+   heavy framed rectangles between sections. */
+
+.landing-page-shell {
+    --landing-green: hsl(119 99% 56%);
+    --landing-cyan: hsl(180 75% 65%);
+    background:
+        radial-gradient(ellipse 95% 38% at 74% 24%, rgba(34, 211, 238, 0.075), transparent 62%),
+        radial-gradient(ellipse 80% 32% at 18% 70%, rgba(34, 211, 102, 0.06), transparent 66%),
+        #070b0a;
+}
+
+html.landing-snap-active {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-y: contain;
+}
+
+html.landing-snap-active body {
+    overscroll-behavior-y: contain;
+}
+
+.landing-snap-panel {
+    position: relative;
+    height: 100vh;
+    min-height: 100vh;
+    width: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    isolation: isolate;
+}
+
+.landing-snap-panel::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+.landing-snap-panel--hero {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    flex-direction: row !important;
+    align-items: flex-end !important;
+    justify-content: flex-start !important;
+    overflow: hidden !important;
+}
+
+.landing-snap-label {
+    position: relative;
+    z-index: 8;
+    flex: 0 0 auto;
+    width: 100%;
+    margin-bottom: clamp(0.15rem, 0.8vw, 0.6rem);
+}
+
+.landing-snap-label > div {
+    padding: clamp(0.65rem, 1.25vw, 1rem) clamp(1.25rem, 4vw, 3rem) !important;
+    scroll-margin-top: 0 !important;
+}
+
+.landing-section-skeleton {
+    min-height: min(var(--skeleton-height), 72vh);
+    width: min(1180px, calc(100% - 3rem));
+    margin: 0 auto;
+    border-radius: 18px;
+    background:
+        linear-gradient(100deg, rgba(255, 255, 255, 0.02), rgba(34, 211, 102, 0.07), rgba(255, 255, 255, 0.02)),
+        rgba(255, 255, 255, 0.025);
+    background-size: 220% 100%;
+    animation: shimmer-sweep 1.4s linear infinite;
+}
+
+.landing-snap-panel > .landing-cinema-section,
+.landing-snap-panel > .btr-section,
+.landing-snap-panel > .lp-section,
+.landing-snap-panel > .two-sides-section,
+.landing-snap-panel > .cnet-section,
+.landing-snap-panel > .cvault-section,
+.landing-snap-panel > .spt-section,
+.landing-snap-panel > .px-capabilities-section,
+.landing-snap-panel > .px-cta-section {
+    flex: 1 1 auto;
+    min-height: 0 !important;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow: visible;
+    margin: 0 !important;
+    padding: clamp(0.7rem, 1.7vw, 1.8rem) clamp(1.25rem, 4vw, 3rem) !important;
+}
+
+.landing-snap-panel > .landing-cinema-section > *,
+.landing-snap-panel > .btr-section > *,
+.landing-snap-panel > .lp-section > *,
+.landing-snap-panel > .two-sides-section > *,
+.landing-snap-panel > .cnet-section > *,
+.landing-snap-panel > .cvault-section > *,
+.landing-snap-panel > .spt-section > *,
+.landing-snap-panel > .px-capabilities-section > *,
+.landing-snap-panel > .px-cta-section > * {
+    width: 100%;
+}
+
+.landing-snap-panel .lp-header,
+.landing-snap-panel .cnet-eyebrow-row,
+.landing-snap-panel .cvault-eyebrow-row,
+.landing-snap-panel .spt-eyebrow-row {
+    margin-bottom: clamp(0.75rem, 1.6vw, 1.35rem);
+}
+
+.landing-snap-panel .lp-heading,
+.landing-snap-panel .cnet-heading,
+.landing-snap-panel .cvault-heading,
+.landing-snap-panel .spt-heading {
+    font-size: clamp(1.6rem, 3.3vw, 2.7rem);
+}
+
+.landing-snap-panel .lp-sub,
+.landing-snap-panel .cnet-sub,
+.landing-snap-panel .cvault-sub {
+    margin-bottom: clamp(1rem, 2.2vw, 1.6rem);
+}
+
+.landing-snap-panel .lp-stage-grid {
+    padding: clamp(0.4rem, 1.4vw, 1rem) 0;
+}
+
+.landing-snap-panel .cnet-map-wrap {
+    max-height: min(52vh, 520px);
+}
+
+.landing-snap-panel .cnet-feed-list {
+    max-height: min(46vh, 460px);
+    overflow: hidden;
+}
+
+.landing-snap-panel .cvault-stage {
+    align-items: center;
+}
+
+.landing-snap-panel .spt-card {
+    padding: clamp(1.35rem, 2.4vw, 2rem);
+}
+
+.landing-snap-panel--trust .bento-card h3 {
+    font-size: clamp(1.05rem, 1.55vw, 1.35rem) !important;
+    line-height: 1.16 !important;
+    overflow-wrap: anywhere;
+}
+
+.landing-snap-panel--trust {
+    align-items: center;
+    justify-content: center;
+}
+
+.landing-snap-panel--trust > .px-capabilities-section {
+    flex: 0 1 auto;
+    align-self: center;
+    max-width: min(1120px, calc(100% - 4rem)) !important;
+    min-height: auto !important;
+    margin: 0 auto !important;
+    padding: clamp(0.35rem, 1vh, 0.8rem) 0 !important;
+}
+
+.landing-snap-panel--trust .px-capabilities-section > * {
+    width: 100%;
+}
+
+.landing-snap-panel--trust .text-center {
+    margin-bottom: clamp(14px, 1.6vh, 22px) !important;
+    padding: 0 !important;
+}
+
+.landing-snap-panel--trust .text-center h2 {
+    font-size: clamp(2rem, 3vw, 2.8rem) !important;
+    margin-bottom: clamp(8px, 1vh, 12px) !important;
+}
+
+.landing-snap-panel--trust .text-center p {
+    font-size: clamp(0.86rem, 1vw, 1rem) !important;
+    line-height: 1.45 !important;
+}
+
+.landing-snap-panel--trust .px-capabilities-section > div:nth-child(2) {
+    gap: clamp(10px, 1.1vw, 16px) !important;
+}
+
+.landing-snap-panel--trust .bento-card {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: clamp(18px, 1.8vw, 28px) !important;
+}
+
+.landing-snap-panel--trust .bento-card:nth-child(1),
+.landing-snap-panel--trust .bento-card:nth-child(2) {
+    min-height: clamp(250px, 33vh, 330px) !important;
+}
+
+.landing-snap-panel--trust .bento-card p {
+    font-size: clamp(0.78rem, 0.92vw, 0.95rem) !important;
+    line-height: 1.5 !important;
+    margin-bottom: clamp(10px, 1.2vh, 16px) !important;
+}
+
+.landing-snap-panel--final {
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.5rem, 1.8vh, 1.1rem);
+}
+
+.landing-snap-panel--final > .px-cta-section {
+    flex: 0 1 auto;
+    align-self: center;
+    width: min(1000px, calc(100% - 2rem));
+    margin: 0 auto !important;
+    padding: 0 !important;
+}
+
+.landing-snap-panel--final .premium-card--strong {
+    padding: clamp(2.25rem, 5.8vh, 4.5rem) clamp(1.5rem, 4vw, 3.75rem) !important;
+    border-radius: 24px !important;
+}
+
+.landing-snap-panel--final .premium-card--strong h2 {
+    font-size: clamp(2rem, 3.6vw, 3.2rem) !important;
+}
+
+.landing-snap-panel--final .premium-card--strong p {
+    margin-bottom: clamp(1.25rem, 2.7vh, 2rem) !important;
+}
+
+.landing-snap-panel--final .premium-card--strong svg {
+    max-width: clamp(76px, 9vh, 104px);
+    max-height: clamp(76px, 9vh, 104px);
+}
+
+.landing-snap-panel--final footer {
+    position: relative;
+    z-index: 3;
+    flex: 0 0 auto;
+    align-self: center;
+    width: min(1200px, calc(100% - 2rem));
+    padding-top: 0 !important;
+}
+
+.landing-snap-panel--final .footer-grid {
+    gap: clamp(1rem, 2vw, 1.8rem);
+}
+
+.landing-snap-panel--final footer p {
+    margin-bottom: 0 !important;
+}
+
+.landing-page-shell::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, transparent 0 14%, rgba(34, 211, 102, 0.026) 30%, transparent 48%, rgba(34, 211, 238, 0.03) 72%, transparent 100%),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 104px);
+    opacity: 0.7;
+    mask-image: linear-gradient(180deg, transparent, black 12%, black 88%, transparent);
+    -webkit-mask-image: linear-gradient(180deg, transparent, black 12%, black 88%, transparent);
+}
+
+.landing-cinema-section {
+    position: relative;
+    isolation: isolate;
+}
+
+.landing-cinema-section > * {
+    position: relative;
+    z-index: 2;
+}
+
+.landing-cinema-section::before {
+    content: '';
+    position: absolute;
+    inset: -3rem 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(100deg, transparent 0 24%, rgba(34, 211, 102, 0.045) 44%, rgba(34, 211, 238, 0.04) 66%, transparent 100%),
+        repeating-linear-gradient(0deg, transparent 0 46px, rgba(34, 211, 102, 0.035) 47px, transparent 48px);
+    opacity: 0.6;
+    mask-image: radial-gradient(ellipse 90% 58% at 50% 50%, black 0 50%, transparent 78%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 58% at 50% 50%, black 0 50%, transparent 78%);
+}
+
+.landing-cinema-section::after {
+    content: '';
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    top: 20%;
+    z-index: 0;
+    height: 1px;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(34, 211, 102, 0.22), rgba(34, 211, 238, 0.26), transparent);
+    filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.18));
+    opacity: 0.58;
+}
+
+.btr-section {
+    overflow: hidden;
+}
+
+.btr-signal-field {
+    position: absolute;
+    top: clamp(0.2rem, 2vw, 1.4rem);
+    right: max(-70px, calc((100vw - 1180px) / 2 - 120px));
+    z-index: 1;
+    width: min(48vw, 650px);
+    height: min(29vw, 330px);
+    min-height: 190px;
+    pointer-events: none;
+    opacity: 0.78;
+    transform: rotate(-2.5deg);
+    mix-blend-mode: screen;
+}
+
+.btr-signal-field::before {
+    content: '';
+    position: absolute;
+    inset: 7% 3%;
+    border-radius: 28px;
+    background:
+        linear-gradient(108deg, transparent 0 42%, rgba(255, 255, 255, 0.10) 49%, transparent 57%),
+        radial-gradient(ellipse at 42% 48%, rgba(34, 211, 102, 0.18), transparent 58%);
+    filter: blur(0.2px);
+    opacity: 0.62;
+}
+
+.btr-signal-grid {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 0 20px rgba(34, 211, 102, 0.18));
+}
+
+.btr-grid-lines line {
+    stroke: rgba(34, 211, 102, 0.085);
+    stroke-width: 1;
+}
+
+.btr-ecg-ghost,
+.btr-ecg-main {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.btr-ecg-ghost {
+    stroke: rgba(34, 211, 102, 0.13);
+    stroke-width: 12;
+    filter: blur(10px);
+}
+
+.btr-ecg-main {
+    stroke: url(#btr-ecg-grad);
+    stroke-width: 7;
+    stroke-dasharray: 1120;
+    animation: btr-ecg-drift 5.8s ease-in-out infinite;
+}
+
+.btr-signal-readout {
+    position: absolute;
+    right: 8.5%;
+    top: 10%;
+    color: var(--landing-green);
+    font: 800 11px/1 Sora, sans-serif;
+    letter-spacing: 0;
+    text-shadow: 0 0 8px rgba(34, 211, 102, 0.65);
+}
+
+@keyframes btr-ecg-drift {
+    0%, 100% { opacity: 0.56; stroke-dashoffset: 170; }
+    48%      { opacity: 1; stroke-dashoffset: 0; }
+}
+
+/* Use compound selector instead of !important — section + classname is
+   specific enough to win over the inline gradient set in BigTextReveal.jsx
+   without weaponizing !important. */
+.btr-section .btr-shifts {
+    background:
+        linear-gradient(115deg, rgba(34, 211, 102, 0.075), transparent 34%, rgba(34, 211, 238, 0.065) 100%),
+        rgba(9, 14, 13, 0.72);
+    border-color: rgba(34, 211, 238, 0.14);
+    border-radius: 14px;
+}
+
+.two-sides-section {
+    overflow: hidden;
+}
+
+.two-sides-bridge-signal {
+    position: absolute;
+    left: 50%;
+    top: 61%;
+    z-index: 1;
+    width: min(56vw, 620px);
+    height: 86px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    opacity: 0.75;
+}
+
+.two-sides-bridge-line,
+.two-sides-bridge-pulse {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(34, 211, 102, 0.5), rgba(34, 211, 238, 0.56), transparent);
+    filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.22));
+}
+
+.two-sides-bridge-pulse {
+    left: 46%;
+    right: auto;
+    width: 58px;
+    height: 58px;
+    top: calc(50% - 29px);
+    border-radius: 50%;
+    border: 1px solid rgba(34, 211, 102, 0.36);
+    background: radial-gradient(circle, rgba(34, 211, 102, 0.16), transparent 66%);
+    animation: bridge-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes bridge-pulse {
+    0%, 100% { transform: scale(0.82); opacity: 0.32; }
+    50%      { transform: scale(1.18); opacity: 0.78; }
+}
+
+.px-capabilities-section {
+    overflow: hidden;
+}
+
+.px-capabilities-section::after {
+    top: 10%;
+}
+
+.px-cta-section::before {
+    opacity: 0.78;
+}
+
+.section-transition-wash {
+    height: 42px !important;
+}
+
+@media (max-width: 900px) {
+    html.landing-snap-active {
+        scroll-snap-type: y proximity;
+    }
+
+    .landing-snap-panel {
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+    }
+
+    .landing-snap-panel > .landing-cinema-section,
+    .landing-snap-panel > .btr-section,
+    .landing-snap-panel > .lp-section,
+    .landing-snap-panel > .two-sides-section,
+    .landing-snap-panel > .cnet-section,
+    .landing-snap-panel > .cvault-section,
+    .landing-snap-panel > .spt-section,
+    .landing-snap-panel > .px-capabilities-section,
+    .landing-snap-panel > .px-cta-section {
+        flex: 0 0 auto;
+        min-height: calc(100vh - 58px) !important;
+        padding: clamp(1rem, 4vw, 1.6rem) clamp(1rem, 4vw, 1.5rem) !important;
+    }
+
+    .btr-signal-field {
+        top: 0.25rem;
+        right: -26vw;
+        width: 84vw;
+        opacity: 0.32;
+    }
+
+    .two-sides-bridge-signal {
+        top: 55%;
+        width: 80vw;
+        opacity: 0.38;
+    }
+}
+
+/* BigTextReveal — single-column on tablet/phone. Moved out of an inline
+   <style> tag for cleaner CSS auditing. */
+@media (max-width: 860px) {
+    .btr-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .landing-snap-label > div {
+        padding: 0.8rem 1rem !important;
+    }
+
+    .landing-snap-panel--final footer {
+        display: none;
+    }
+
+    .landing-page-shell::before {
+        opacity: 0.42;
+    }
+
+    .landing-cinema-section::before,
+    .landing-cinema-section::after {
+        opacity: 0.32;
+    }
+
+    .btr-signal-field {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.landing-snap-active {
+        scroll-snap-type: none;
+        scroll-behavior: auto;
+    }
+
+    .btr-ecg-main,
+    .two-sides-bridge-pulse {
+        animation: none !important;
+    }
+}
+
+/* ==========================================================================
+   FinalCTA mouse spotlight (apex landing pass)
+   --------------------------------------------------------------------------
+   The FinalCTA card already runs useTilt which writes --mouse-x / --mouse-y
+   to the element on hover (and adds .is-tilting). We layer a soft radial
+   highlight at those coordinates so the cursor "lights" the card under it.
+   Localised to the FinalCTA only via .landing-cta-spotlight so dashboard
+   premium cards stay untouched.
+   ========================================================================== */
+.landing-cta-spotlight::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+        260px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(34, 211, 102, 0.22),
+        rgba(34, 211, 102, 0.08) 40%,
+        transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    mix-blend-mode: screen;
+    z-index: 1;
+}
+.landing-cta-spotlight.is-tilting::after {
+    opacity: 1;
+}
+@media (hover: none), (prefers-reduced-motion: reduce) {
+    .landing-cta-spotlight::after { display: none; }
+}
+
+/* ==========================================================================
+   TwoSides bridge bidirectional pulse (apex landing pass)
+   --------------------------------------------------------------------------
+   The center bridge between the Engineer / Clinician panes is currently a
+   static gradient line. Animate it as a dual-direction sweep (engineer →
+   clinician, then clinician → engineer) so the bridge reads as live data
+   flow connecting the two sides.
+   ========================================================================== */
+.two-sides-bridge-line {
+    position: relative;
+    overflow: hidden;
+}
+.two-sides-bridge-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -30%;
+    height: 100%;
+    width: 30%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(34, 211, 102, 0.85) 50%,
+        transparent 100%
+    );
+    filter: drop-shadow(0 0 6px rgba(34, 211, 102, 0.6));
+    animation: two-sides-bridge-sweep 4.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+    pointer-events: none;
+}
+@keyframes two-sides-bridge-sweep {
+    0%   { left: -30%;  opacity: 0; }
+    18%  { opacity: 0.95; }
+    50%  { left: 100%; opacity: 0.95; }
+    52%  { left: 100%; opacity: 0; }   /* instant reset, off-stage */
+    54%  { left: 100%; opacity: 0.95; transform: scaleX(-1); }
+    86%  { left: -30%; opacity: 0.95; transform: scaleX(-1); }
+    100% { left: -30%; opacity: 0;    transform: scaleX(-1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .two-sides-bridge-line::after { animation: none; opacity: 0; }
+}
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES
+   --------------------------------------------------------------------------
+   Cinematic stage backplate (.landing-page-shell, ::before grid wash) stays
+   dark — that's the dark canvas the cinematic content sits on. Card-like
+   surfaces that float above the page (BTR shifts panel) shift to light.
+   The bridge / ECG signal field / lens streak elements are decorative
+   cinematic glow — keep their hue but soften.
+   ========================================================================== */
+
+/* --- BigTextReveal "shifts" panel: a UI surface, lift it onto white --- */
+:root[data-theme="light"] .btr-section .btr-shifts {
+    background:
+        linear-gradient(115deg, rgba(34, 211, 102, 0.07), transparent 34%, rgba(34, 211, 238, 0.05) 100%),
+        rgba(255, 255, 255, 0.92);
+    border-color: rgba(15, 18, 22, 0.10);
+    box-shadow: 0 8px 24px -12px rgba(15, 18, 22, 0.12);
+}
+
+/* --- BTR signal field: cinematic decoration on the page; soften, don't whitewash --- */
+:root[data-theme="light"] .btr-signal-field {
+    opacity: 0.42;
+    mix-blend-mode: multiply;
+}
+:root[data-theme="light"] .btr-grid-lines line {
+    stroke: rgba(34, 211, 102, 0.18);
+}
+:root[data-theme="light"] .btr-ecg-ghost {
+    stroke: rgba(34, 211, 102, 0.18);
+}
+
+/* --- Page-shell ambient grid wash: tone down on light backgrounds --- */
+:root[data-theme="light"] .landing-page-shell::before {
+    background:
+        linear-gradient(90deg, transparent 0 14%, rgba(34, 211, 102, 0.04) 30%, transparent 48%, rgba(34, 211, 238, 0.04) 72%, transparent 100%),
+        repeating-linear-gradient(90deg, rgba(15, 18, 22, 0.04) 0 1px, transparent 1px 104px);
+    opacity: 0.55;
+}
+
+/* --- Cinema section ambient overlays: keep brand glow, drop alpha --- */
+:root[data-theme="light"] .landing-cinema-section::before {
+    opacity: 0.38;
+}
+:root[data-theme="light"] .landing-cinema-section::after {
+    opacity: 0.42;
+}
+
+/* --- Two-sides bridge: keep brand-colored bridge, lower glow --- */
+:root[data-theme="light"] .two-sides-bridge-signal {
+    opacity: 0.55;
+}

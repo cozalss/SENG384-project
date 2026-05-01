@@ -25,8 +25,13 @@ export default defineConfig([
     rules: {
       // Uppercase + `motion` (framer-motion is always used via JSX member
       // expressions like <motion.div />, which base no-unused-vars cannot track
-      // without eslint-plugin-react's react/jsx-uses-vars).
-      'no-unused-vars': ['error', { varsIgnorePattern: '^(motion|[A-Z_])' }],
+      // without eslint-plugin-react's react/jsx-uses-vars). The same applies
+      // to destructured parameter renames like `({ icon: Icon })` where Icon
+      // is consumed solely as a JSX tag — flag args under the same pattern.
+      'no-unused-vars': ['error', {
+        varsIgnorePattern: '^(motion|[A-Z_])',
+        argsIgnorePattern: '^(motion|[A-Z_])',
+      }],
     },
   },
 ])

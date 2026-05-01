@@ -1,0 +1,261 @@
+/* =====================================================================
+   Premium card system
+   ---------------------------------------------------------------------
+   A drop-in visual upgrade for any card / tile / panel. Combines four
+   layered effects on top of whatever the host element already renders:
+
+     1. Cursor-following radial spotlight
+        Tracks `--mouse-x` / `--mouse-y` (set per pointermove by the
+        useTilt hook in src/hooks/useInteractiveFX.js). No JS rerender.
+
+     2. Conic-gradient halo border
+        A faint rotating gradient bleeds through `::after` so hovered
+        cards feel "energized" without overpowering the base card.
+
+     3. Diagonal shine sweep
+        On enter, a translucent band slides across the surface once.
+        Suppressed on subsequent moves so the effect doesn't loop.
+
+     4. 3D tilt + lift
+        The hook handles the transform; we add the matching shadow and
+        a soft glow that scales with the tilt depth.
+
+   To opt in, add `className="premium-card"` to the element that owns
+   the spread of useTilt() handlers. Layer modifiers like
+   `premium-card--soft` or `premium-card--strong` to dial intensity.
+   ===================================================================== */
+
+.premium-card {
+    /* Coordinate system for the cursor-driven gradients. The hook writes
+       these on every move; default keeps the spotlight off-screen so the
+       initial render is clean. */
+    --mouse-x: -200px;
+    --mouse-y: -200px;
+    /* Brand-aligned default glow — green, matching the site's primary
+       accent. Cards opt out by overriding --pc-glow inline. */
+    --pc-glow: rgba(34, 211, 102, 0.45);
+    --pc-glow-soft: rgba(34, 211, 102, 0.18);
+    --pc-shine: rgba(255, 255, 255, 0.12);
+    --pc-radius: 20px;
+
+    position: relative;
+    isolation: isolate;
+    transform-style: preserve-3d;
+    /* Only transition shadow + border by default. We deliberately leave
+       `transform` out so framer-motion's enter/exit springs aren't double-
+       interpolated by CSS — that would visibly stutter modal scale-ins.
+       The transform transition is opted in on .is-tilting (mouse-leave
+       reset) where we do want a smooth glide back to identity. */
+    transition:
+        box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.3s ease;
+}
+
+.premium-card.is-tilting,
+.premium-card:hover {
+    transition:
+        transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.3s ease;
+}
+
+/* Spotlight — drawn on a pseudo so it never affects layout or hit-testing.
+   Inherits the host's border-radius via `inherit`. The radial gradient is
+   anchored to the live cursor position and fades to nothing well before the
+   card edge so it reads as an internal highlight, not a wash. */
+.premium-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: radial-gradient(
+        650px circle at var(--mouse-x) var(--mouse-y),
+        var(--pc-glow-soft),
+        transparent 40%
+    );
+    opacity: 0;
+    transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 1;
+    mix-blend-mode: screen;
+}
+
+/* Diagonal shine — a single sweep on hover-enter. Uses transform instead
+   of a background-position animation so it's compositor-friendly. */
+.premium-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: linear-gradient(
+        110deg,
+        transparent 30%,
+        var(--pc-shine) 50%,
+        transparent 70%
+    );
+    transform: translateX(-130%);
+    opacity: 0;
+    z-index: 2;
+    transition: opacity 0.2s ease;
+}
+
+/* Hover state — light up spotlight + shine + lift the base shadow.
+   The transform lift is only used when the host hasn't opted into useTilt
+   (which writes its own transform). When useTilt is active the
+   `.is-tilting` class wins and we skip the lift here to avoid clobbering
+   the hook's matrix. */
+.premium-card:hover::before { opacity: 1; }
+
+.premium-card:hover::after {
+    opacity: 1;
+    animation: pcShineSweep 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes pcShineSweep {
+    0%   { transform: translateX(-130%); opacity: 0.0; }
+    10%  { opacity: 0.95; }
+    90%  { opacity: 0.95; }
+    100% { transform: translateX(130%); opacity: 0.0; }
+}
+
+/* When useTilt is engaged, deepen the shadow so the lift reads as 3D
+   instead of a flat scale. `is-tilting` is set in the hook on enter. */
+.premium-card.is-tilting {
+    box-shadow:
+        0 22px 60px -18px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 0 36px -6px var(--pc-glow);
+}
+
+/* Animated halo border — a thin conic gradient that rotates lazily,
+   masked to render only along the edge. Disabled by default; opt in
+   per-card with `.premium-card--halo`. */
+.premium-card--halo {
+    background-clip: padding-box;
+}
+.premium-card--halo > .premium-card-halo,
+.premium-card--halo::before {
+    /* leave ::before for spotlight */
+}
+.premium-card-halo {
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    /* Brand-aligned conic halo — green primary fading through cyan/teal
+       supporting tones. Matches the unified accent system. */
+    background: conic-gradient(
+        from var(--pc-halo-angle, 0deg),
+        rgba(34, 211, 102, 0.0) 0deg,
+        rgba(34, 211, 102, 0.6) 90deg,
+        rgba(20, 184, 166, 0.55) 180deg,
+        rgba(34, 211, 238, 0.45) 270deg,
+        rgba(34, 211, 102, 0.0) 360deg
+    );
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    padding: 1px;
+    opacity: 0;
+    transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: pcHaloRotate 7s linear infinite;
+}
+.premium-card--halo:hover > .premium-card-halo { opacity: 1; }
+
+@keyframes pcHaloRotate {
+    to { --pc-halo-angle: 360deg; }
+}
+@property --pc-halo-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+}
+
+/* Soft variant — gentler spotlight, no shine sweep. Use on small tiles
+   (stat cards, list rows) where a full shine reads as too aggressive. */
+.premium-card--soft::before {
+    background: radial-gradient(
+        420px circle at var(--mouse-x) var(--mouse-y),
+        var(--pc-glow-soft),
+        transparent 45%
+    );
+}
+.premium-card--soft::after { display: none; }
+
+/* Strong variant — bigger spotlight + always-on subtle outline glow.
+   Reserved for hero-tier panels (final CTA, primary modals). */
+.premium-card--strong {
+    box-shadow:
+        0 14px 40px -16px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 0 0 0 var(--pc-glow);
+}
+.premium-card--strong::before {
+    background: radial-gradient(
+        820px circle at var(--mouse-x) var(--mouse-y),
+        var(--pc-glow),
+        transparent 38%
+    );
+}
+.premium-card--strong:hover {
+    box-shadow:
+        0 30px 80px -22px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 0 60px -8px var(--pc-glow);
+}
+
+/* Reduced motion — disable shine sweep and tilt-driven shadow swings. */
+@media (prefers-reduced-motion: reduce) {
+    .premium-card { transition: box-shadow 0.2s ease; }
+    .premium-card::before,
+    .premium-card::after,
+    .premium-card-halo { animation: none !important; }
+    .premium-card:hover::after { opacity: 0; }
+}
+
+/* Touch devices have no real hover — keep cards static instead of leaving
+   spotlights stuck where the last tap landed. */
+@media (hover: none) {
+    .premium-card::before,
+    .premium-card::after,
+    .premium-card-halo { display: none; }
+}
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES
+   --------------------------------------------------------------------------
+   The premium-card system stays brand-consistent — green halo + spotlight —
+   but the shine band shifts to a faint dark wash (instead of white-on-dark)
+   and the tilt/strong shadows move to warm slate alphas to match elevation
+   on the light canvas. Brand glow tokens (--pc-glow*) stay green.
+   ========================================================================== */
+
+:root[data-theme="light"] .premium-card {
+    --pc-shine: rgba(15, 18, 22, 0.06);
+}
+
+/* ---- Tilt elevation: warm slate shadow instead of pure black ---- */
+:root[data-theme="light"] .premium-card.is-tilting {
+    box-shadow:
+        0 22px 50px -18px rgba(20, 30, 40, 0.18),
+        0 0 0 1px rgba(15, 18, 22, 0.06),
+        0 0 36px -6px var(--pc-glow);
+}
+
+/* ---- Strong variant: lighter base shadow + matching hover lift ---- */
+:root[data-theme="light"] .premium-card--strong {
+    box-shadow:
+        0 14px 36px -16px rgba(20, 30, 40, 0.14),
+        0 0 0 1px rgba(15, 18, 22, 0.06),
+        0 0 0 0 var(--pc-glow);
+}
+:root[data-theme="light"] .premium-card--strong:hover {
+    box-shadow:
+        0 28px 70px -22px rgba(20, 30, 40, 0.20),
+        0 0 0 1px rgba(15, 18, 22, 0.10),
+        0 0 60px -8px var(--pc-glow);
+}

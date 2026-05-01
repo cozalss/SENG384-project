@@ -19,10 +19,10 @@ const ROW_A = [
 ];
 
 const ROW_B = [
-    'Cross-disciplinary', 'NDA-gated', 'GDPR-compliant', '.edu institutions',
-    'Pan-EU collaboration', 'Bedside problems', 'Working prototypes',
-    'Pilot partnerships', 'Co-development', 'Joint research',
-    'IP-safe discovery', 'Structured first contact',
+    'Cross-disciplinary', 'NDA-gated details', 'Profile data controls', '.edu registration',
+    'Dashboard filters', 'Clinical problem posts', 'Engineering proposals',
+    'Meeting requests', 'Real-time chat', 'Admin review',
+    'Role-based discovery', 'Structured collaboration flow',
 ];
 
 const Pill = ({ children, accent }) => (

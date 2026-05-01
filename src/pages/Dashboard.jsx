@@ -4,13 +4,14 @@ import {
     Search, Plus, MapPin, Calendar, Filter, Sparkles, ArrowUpRight,
     Bookmark, BookmarkCheck, LayoutDashboard, Brain, HeartPulse,
     Stethoscope, FlaskConical, Dna, Microscope, Cpu, Activity,
-    Layers, MessageSquare, TrendingUp, FileText, Flame, Clock, Users
+    Layers, MessageSquare, TrendingUp, FileText, Flame, Clock, Users, X
 } from 'lucide-react';
 import AnimatedCounter from '../components/AnimatedCounter';
  
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { useAnimReady } from '../hooks/useAnimReady';
 import { useToast } from '../hooks/useToast';
+import { useTilt } from '../hooks/useInteractiveFX';
 import SkeletonCard from '../components/SkeletonCard';
 import PxSelect from '../components/PxSelect';
 
@@ -40,19 +41,206 @@ const domainAccent = (domain = '') => {
     if (d.includes('bio') || d.includes('genom') || d.includes('dna'))
         return { ink: '#6ee7b7', wash: 'rgba(52, 211, 153, 0.14)', glow: 'rgba(52, 211, 153, 0.18)' };
     if (d.includes('clinic') || d.includes('research') || d.includes('pharm'))
-        return { ink: '#fcd34d', wash: 'rgba(245, 158, 11, 0.14)', glow: 'rgba(245, 158, 11, 0.18)' };
+        return { ink: 'hsl(155 70% 70%)', wash: 'rgba(52, 211, 153, 0.14)', glow: 'rgba(52, 211, 153, 0.18)' };
     if (d.includes('device') || d.includes('robot') || d.includes('iot'))
         return { ink: '#7dd3fc', wash: 'rgba(56, 189, 248, 0.14)', glow: 'rgba(56, 189, 248, 0.18)' };
     if (d.includes('diagn') || d.includes('ai') || d.includes('ml'))
-        return { ink: '#f5c48a', wash: 'rgba(249, 168, 96, 0.14)', glow: 'rgba(249, 168, 96, 0.18)' };
-    // Default — aurora amber
-    return { ink: '#f5c48a', wash: 'rgba(249, 168, 96, 0.12)', glow: 'rgba(249, 168, 96, 0.16)' };
+        return { ink: 'var(--brand-soft-text)', wash: 'rgba(34, 211, 102, 0.14)', glow: 'rgba(34, 211, 102, 0.18)' };
+    // Default — brand green
+    return { ink: 'var(--brand-soft-text)', wash: 'rgba(34, 211, 102, 0.12)', glow: 'rgba(34, 211, 102, 0.16)' };
 };
 
 const MS_PER_DAY = 86400000;
 const INITIAL_DASHBOARD_NOW = Date.now();
 
-const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
+/* Feed card — extracted so each card can own its own useTilt handlers.
+   The Link itself wears the premium-card class and a halo overlay so the
+   spotlight and shine sweep land directly on the card surface (the outer
+   motion wrapper exists only for layout/exit animation). */
+const DashFeedCard = ({
+    animReady, index, post, status, isSaved, accent,
+    isLocalMatch, matchExplanation, domainIconNode, onToggleBookmark,
+}) => {
+    const tilt = useTilt({ max: 5, scale: 1.012 });
+    return (
+        <motion.div
+            layout
+            initial={animReady ? { opacity: 0, y: 20 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.45, delay: Math.min(index * 0.04, 0.3), ease: [0.22, 1, 0.36, 1] }}
+        >
+            <div style={{ position: 'relative' }}>
+                <Link
+                    {...tilt}
+                    to={`/post/${post.id}`}
+                    className="editorial-card dash-feed-card premium-card premium-card--halo"
+                    style={{
+                        '--card-accent-ink': accent.ink,
+                        '--card-accent-wash': accent.wash,
+                        '--card-accent-glow': accent.glow,
+                        '--pc-glow': accent.glow,
+                        '--pc-glow-soft': accent.wash,
+                    }}
+                >
+                    <span className="premium-card-halo" aria-hidden="true" />
+                    <div className="card-visual" style={{
+                        background: `radial-gradient(ellipse 70% 90% at 50% 50%, ${accent.glow}, transparent 70%), linear-gradient(135deg, rgba(26, 24, 30, 0.7), rgba(10, 10, 14, 0.5))`,
+                    }}>
+                        <div className="visual-glow" style={{ background: `radial-gradient(circle at 30% 30%, ${accent.glow}, transparent 60%)` }} />
+                        <div style={{ position: 'relative', zIndex: 1, color: accent.ink }}>
+                            {domainIconNode}
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', minWidth: 0, position: 'relative', zIndex: 3 }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px', alignItems: 'center' }}>
+                            <span className="pill pill-neon">
+                                {post.authorRole === 'Engineer' ? 'Engineer' : 'Healthcare Professional'}
+                            </span>
+                            <span className="pill pill-dim" style={{ textTransform: 'uppercase' }}>
+                                {post.domain}
+                            </span>
+                            <span className={`pill ${status.cls}`}>{status.label}</span>
+                            {isLocalMatch && (
+                                <span className="pill pill-cyan" style={{ animation: 'statusPulse 2.4s infinite' }}>
+                                    <MapPin size={10} /> Local
+                                </span>
+                            )}
+                        </div>
+
+                        <h2
+                            className="card-title"
+                            style={{
+                                fontFamily: 'var(--font-heading)',
+                                fontSize: 'clamp(22px, 2.2vw, 28px)',
+                                fontWeight: 600,
+                                letterSpacing: '-0.03em',
+                                lineHeight: '1.12',
+                                color: 'var(--text-main)',
+                                marginTop: '2px'
+                            }}
+                        >
+                            {post.title}
+                        </h2>
+
+                        <p style={{
+                            color: 'var(--text-muted)', fontSize: '14px',
+                            lineHeight: '1.7', letterSpacing: '-0.005em',
+                            display: '-webkit-box', WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                            maxWidth: '640px'
+                        }}>
+                            {post.explanation}
+                        </p>
+
+                        {matchExplanation && (
+                            <div style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                color: 'var(--brand-soft-text)', fontSize: '11.5px', fontWeight: '600',
+                                letterSpacing: '0.04em',
+                                textTransform: 'uppercase',
+                                alignSelf: 'flex-start'
+                            }}>
+                                <Sparkles size={12} /> Match · {matchExplanation}
+                            </div>
+                        )}
+
+                        <div style={{
+                            display: 'flex', flexWrap: 'wrap', gap: '20px',
+                            alignItems: 'center', justifyContent: 'space-between',
+                            marginTop: '8px',
+                            paddingTop: '18px',
+                            borderTop: '1px solid var(--border)'
+                        }}>
+                            <div className="expertise-badge">
+                                <span className="expertise-badge-label">Required Expertise</span>
+                                <span className="expertise-badge-role">
+                                    <MessageSquare size={11} />
+                                    {post.authorRole === 'Engineer' ? 'Clinical / Healthcare Expert' : 'Engineering / Dev Expert'}
+                                </span>
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div style={{
+                                    width: '34px', height: '34px', borderRadius: '11px',
+                                    background: `linear-gradient(135deg, ${accent.ink}, color-mix(in srgb, ${accent.ink} 70%, transparent))`,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontWeight: '700', fontSize: '13px', color: 'var(--fg-on-accent)',
+                                    flexShrink: 0,
+                                    boxShadow: `0 6px 16px -4px ${accent.glow}, inset 0 1px 0 rgba(255,255,255,0.2)`
+                                }}>
+                                    {(post.authorName || '?').charAt(0)}
+                                </div>
+                                <div style={{ minWidth: 0 }}>
+                                    <div style={{ fontSize: '13.5px', fontWeight: '600', color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+                                        {post.authorName}
+                                    </div>
+                                    <div style={{
+                                        fontSize: '11px', color: 'var(--text-subtle)',
+                                        display: 'flex', alignItems: 'center', gap: '4px',
+                                        letterSpacing: '0.02em'
+                                    }}>
+                                        <Calendar size={10} /> {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{
+                        display: 'flex', alignItems: 'center',
+                        alignSelf: 'stretch', paddingLeft: '8px',
+                        borderLeft: '1px dashed var(--border)',
+                        position: 'relative', zIndex: 3
+                    }} className="cta-slot">
+                        <span className="card-cta">
+                            Explore <ArrowUpRight size={14} strokeWidth={2.5} />
+                        </span>
+                    </div>
+                </Link>
+
+                <button
+                    onClick={onToggleBookmark}
+                    className={`bookmark-float ${isSaved ? 'saved' : ''}`}
+                    aria-label={isSaved ? 'Remove bookmark' : 'Save project'}
+                    style={{
+                        position: 'absolute',
+                        top: '24px',
+                        right: '24px',
+                        zIndex: 10
+                    }}
+                >
+                    {isSaved ? <BookmarkCheck size={17} fill="currentColor" /> : <Bookmark size={17} />}
+                </button>
+            </div>
+        </motion.div>
+    );
+};
+
+/* Stat tile — its own component so each instance gets its own useTilt
+   handler set (hooks can't be looped in render). The premium-card class
+   layers spotlight + soft glow on top of the existing tone-* style. */
+const DashStatCard = ({ icon: Icon, label, value, tone, index }) => {
+    const tilt = useTilt({ max: 6, scale: 1.02 });
+    return (
+        <motion.div
+            {...tilt}
+            className={`dash-stat-card tone-${tone} premium-card premium-card--soft`}
+            transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+        >
+            <div className="dash-stat-icon"><Icon size={16} strokeWidth={2} /></div>
+            <div className="dash-stat-body">
+                <span className="dash-stat-value">
+                    <AnimatedCounter value={value} duration={850 + index * 100} />
+                </span>
+                <span className="dash-stat-label">{label}</span>
+            </div>
+        </motion.div>
+    );
+};
+
+const Dashboard = ({ posts, user, updateUser, toggleSavedPost, postsLoading = false }) => {
     const animReady = useAnimReady();
     const toast = useToast();
     const location = useLocation();
@@ -75,18 +263,27 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
 
     const savedPostIds = useMemo(() => user?.savedPosts || [], [user?.savedPosts]);
 
-    const toggleBookmark = (e, postId) => {
+    const toggleBookmark = async (e, postId) => {
         e.preventDefault();
         e.stopPropagation();
-        const currentSaved = [...savedPostIds];
-        const index = currentSaved.indexOf(postId);
-        const wasSaved = index > -1;
-        if (wasSaved) currentSaved.splice(index, 1);
-        else currentSaved.push(postId);
-        updateUser({ savedPosts: currentSaved });
-        toast.success(wasSaved ? 'Removed from saved' : 'Saved to bookmarks', {
-            title: wasSaved ? 'Unsaved' : 'Saved'
-        });
+        const wasSaved = savedPostIds.includes(postId);
+        try {
+            if (toggleSavedPost) {
+                await toggleSavedPost(postId);
+            } else {
+                // Legacy fallback if the prop isn't wired (older route configs).
+                const updatedSaved = wasSaved
+                    ? savedPostIds.filter(id => id !== postId)
+                    : [...savedPostIds, postId];
+                updateUser({ savedPosts: updatedSaved });
+            }
+            toast.success(wasSaved ? 'Removed from saved' : 'Saved to bookmarks', {
+                title: wasSaved ? 'Unsaved' : 'Saved'
+            });
+        } catch (err) {
+            console.error('toggleBookmark failed:', err);
+            toast.error('Could not update your bookmarks. Please retry.', { title: 'Bookmark failed' });
+        }
     };
 
     const allDomains = useMemo(() => ['All', ...new Set(posts.map(p => p.domain))], [posts]);
@@ -98,12 +295,17 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
     const filteredPosts = useMemo(() => {
         return posts.filter(post => {
             if (post.status === 'DELETED') return false;
+            // Drafts are private to the author — they must never leak into the
+            // public feed even when the user picks "All" from the status filter.
+            if (post.status === 'Draft' && post.authorId !== user?.id) return false;
             if (filterStatus !== 'All' && post.status !== filterStatus) return false;
-            if (searchTerm &&
-                !post.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-                !post.explanation.toLowerCase().includes(searchTerm.toLowerCase()) &&
-                !post.domain.toLowerCase().includes(searchTerm.toLowerCase()) &&
-                !(post.expertiseNeeded || '').toLowerCase().includes(searchTerm.toLowerCase())) return false;
+            if (searchTerm) {
+                const q = searchTerm.toLowerCase();
+                if (!(post.title || '').toLowerCase().includes(q) &&
+                    !(post.explanation || '').toLowerCase().includes(q) &&
+                    !(post.domain || '').toLowerCase().includes(q) &&
+                    !(post.expertiseNeeded || '').toLowerCase().includes(q)) return false;
+            }
             if (filterDomain !== 'All' && post.domain !== filterDomain) return false;
             if (filterStage !== 'All' && post.projectStage !== filterStage) return false;
             if (filterCountry !== 'All' && post.country !== filterCountry) return false;
@@ -116,23 +318,43 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
     // ---- Dashboard stats ----
     // Premium dashboards show a pulse at a glance. These four numbers answer
     // "what's happening right now?" without making the user read every card.
+    // The "pending meetings" tile previously read `p.meetings` from the parent
+    // doc, but meetings live in a /posts/{id}/meetings subcollection now —
+    // the parent only carries the denormalized counter `meetingCount`. We
+    // approximate "engagement" with that counter so the tile is meaningful
+    // again without subscribing to N subcollections from the feed view.
+    //
+    // "Live" excludes DELETED, Draft, and Expired so every counter answers
+    // "things you can act on right now". The previous shape only excluded
+    // DELETED, which made "New this week" count Drafts that the feed itself
+    // hides — leading to the disconnect of "1 new" with zero new visible.
     const stats = useMemo(() => {
-        const livePosts = posts.filter(p => p.status !== 'DELETED');
+        const livePosts = posts.filter(p =>
+            p.status !== 'DELETED' && p.status !== 'Draft' && p.status !== 'Expired'
+        );
         const active = livePosts.filter(p => p.status === 'Active').length;
         const newThisWeek = livePosts.filter(p => {
             const created = new Date(p.createdAt).getTime();
-            return (now - created) < (7 * MS_PER_DAY);
+            return Number.isFinite(created) && (now - created) < (7 * MS_PER_DAY);
         }).length;
         const saved = savedPostIds.length;
-        const pendingMeetings = livePosts.filter(p => (p.meetings || []).some(m => m.status === 'pending')).length;
-        return { active, newThisWeek, saved, pendingMeetings };
+        const engagedActive = livePosts.filter(p =>
+            p.status === 'Active' && ((p.meetingCount || 0) > 0 || (p.interestCount || 0) > 0)
+        ).length;
+        return { active, newThisWeek, saved, engagedActive };
     }, [posts, savedPostIds, now]);
 
-    // ---- Trending domains — top 3 by active post count ----
+    // ---- Trending domains — top 4 by ACTIVE post count ----
+    // The trending sidebar is a discovery affordance: clicking a row should
+    // land the user on actual posts. Counting CLOSED/Meeting Scheduled posts
+    // would inflate the numbers for projects that are no longer accepting
+    // collaborators, so we restrict to Active. (Drafts/Expired/Deleted were
+    // already excluded.)
     const trendingDomains = useMemo(() => {
         const counts = new Map();
         posts.forEach(p => {
-            if (p.status === 'DELETED' || p.status === 'Expired') return;
+            if (p.status !== 'Active') return;
+            if (!p.domain) return;
             counts.set(p.domain, (counts.get(p.domain) || 0) + 1);
         });
         return Array.from(counts.entries())
@@ -141,10 +363,28 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
             .map(([name, count]) => ({ name, count }));
     }, [posts]);
 
-    // ---- Recent activity — last 5 non-deleted posts ----
+    // Clicking a trending row sets the domain filter AND clears Status back to
+    // "All" so the user actually sees the matched projects (the default
+    // Status:Active is fine because trendingDomains itself is Active-only,
+    // but switching to All keeps the click promise true even if a domain's
+    // last Active post just flipped to Meeting Scheduled mid-session).
+    const onTrendingClick = (name) => {
+        if (filterDomain === name) {
+            setFilterDomain('All');
+        } else {
+            setFilterDomain(name);
+            setFilterStatus('All');
+        }
+    };
+
+    // ---- Recent activity — last 5 user-visible posts ----
+    // Mirrors the feed's exclusion rules so what the sidebar previews matches
+    // what the user can actually open.
     const recentActivity = useMemo(() => {
         return [...posts]
-            .filter(p => p.status !== 'DELETED')
+            .filter(p =>
+                p.status !== 'DELETED' && p.status !== 'Draft' && p.status !== 'Expired'
+            )
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice(0, 5);
     }, [posts]);
@@ -153,10 +393,59 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
         return user?.city && post.city && user.city.toLowerCase() === post.city.toLowerCase();
     };
 
+    // Naive keyword tokenizer that strips punctuation, drops short fillers, and
+    // returns a Set so overlap is O(min(a, b)). Brief 4.3 explicitly asks for
+    // "shared expertise tags" surfaced in the match explanation, but the data
+    // model carries plain free-text expertise fields rather than discrete tags
+    // — so we tokenize on the fly. Tokens shorter than 4 chars are skipped to
+    // avoid noise like "and", "for", "the".
+    const STOP_WORDS = new Set([
+        'with', 'that', 'this', 'from', 'into', 'have', 'been', 'their', 'will',
+        'would', 'could', 'should', 'about', 'using', 'work', 'team', 'need',
+        'looking', 'experience', 'expertise', 'skills', 'knowledge', 'background',
+    ]);
+    const tokenize = (text = '') => {
+        const set = new Set();
+        text.toLowerCase()
+            .replace(/[^a-z0-9\s+#.-]/g, ' ')
+            .split(/\s+/)
+            .forEach(tok => {
+                const t = tok.replace(/^[.+#-]+|[.+#-]+$/g, '');
+                if (t.length >= 4 && !STOP_WORDS.has(t)) set.add(t);
+            });
+        return set;
+    };
+
+    // Shared tokens between the post's "expertise needed" and what the user
+    // wrote in their own bio/profile. We don't have a structured profile bio,
+    // so we approximate the viewer's profile by combining domain interests
+    // they've engaged with. As a fallback we still highlight cross-role +
+    // city matches even when there is no token overlap.
+    const sharedExpertiseTags = (post) => {
+        if (!post.expertiseNeeded) return [];
+        const postTokens = tokenize(post.expertiseNeeded);
+        // Approximate user expertise from their own posts (their authored work
+        // is the strongest signal we have without a formal profile bio field).
+        const userText = (posts || [])
+            .filter(p => p.authorId === user?.id)
+            .map(p => `${p.domain} ${p.expertiseNeeded || ''} ${p.explanation || ''}`)
+            .join(' ');
+        if (!userText) return [];
+        const userTokens = tokenize(userText);
+        const shared = [];
+        for (const t of postTokens) {
+            if (userTokens.has(t)) shared.push(t);
+            if (shared.length >= 3) break;
+        }
+        return shared;
+    };
+
     const getMatchExplanation = (post) => {
         const reasons = [];
         if (isLocalMatch(post)) reasons.push('Same city');
         if (post.authorRole !== user?.role) reasons.push('Complementary role');
+        const shared = sharedExpertiseTags(post);
+        if (shared.length > 0) reasons.push(`Shared: ${shared.join(', ')}`);
         return reasons.join(' • ');
     };
 
@@ -234,24 +523,11 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                     { icon: Flame, label: 'Active', value: stats.active, tone: 'amber' },
                     { icon: Sparkles, label: 'New this week', value: stats.newThisWeek, tone: 'cyan' },
                     { icon: Bookmark, label: 'Saved', value: stats.saved, tone: 'emerald' },
-                    { icon: Clock, label: 'Pending meetings', value: stats.pendingMeetings, tone: 'violet' },
+                    { icon: Clock, label: 'In conversation', value: stats.engagedActive, tone: 'violet' },
                 ].map((s, i) => {
                     const Icon = s.icon;
                     return (
-                        <motion.div
-                            key={s.label}
-                            className={`dash-stat-card tone-${s.tone}`}
-                            whileHover={{ y: -2 }}
-                            transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
-                        >
-                            <div className="dash-stat-icon"><Icon size={16} strokeWidth={2} /></div>
-                            <div className="dash-stat-body">
-                                <span className="dash-stat-value">
-                                    <AnimatedCounter value={s.value} duration={850 + i * 100} />
-                                </span>
-                                <span className="dash-stat-label">{s.label}</span>
-                            </div>
-                        </motion.div>
+                        <DashStatCard key={s.label} icon={Icon} label={s.label} value={s.value} tone={s.tone} index={i} />
                     );
                 })}
             </motion.div>
@@ -293,7 +569,8 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                         <motion.span
                                             layoutId="segmented-pill"
                                             className="dash-segmented-fill"
-                                            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                                            initial={false}
+                                            transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.8 }}
                                         />
                                     )}
                                     {tab.icon} {tab.label}
@@ -308,7 +585,7 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                     </LayoutGroup>
                 </div>
 
-                <div className="filter-row" style={{ marginTop: 12 }}>
+                <div className="filter-row" style={{ marginTop: 12, alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
                     {[
                         { id: 'domain', value: filterDomain, setter: setFilterDomain, opts: allDomains, label: 'Domain' },
                         { id: 'stage', value: filterStage, setter: setFilterStage, opts: stages, label: 'Stage' },
@@ -327,6 +604,24 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                             options={f.opts.map(o => ({ value: o, label: o }))}
                         />
                     ))}
+                    {(searchTerm || filterDomain !== 'All' || filterStage !== 'All' || filterCountry !== 'All' || filterCity !== 'All' || filterStatus !== 'Active') && (
+                        <button
+                            type="button"
+                            id="clear-filters-btn"
+                            onClick={() => {
+                                setSearchTerm('');
+                                setFilterDomain('All');
+                                setFilterStage('All');
+                                setFilterCountry('All');
+                                setFilterCity('All');
+                                setFilterStatus('Active');
+                            }}
+                            className="px-btn ghost sm"
+                            style={{ marginLeft: 'auto' }}
+                        >
+                            <X size={13} /> Clear filters
+                        </button>
+                    )}
                 </div>
             </motion.div>
 
@@ -358,20 +653,20 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                 overflow: 'hidden',
                             }}
                         >
-                            {/* Aurora glow behind the empty — echoes the amber+cyan system */}
+                            {/* Brand-green ambient glow */}
                             <div aria-hidden="true" style={{
                                 position: 'absolute', inset: 0, pointerEvents: 'none',
-                                background: 'radial-gradient(ellipse 60% 50% at 30% 30%, rgba(249, 168, 96, 0.09), transparent 60%), radial-gradient(ellipse 55% 45% at 80% 80%, rgba(34, 211, 238, 0.07), transparent 65%)',
+                                background: 'radial-gradient(ellipse 60% 50% at 30% 30%, rgba(34, 211, 102, 0.10), transparent 60%), radial-gradient(ellipse 55% 45% at 80% 80%, rgba(34, 211, 238, 0.06), transparent 65%)',
                             }} />
                             <div style={{
                                 position: 'relative',
                                 width: 72, height: 72, margin: '0 auto 22px',
                                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                                 borderRadius: 20,
-                                background: 'linear-gradient(135deg, rgba(249, 168, 96, 0.14), rgba(34, 211, 238, 0.1))',
-                                border: '1px solid rgba(255, 255, 255, 0.08)',
-                                color: '#f5c48a',
-                                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 12px 32px -8px rgba(249, 168, 96, 0.25)',
+                                background: 'linear-gradient(135deg, rgba(34, 211, 102, 0.16), rgba(34, 211, 238, 0.10))',
+                                border: '1px solid rgba(34, 211, 102, 0.18)',
+                                color: 'var(--brand-soft-text)',
+                                boxShadow: 'var(--shadow-warm-sm)',
                             }}>
                                 <Sparkles size={30} strokeWidth={1.6} />
                             </div>
@@ -402,165 +697,19 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                             const isSaved = savedPostIds.includes(post.id);
                             const accent = domainAccent(post.domain);
                             return (
-                                <motion.div
+                                <DashFeedCard
                                     key={post.id}
-                                    layout
-                                    initial={animReady ? { opacity: 0, y: 20 } : false}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -16 }}
-                                    transition={{ duration: 0.45, delay: Math.min(index * 0.04, 0.3), ease: [0.22, 1, 0.36, 1] }}
-                                    whileHover={{ y: -3 }}
-                                >
-                                    <div style={{ position: 'relative' }}>
-                                        <Link
-                                            to={`/post/${post.id}`}
-                                            className="editorial-card dash-feed-card"
-                                            style={{
-                                                '--card-accent-ink': accent.ink,
-                                                '--card-accent-wash': accent.wash,
-                                                '--card-accent-glow': accent.glow,
-                                            }}
-                                        >
-                                            {/* VISUAL SLOT — domain-accented icon with halo */}
-                                            <div className="card-visual" style={{
-                                                background: `radial-gradient(ellipse 70% 90% at 50% 50%, ${accent.glow}, transparent 70%), linear-gradient(135deg, rgba(26, 24, 30, 0.7), rgba(10, 10, 14, 0.5))`,
-                                            }}>
-                                                <div className="visual-glow" style={{ background: `radial-gradient(circle at 30% 30%, ${accent.glow}, transparent 60%)` }} />
-                                                <div style={{ position: 'relative', zIndex: 1, color: accent.ink }}>
-                                                    {domainIcon(post.domain)}
-                                                </div>
-                                            </div>
-
-                                            {/* CONTENT SLOT */}
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', minWidth: 0 }}>
-                                                {/* Top: tag cluster (upper-right area of title block) */}
-                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px', alignItems: 'center' }}>
-                                                    <span className="pill pill-neon">
-                                                        {post.authorRole === 'Engineer' ? 'Engineer' : 'Healthcare Professional'}
-                                                    </span>
-                                                    <span className="pill pill-dim" style={{ textTransform: 'uppercase' }}>
-                                                        {post.domain}
-                                                    </span>
-                                                    <span className={`pill ${status.cls}`}>{status.label}</span>
-                                                    {isLocalMatch(post) && (
-                                                        <span className="pill pill-cyan" style={{ animation: 'statusPulse 2.4s infinite' }}>
-                                                            <MapPin size={10} /> Local
-                                                        </span>
-                                                    )}
-                                                </div>
-
-                                                {/* Editorial title */}
-                                                <h2
-                                                    className="card-title"
-                                                    style={{
-                                                        fontFamily: 'var(--font-heading)',
-                                                        fontSize: 'clamp(22px, 2.2vw, 28px)',
-                                                        // Premium display caps at 600 — 800 read as bold-template, not editorial.
-                                                        fontWeight: 600,
-                                                        letterSpacing: '-0.03em',
-                                                        lineHeight: '1.12',
-                                                        color: 'var(--text-main)',
-                                                        marginTop: '2px'
-                                                    }}
-                                                >
-                                                    {post.title}
-                                                </h2>
-
-                                                {/* Description */}
-                                                <p style={{
-                                                    color: 'var(--text-muted)', fontSize: '14px',
-                                                    lineHeight: '1.7', letterSpacing: '-0.005em',
-                                                    display: '-webkit-box', WebkitLineClamp: 2,
-                                                    WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                                                    maxWidth: '640px'
-                                                }}>
-                                                    {post.explanation}
-                                                </p>
-
-                                                {/* Match ribbon — only if relevant */}
-                                                {getMatchExplanation(post) && (
-                                                    <div style={{
-                                                        display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                                        color: '#f5c48a', fontSize: '11.5px', fontWeight: '600',
-                                                        letterSpacing: '0.04em',
-                                                        textTransform: 'uppercase',
-                                                        alignSelf: 'flex-start'
-                                                    }}>
-                                                        <Sparkles size={12} /> Match · {getMatchExplanation(post)}
-                                                    </div>
-                                                )}
-
-                                                {/* Required expertise + author row */}
-                                                <div style={{
-                                                    display: 'flex', flexWrap: 'wrap', gap: '20px',
-                                                    alignItems: 'center', justifyContent: 'space-between',
-                                                    marginTop: '8px',
-                                                    paddingTop: '18px',
-                                                    borderTop: '1px solid rgba(255,255,255,0.05)'
-                                                }}>
-                                                    <div className="expertise-badge">
-                                                        <span className="expertise-badge-label">Required Expertise</span>
-                                                        <span className="expertise-badge-role">
-                                                            <MessageSquare size={11} />
-                                                            {post.authorRole === 'Engineer' ? 'Clinical / Healthcare Expert' : 'Engineering / Dev Expert'}
-                                                        </span>
-                                                    </div>
-
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                        <div style={{
-                                                            width: '34px', height: '34px', borderRadius: '11px',
-                                                            background: `linear-gradient(135deg, ${accent.ink}, ${accent.ink}99)`,
-                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                            fontWeight: '700', fontSize: '13px', color: '#1a1012',
-                                                            flexShrink: 0,
-                                                            boxShadow: `0 6px 16px -4px ${accent.glow}, inset 0 1px 0 rgba(255,255,255,0.2)`
-                                                        }}>
-                                                            {post.authorName.charAt(0)}
-                                                        </div>
-                                                        <div style={{ minWidth: 0 }}>
-                                                            <div style={{ fontSize: '13.5px', fontWeight: '600', color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-                                                                {post.authorName}
-                                                            </div>
-                                                            <div style={{
-                                                                fontSize: '11px', color: 'var(--text-subtle)',
-                                                                display: 'flex', alignItems: 'center', gap: '4px',
-                                                                letterSpacing: '0.02em'
-                                                            }}>
-                                                                <Calendar size={10} /> {new Date(post.createdAt).toLocaleDateString()}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* CTA SLOT — right edge, aligned */}
-                                            <div style={{
-                                                display: 'flex', alignItems: 'center',
-                                                alignSelf: 'stretch', paddingLeft: '8px',
-                                                borderLeft: '1px dashed rgba(255,255,255,0.04)'
-                                            }} className="cta-slot">
-                                                <span className="card-cta">
-                                                    Explore <ArrowUpRight size={14} strokeWidth={2.5} />
-                                                </span>
-                                            </div>
-                                        </Link>
-
-                                        {/* Bookmark float button moved OUTSIDE of the Link */}
-                                        <button
-                                            onClick={(e) => toggleBookmark(e, post.id)}
-                                            className={`bookmark-float ${isSaved ? 'saved' : ''}`}
-                                            aria-label={isSaved ? 'Remove bookmark' : 'Save project'}
-                                            style={{ 
-                                                position: 'absolute', 
-                                                top: '24px', 
-                                                right: '24px',
-                                                zIndex: 10 
-                                            }}
-                                        >
-                                            {isSaved ? <BookmarkCheck size={17} fill="currentColor" /> : <Bookmark size={17} />}
-                                        </button>
-                                    </div>
-                                </motion.div>
+                                    animReady={animReady}
+                                    index={index}
+                                    post={post}
+                                    status={status}
+                                    isSaved={isSaved}
+                                    accent={accent}
+                                    isLocalMatch={isLocalMatch(post)}
+                                    matchExplanation={getMatchExplanation(post)}
+                                    domainIconNode={domainIcon(post.domain)}
+                                    onToggleBookmark={(e) => toggleBookmark(e, post.id)}
+                                />
                             );
                         })
                     )}
@@ -591,7 +740,7 @@ const Dashboard = ({ posts, user, updateUser, postsLoading = false }) => {
                                         <button
                                             type="button"
                                             className={`dash-rail-row ${filterDomain === d.name ? 'is-active' : ''}`}
-                                            onClick={() => setFilterDomain(filterDomain === d.name ? 'All' : d.name)}
+                                            onClick={() => onTrendingClick(d.name)}
                                         >
                                             <span className="dash-rail-rank">{i + 1}</span>
                                             <span className="dash-rail-dot" style={{ background: accent.ink }} />

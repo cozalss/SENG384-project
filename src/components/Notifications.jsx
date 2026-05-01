@@ -19,7 +19,7 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
     const getIcon = (type) => {
         switch (type) {
             case 'interest': return <UserPlus size={16} color="#6ee7b7" />;
-            case 'meeting-request': return <Calendar size={16} color="#93c5fd" />;
+            case 'meeting-request': return <Calendar size={16} color="var(--brand-soft-text, #93c5fd)" />;
             case 'meeting-accepted': return <CheckCircle2 size={16} color="#34d399" />;
             case 'meeting-declined': return <X size={16} color="#fca5a5" />;
             case 'post-closed': return <CheckCircle2 size={16} color="#c4b5fd" />;
@@ -31,7 +31,7 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
     const getIconBg = (type) => {
         switch (type) {
             case 'interest': return 'rgba(16, 185, 129, 0.08)';
-            case 'meeting-request': return 'rgba(96, 165, 250, 0.08)';
+            case 'meeting-request': return 'var(--brand-soft-bg, rgba(96, 165, 250, 0.08))';
             case 'meeting-accepted': return 'rgba(52, 211, 153, 0.08)';
             case 'meeting-declined': return 'rgba(239, 68, 68, 0.08)';
             case 'post-closed': return 'rgba(34, 211, 238, 0.08)';
@@ -60,10 +60,10 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                 aria-haspopup="menu"
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
-                    background: isOpen ? 'rgba(249, 168, 96, 0.1)' : 'rgba(255, 255, 255, 0.035)',
-                    border: `1px solid ${isOpen ? 'rgba(249, 168, 96, 0.32)' : 'rgba(255,255,255,0.08)'}`,
+                    background: isOpen ? 'var(--brand-soft-bg)' : 'var(--hl-faint)',
+                    border: `1px solid ${isOpen ? 'var(--brand-soft-border)' : 'var(--border)'}`,
                     cursor: 'pointer',
-                    color: isOpen ? '#f5c48a' : 'var(--text-muted)',
+                    color: isOpen ? 'var(--brand-soft-text)' : 'var(--text-muted)',
                     padding: '9px',
                     borderRadius: '11px',
                     transition: 'background 160ms var(--ease-smooth), border-color 160ms var(--ease-smooth), color 160ms var(--ease-smooth), box-shadow 160ms var(--ease-smooth)',
@@ -75,15 +75,15 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                 }}
                 onMouseOver={(e) => {
                     if (!isOpen) {
-                        e.currentTarget.style.color = '#f5c48a';
-                        e.currentTarget.style.background = 'rgba(249, 168, 96, 0.08)';
-                        e.currentTarget.style.borderColor = 'rgba(249, 168, 96, 0.26)';
+                        e.currentTarget.style.color = 'var(--brand-soft-text)';
+                        e.currentTarget.style.background = 'var(--interactive-row-hover-bg)';
+                        e.currentTarget.style.borderColor = 'var(--brand-soft-border)';
                     }
                 }}
                 onMouseOut={(e) => {
-                    e.currentTarget.style.color = isOpen ? '#f5c48a' : 'var(--text-muted)';
-                    e.currentTarget.style.background = isOpen ? 'rgba(249, 168, 96, 0.1)' : 'rgba(255, 255, 255, 0.035)';
-                    e.currentTarget.style.borderColor = isOpen ? 'rgba(249, 168, 96, 0.32)' : 'rgba(255,255,255,0.08)';
+                    e.currentTarget.style.color = isOpen ? 'var(--brand-soft-text)' : 'var(--text-muted)';
+                    e.currentTarget.style.background = isOpen ? 'var(--brand-soft-bg)' : 'var(--hl-faint)';
+                    e.currentTarget.style.borderColor = isOpen ? 'var(--brand-soft-border)' : 'var(--border)';
                 }}
             >
                 <Bell size={17} />
@@ -112,14 +112,14 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                                 maxHeight: 'min(520px, calc(100vh - 120px))',
                                 overflowY: 'auto',
                                 zIndex: 999, padding: 0,
-                                boxShadow: '0 30px 70px rgba(0,0,0,0.6), 0 0 60px rgba(96, 165, 250, 0.08)'
+                                boxShadow: 'var(--floating-panel-shadow, 0 30px 70px rgba(0,0,0,0.6), 0 0 60px rgba(96, 165, 250, 0.08))'
                             }}
                         >
                             {/* Header */}
                             <div className="flex justify-between items-center" style={{
                                 padding: '20px 22px 16px',
-                                borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                                background: 'rgba(7, 11, 10, 0.5)'
+                                borderBottom: '1px solid var(--border)',
+                                background: 'var(--bg-overlay)'
                             }}>
                                 <div className="flex items-center gap-3">
                                     <h3 style={{ fontSize: '15px', fontWeight: '700', fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}>Notifications</h3>
@@ -135,10 +135,10 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                                         whileTap={{ scale: 0.96 }}
                                         onClick={() => { onDismissAll?.(); }}
                                         style={{
-                                            background: 'rgba(255, 255, 255, 0.04)',
-                                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                                            background: 'var(--hl-faint)',
+                                            border: '1px solid var(--border)',
                                             cursor: 'pointer',
-                                            color: '#f5c48a', fontSize: '11.5px', fontWeight: '600',
+                                            color: 'var(--brand-soft-text)', fontSize: '11.5px', fontWeight: '600',
                                             fontFamily: 'var(--font-body)',
                                             letterSpacing: '0.01em',
                                             transition: 'background 160ms var(--ease-smooth), border-color 160ms var(--ease-smooth)',
@@ -158,15 +158,15 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                                         instead of "the dropdown loaded but has nothing". */}
                                     <div aria-hidden="true" style={{
                                         position: 'absolute', inset: 0, pointerEvents: 'none',
-                                        background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(249, 168, 96, 0.08), transparent 65%), radial-gradient(ellipse 55% 45% at 50% 85%, rgba(34, 211, 238, 0.06), transparent 70%)',
+                                        background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(34, 211, 102, 0.08), transparent 65%), radial-gradient(ellipse 55% 45% at 50% 85%, rgba(34, 211, 238, 0.06), transparent 70%)',
                                     }} />
                                     <div style={{
                                         position: 'relative',
                                         width: 48, height: 48,
                                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                                         borderRadius: 14,
-                                        background: 'rgba(255, 255, 255, 0.04)',
-                                        border: '1px solid rgba(255, 255, 255, 0.07)',
+                                        background: 'var(--hl-faint)',
+                                        border: '1px solid var(--border)',
                                         marginBottom: 14,
                                         color: 'var(--text-muted)',
                                         boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)'
@@ -205,14 +205,14 @@ const Notifications = ({ notifications = [], onDismiss, onDismissAll }) => {
                                             transition={{ delay: i * 0.03 }}
                                             style={{
                                                 padding: '16px 20px',
-                                                borderBottom: '1px solid rgba(255,255,255,0.03)',
+                                                borderBottom: '1px solid var(--border)',
                                                 display: 'flex', gap: '14px', alignItems: 'flex-start',
-                                                background: n.read ? 'transparent' : 'rgba(96, 165, 250, 0.02)',
+                                                background: n.read ? 'transparent' : 'var(--interactive-row-hover-bg, rgba(96, 165, 250, 0.02))',
                                                 transition: 'background 0.2s',
                                                 cursor: 'pointer'
                                             }}
                                             onMouseOver={(e) => e.currentTarget.style.background = 'var(--background-alt)'}
-                                            onMouseOut={(e) => e.currentTarget.style.background = n.read ? 'transparent' : 'rgba(96, 165, 250, 0.02)'}
+                                            onMouseOut={(e) => e.currentTarget.style.background = n.read ? 'transparent' : 'var(--interactive-row-hover-bg, rgba(96, 165, 250, 0.02))'}
                                         >
                                             <div style={{
                                                 width: '38px', height: '38px', borderRadius: '12px',

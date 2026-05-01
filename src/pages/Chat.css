@@ -41,7 +41,7 @@
     height: 1px;
     background: linear-gradient(90deg,
         transparent 0%,
-        rgba(249, 168, 96, 0.55) 28%,
+        rgba(34, 211, 102, 0.55) 28%,
         rgba(34, 211, 238, 0.55) 72%,
         transparent 100%);
     pointer-events: none;
@@ -54,7 +54,7 @@
     inset: 0;
     pointer-events: none;
     background:
-        radial-gradient(ellipse 42% 60% at 0% 0%, rgba(249, 168, 96, 0.08), transparent 60%),
+        radial-gradient(ellipse 42% 60% at 0% 0%, rgba(34, 211, 102, 0.08), transparent 60%),
         radial-gradient(ellipse 46% 56% at 100% 100%, rgba(34, 211, 238, 0.06), transparent 60%);
     z-index: 0;
 }
@@ -65,11 +65,8 @@
 
 .mx-sidebar {
     position: relative;
-    /* Grid with auto/1fr rows is the canonical "fixed header + scrolling body"
-       layout — less ambiguous than nested flex + flex:1 chains, which in this
-       tree were somehow letting the scroll area collapse and content show up
-       pushed down. Grid guarantees the scroll row takes exactly the remaining
-       column height with no cross-interaction from children. */
+    /* Two rows: fixed header + scrolling body. Grid is more predictable than
+       flex:1 chains for this kind of "fill remaining height" layout. */
     display: grid;
     grid-template-rows: auto 1fr;
     min-height: 0;
@@ -137,7 +134,7 @@
 }
 
 .mx-new-chat.is-on {
-    background: linear-gradient(135deg, rgba(249, 168, 96, 0.22), rgba(34, 211, 238, 0.18));
+    background: linear-gradient(135deg, rgba(34, 211, 102, 0.22), rgba(34, 211, 238, 0.18));
     border-color: rgba(255, 255, 255, 0.12);
 }
 
@@ -155,7 +152,7 @@
 }
 
 .mx-search:focus-within {
-    border-color: rgba(249, 168, 96, 0.32);
+    border-color: rgba(34, 211, 102, 0.32);
     background: rgba(255, 255, 255, 0.04);
 }
 
@@ -258,8 +255,8 @@ kbd {
     bottom: 16%;
     width: 3px;
     border-radius: 3px;
-    background: linear-gradient(180deg, rgba(249, 168, 96, 0.9), rgba(34, 211, 238, 0.8));
-    box-shadow: 0 0 14px rgba(249, 168, 96, 0.4);
+    background: linear-gradient(180deg, rgba(34, 211, 102, 0.9), rgba(34, 211, 238, 0.8));
+    box-shadow: 0 0 14px rgba(34, 211, 102, 0.4);
 }
 
 .mx-row-body {
@@ -324,13 +321,13 @@ kbd {
     height: 20px;
     padding: 0 7px;
     border-radius: 999px;
-    background: linear-gradient(135deg, #f5b57c, #f39a54);
+    background: linear-gradient(135deg, #f5b57c, hsl(119 99% 50%));
     color: #1a1013;
     font-family: var(--font-body);
     font-size: 10.5px;
     font-weight: 800;
     letter-spacing: 0.02em;
-    box-shadow: 0 2px 10px rgba(249, 168, 96, 0.35);
+    box-shadow: 0 2px 10px rgba(34, 211, 102, 0.35);
     flex-shrink: 0;
 }
 
@@ -399,7 +396,7 @@ kbd {
     position: absolute;
     inset: 0;
     background: radial-gradient(ellipse 80% 50% at 50% 100%,
-        rgba(249, 168, 96, 0.08), transparent 70%);
+        rgba(34, 211, 102, 0.08), transparent 70%);
     pointer-events: none;
 }
 
@@ -421,8 +418,8 @@ kbd {
 }
 
 .mx-outline-btn:hover {
-    background: linear-gradient(135deg, rgba(249, 168, 96, 0.18), rgba(34, 211, 238, 0.14));
-    border-color: rgba(249, 168, 96, 0.28);
+    background: linear-gradient(135deg, rgba(34, 211, 102, 0.18), rgba(34, 211, 238, 0.14));
+    border-color: rgba(34, 211, 102, 0.28);
 }
 
 /* ============================================================
@@ -446,10 +443,10 @@ kbd {
     padding: 2px;
     background: conic-gradient(
         from 210deg at 50% 50%,
-        rgba(249, 168, 96, 0.8) 0deg,
+        rgba(34, 211, 102, 0.8) 0deg,
         rgba(34, 211, 238, 0.6) 140deg,
-        rgba(249, 168, 96, 0.6) 300deg,
-        rgba(249, 168, 96, 0.8) 360deg
+        rgba(34, 211, 102, 0.6) 300deg,
+        rgba(34, 211, 102, 0.8) 360deg
     );
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -504,7 +501,7 @@ kbd {
     flex-direction: column;
     min-height: 0;
     background:
-        radial-gradient(ellipse 70% 40% at 50% 0%, rgba(249, 168, 96, 0.03), transparent 60%),
+        radial-gradient(ellipse 70% 40% at 50% 0%, rgba(34, 211, 102, 0.03), transparent 60%),
         radial-gradient(ellipse 60% 50% at 50% 120%, rgba(34, 211, 238, 0.03), transparent 60%);
     z-index: 1;
 }
@@ -686,30 +683,45 @@ kbd {
     margin: 0 auto;
 }
 
-/* Date divider — sticky-aware */
+/* Date divider — sticky-aware, framed by hairlines for editorial structure.
+   The chip itself is centered between two soft hairlines so the divider reads
+   as a horizontal section break instead of a floating pill. */
 .mx-date-divider {
     position: sticky;
     top: 8px;
     z-index: 2;
     display: flex;
+    align-items: center;
     justify-content: center;
-    margin: 14px 0 10px;
+    gap: 14px;
+    margin: 18px 4px 12px;
     pointer-events: none;
+}
+
+.mx-date-divider::before,
+.mx-date-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08) 30%, rgba(255, 255, 255, 0.08) 70%, transparent);
+    max-width: 180px;
 }
 
 .mx-date-divider span {
     font-family: var(--font-body);
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 600;
-    letter-spacing: 0.06em;
-    color: var(--text-subtle);
+    letter-spacing: 0.14em;
+    color: rgba(255, 255, 255, 0.62);
     padding: 5px 14px;
     border-radius: 999px;
-    background: rgba(22, 22, 28, 0.72);
+    background: rgba(15, 18, 16, 0.72);
     backdrop-filter: blur(14px) saturate(160%);
     -webkit-backdrop-filter: blur(14px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.04);
     text-transform: uppercase;
+    flex-shrink: 0;
 }
 
 /* ============================================================
@@ -735,6 +747,7 @@ kbd {
 }
 
 .mx-bubble-stack {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -774,13 +787,13 @@ kbd {
 
 /* Mine (right) — amber→coral gradient */
 .is-mine .mx-bubble {
-    background: linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%);
+    background: linear-gradient(135deg, hsl(119 99% 56%) 0%, hsl(119 99% 50%) 55%, hsl(119 99% 44%) 100%);
     color: #1a1012;
     border-top-right-radius: 20px;
     border-bottom-right-radius: 6px;
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.26),
-        0 10px 28px -8px rgba(249, 168, 96, 0.32);
+        0 10px 28px -8px rgba(34, 211, 102, 0.32);
     font-weight: 500;
 }
 
@@ -830,7 +843,7 @@ kbd {
     max-width: 100%;
     padding: 6px 10px;
     margin-bottom: 4px;
-    border-left: 2px solid rgba(249, 168, 96, 0.6);
+    border-left: 2px solid rgba(34, 211, 102, 0.6);
     background: rgba(255, 255, 255, 0.04);
     border-radius: 4px 10px 10px 4px;
     font-size: 12px;
@@ -839,7 +852,7 @@ kbd {
 
 .mx-quote-author {
     font-weight: 700;
-    color: rgba(249, 168, 96, 0.95);
+    color: rgba(34, 211, 102, 0.95);
     font-size: 11px;
     letter-spacing: 0.02em;
 }
@@ -891,8 +904,8 @@ kbd {
 }
 
 .mx-reaction-pill.is-you {
-    background: linear-gradient(135deg, rgba(249, 168, 96, 0.22), rgba(34, 211, 238, 0.18));
-    border-color: rgba(249, 168, 96, 0.45);
+    background: linear-gradient(135deg, rgba(34, 211, 102, 0.22), rgba(34, 211, 238, 0.18));
+    border-color: rgba(34, 211, 102, 0.45);
 }
 
 .mx-reaction-emoji { font-size: 13px; line-height: 1; }
@@ -936,7 +949,7 @@ kbd {
 .mx-action-btn:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-1px); }
 .mx-action-btn:active { transform: scale(0.94); transition-duration: 80ms; }
 .mx-action-btn.danger:hover { color: #fb7185; background: rgba(251, 113, 133, 0.12); }
-.mx-action-btn:focus-visible { outline: 2px solid rgba(249, 168, 96, 0.55); outline-offset: 2px; }
+.mx-action-btn:focus-visible { outline: 2px solid rgba(34, 211, 102, 0.55); outline-offset: 2px; }
 
 .mx-reaction-picker {
     position: absolute;
@@ -1041,7 +1054,7 @@ kbd {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: conic-gradient(from 0deg, transparent 0deg, rgba(249, 168, 96, 0.8) 120deg, transparent 360deg);
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(34, 211, 102, 0.8) 120deg, transparent 360deg);
     animation: mxSpin 1.1s linear infinite;
     -webkit-mask: radial-gradient(circle, transparent 55%, black 56%);
     mask: radial-gradient(circle, transparent 55%, black 56%);
@@ -1097,8 +1110,8 @@ kbd {
     padding: 10px 12px;
     margin-bottom: 10px;
     border-radius: 12px;
-    background: rgba(249, 168, 96, 0.08);
-    border: 1px solid rgba(249, 168, 96, 0.22);
+    background: rgba(34, 211, 102, 0.08);
+    border: 1px solid rgba(34, 211, 102, 0.22);
     overflow: hidden;
 }
 
@@ -1106,7 +1119,7 @@ kbd {
     width: 3px;
     align-self: stretch;
     border-radius: 3px;
-    background: linear-gradient(180deg, rgba(249, 168, 96, 0.95), rgba(34, 211, 238, 0.8));
+    background: linear-gradient(180deg, rgba(34, 211, 102, 0.95), rgba(34, 211, 238, 0.8));
     flex-shrink: 0;
 }
 
@@ -1123,7 +1136,7 @@ kbd {
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: rgba(249, 168, 96, 0.95);
+    color: rgba(34, 211, 102, 0.95);
 }
 
 .mx-reply-banner-text {
@@ -1163,9 +1176,9 @@ kbd {
 }
 
 .mx-composer-row:focus-within {
-    border-color: rgba(249, 168, 96, 0.38);
+    border-color: rgba(34, 211, 102, 0.38);
     background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 0 0 3px rgba(249, 168, 96, 0.1);
+    box-shadow: 0 0 0 3px rgba(34, 211, 102, 0.1);
 }
 
 .mx-composer textarea {
@@ -1195,8 +1208,8 @@ kbd {
     border: none;
     border-radius: 12px;
     color: #1a1012;
-    background: linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%);
-    box-shadow: 0 10px 24px -6px rgba(249, 168, 96, 0.4);
+    background: linear-gradient(135deg, hsl(119 99% 56%) 0%, hsl(119 99% 50%) 55%, hsl(119 99% 44%) 100%);
+    box-shadow: 0 10px 24px -6px rgba(34, 211, 102, 0.4);
     cursor: pointer;
     transition: transform 0.18s, box-shadow 0.2s, filter 0.2s;
     flex-shrink: 0;
@@ -1258,7 +1271,7 @@ kbd {
     position: absolute;
     inset: -20%;
     background:
-        radial-gradient(ellipse 60% 60% at 40% 35%, rgba(249, 168, 96, 0.35), transparent 60%),
+        radial-gradient(ellipse 60% 60% at 40% 35%, rgba(34, 211, 102, 0.35), transparent 60%),
         radial-gradient(ellipse 60% 60% at 70% 80%, rgba(34, 211, 238, 0.28), transparent 60%);
     animation: mxDrift 14s ease-in-out infinite;
     filter: blur(22px);
@@ -1293,14 +1306,14 @@ kbd {
     padding: 11px 20px;
     border: none;
     border-radius: 12px;
-    background: linear-gradient(135deg, #f5b37a 0%, #f39a54 60%, #ec7b48 100%);
+    background: linear-gradient(135deg, hsl(119 99% 56%) 0%, hsl(119 99% 50%) 60%, hsl(119 99% 44%) 100%);
     color: #1a1012;
     font-family: var(--font-body);
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.01em;
     cursor: pointer;
-    box-shadow: 0 14px 32px -8px rgba(249, 168, 96, 0.4);
+    box-shadow: 0 14px 32px -8px rgba(34, 211, 102, 0.4);
     transition: transform 0.2s, filter 0.2s;
     margin-top: 2px;
 }
@@ -1377,4 +1390,428 @@ kbd {
 @media (min-width: 901px) {
     .mobile-hidden { display: flex !important; }
     .mx-shell > .mobile-hidden { display: grid !important; }
+}
+
+/* ============================================================
+   LIGHT THEME OVERRIDES
+   Flips dark surfaces, borders, highlights, and shadows to a
+   warm off-white palette. Brand greens/cyans and status colors
+   intentionally left intact (they read on both themes).
+   ============================================================ */
+
+/* --- Shell --- */
+:root[data-theme="light"] .mx-shell {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 248, 244, 0.84) 100%);
+    border: 1px solid rgba(15, 18, 22, 0.08);
+    box-shadow:
+        0 28px 60px -16px rgba(20, 30, 40, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+:root[data-theme="light"] .mx-shell::after {
+    background:
+        radial-gradient(ellipse 42% 60% at 0% 0%, rgba(34, 211, 102, 0.06), transparent 60%),
+        radial-gradient(ellipse 46% 56% at 100% 100%, rgba(34, 211, 238, 0.05), transparent 60%);
+}
+
+/* --- Sidebar --- */
+:root[data-theme="light"] .mx-sidebar {
+    border-right: 1px solid rgba(15, 18, 22, 0.07);
+    background: rgba(255, 255, 255, 0.45);
+}
+
+:root[data-theme="light"] .mx-sidebar-header {
+    border-bottom: 1px solid rgba(15, 18, 22, 0.06);
+}
+
+:root[data-theme="light"] .mx-icon-btn {
+    border: 1px solid rgba(15, 18, 22, 0.1);
+    background: rgba(255, 255, 255, 0.7);
+}
+
+:root[data-theme="light"] .mx-icon-btn:hover {
+    background: rgba(15, 18, 22, 0.05);
+    border-color: rgba(15, 18, 22, 0.16);
+}
+
+:root[data-theme="light"] .mx-new-chat.is-on {
+    background: linear-gradient(135deg, rgba(34, 211, 102, 0.18), rgba(34, 211, 238, 0.14));
+    border-color: rgba(34, 211, 102, 0.35);
+}
+
+:root[data-theme="light"] .mx-search {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(15, 18, 22, 0.08);
+}
+
+:root[data-theme="light"] .mx-search:focus-within {
+    border-color: rgba(34, 211, 102, 0.4);
+    background: rgba(255, 255, 255, 0.92);
+}
+
+:root[data-theme="light"] .mx-search input::placeholder {
+    color: rgba(107, 116, 132, 0.75);
+}
+
+:root[data-theme="light"] .mx-kbd,
+:root[data-theme="light"] kbd {
+    background: rgba(15, 18, 22, 0.05);
+    border: 1px solid rgba(15, 18, 22, 0.08);
+}
+
+:root[data-theme="light"] .mx-sidebar-scroll::-webkit-scrollbar-thumb {
+    background: rgba(15, 18, 22, 0.16);
+    background-clip: padding-box;
+}
+:root[data-theme="light"] .mx-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 18, 22, 0.28);
+    background-clip: padding-box;
+}
+
+/* --- Rows --- */
+:root[data-theme="light"] .mx-row:hover {
+    background: rgba(15, 18, 22, 0.05);
+}
+
+:root[data-theme="light"] .mx-row.is-active {
+    background: rgba(15, 18, 22, 0.07);
+}
+
+:root[data-theme="light"] .mx-row-trash:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+:root[data-theme="light"] .mx-outline-btn {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(15, 18, 22, 0.12);
+}
+
+:root[data-theme="light"] .mx-outline-btn:hover {
+    background: linear-gradient(135deg, rgba(34, 211, 102, 0.15), rgba(34, 211, 238, 0.12));
+    border-color: rgba(34, 211, 102, 0.35);
+}
+
+/* --- Avatar --- */
+:root[data-theme="light"] .mx-avatar-face {
+    box-shadow: inset 0 0 0 1px rgba(15, 18, 22, 0.08);
+}
+
+:root[data-theme="light"] .mx-avatar-dot {
+    border: 2px solid #ffffff;
+}
+
+/* --- Main thread --- */
+:root[data-theme="light"] .mx-main {
+    background:
+        radial-gradient(ellipse 70% 40% at 50% 0%, rgba(34, 211, 102, 0.04), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 50% 120%, rgba(34, 211, 238, 0.04), transparent 60%);
+}
+
+:root[data-theme="light"] .mx-thread-header {
+    border-bottom: 1px solid rgba(15, 18, 22, 0.07);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent);
+}
+
+:root[data-theme="light"] .mx-presence::before {
+    background: rgba(15, 18, 22, 0.22);
+}
+
+:root[data-theme="light"] .mx-presence.is-online {
+    color: #0891b2;
+}
+
+/* --- Menu --- */
+:root[data-theme="light"] .mx-menu {
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(15, 18, 22, 0.1);
+    box-shadow: 0 24px 60px rgba(20, 30, 40, 0.18);
+}
+
+:root[data-theme="light"] .mx-menu button:hover {
+    background: rgba(15, 18, 22, 0.06);
+}
+
+:root[data-theme="light"] .mx-menu button.danger:hover {
+    background: rgba(239, 68, 68, 0.08);
+}
+
+/* --- Messages scroll --- */
+:root[data-theme="light"] .mx-messages::-webkit-scrollbar-thumb {
+    background: rgba(15, 18, 22, 0.16);
+    background-clip: padding-box;
+}
+:root[data-theme="light"] .mx-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 18, 22, 0.28);
+    background-clip: padding-box;
+}
+
+/* --- Date divider --- */
+:root[data-theme="light"] .mx-date-divider::before,
+:root[data-theme="light"] .mx-date-divider::after {
+    background: linear-gradient(90deg, transparent, rgba(15, 18, 22, 0.1) 30%, rgba(15, 18, 22, 0.1) 70%, transparent);
+}
+
+:root[data-theme="light"] .mx-date-divider span {
+    color: rgba(21, 24, 29, 0.7);
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(15, 18, 22, 0.08);
+    box-shadow: 0 1px 2px rgba(20, 30, 40, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* --- Bubbles --- */
+:root[data-theme="light"] .is-theirs .mx-bubble {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(15, 18, 22, 0.08);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        0 1px 2px rgba(20, 30, 40, 0.06);
+}
+
+:root[data-theme="light"] .is-mine .mx-bubble {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 8px 22px -8px rgba(34, 211, 102, 0.28);
+}
+
+:root[data-theme="light"] .mx-quote {
+    background: rgba(15, 18, 22, 0.04);
+}
+
+/* --- Reactions --- */
+:root[data-theme="light"] .mx-reaction-pill {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(15, 18, 22, 0.1);
+}
+
+:root[data-theme="light"] .mx-reaction-pill:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(15, 18, 22, 0.16);
+}
+
+:root[data-theme="light"] .mx-reaction-pill.is-you {
+    background: linear-gradient(135deg, rgba(34, 211, 102, 0.16), rgba(34, 211, 238, 0.12));
+    border-color: rgba(34, 211, 102, 0.4);
+}
+
+/* --- Bubble actions / picker --- */
+:root[data-theme="light"] .mx-bubble-actions {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(15, 18, 22, 0.1);
+    box-shadow: 0 12px 28px -6px rgba(20, 30, 40, 0.18);
+}
+
+:root[data-theme="light"] .mx-action-btn:hover {
+    background: rgba(15, 18, 22, 0.06);
+}
+
+:root[data-theme="light"] .mx-action-btn.danger:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+:root[data-theme="light"] .mx-reaction-picker {
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(15, 18, 22, 0.1);
+    box-shadow: 0 14px 32px -6px rgba(20, 30, 40, 0.18);
+}
+
+:root[data-theme="light"] .mx-reaction-picker-btn:hover {
+    background: rgba(15, 18, 22, 0.06);
+}
+
+/* --- Typing indicator --- */
+:root[data-theme="light"] .mx-typing span {
+    background: rgba(107, 116, 132, 0.7);
+}
+
+/* --- Scroll FAB --- */
+:root[data-theme="light"] .mx-scroll-fab {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(15, 18, 22, 0.1);
+    box-shadow: 0 14px 28px -10px rgba(20, 30, 40, 0.18);
+}
+
+/* --- Composer --- */
+:root[data-theme="light"] .mx-composer {
+    border-top: 1px solid rgba(15, 18, 22, 0.07);
+    background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.5));
+}
+
+:root[data-theme="light"] .mx-reply-banner {
+    background: rgba(34, 211, 102, 0.08);
+    border: 1px solid rgba(34, 211, 102, 0.28);
+}
+
+:root[data-theme="light"] .mx-reply-banner-close {
+    background: rgba(15, 18, 22, 0.05);
+}
+
+:root[data-theme="light"] .mx-reply-banner-close:hover {
+    background: rgba(15, 18, 22, 0.1);
+}
+
+:root[data-theme="light"] .mx-composer-row {
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(15, 18, 22, 0.1);
+}
+
+:root[data-theme="light"] .mx-composer-row:focus-within {
+    border-color: rgba(34, 211, 102, 0.45);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 0 3px rgba(34, 211, 102, 0.1);
+}
+
+:root[data-theme="light"] .mx-composer textarea::placeholder {
+    color: rgba(107, 116, 132, 0.75);
+}
+
+:root[data-theme="light"] .mx-send {
+    box-shadow: 0 8px 20px -6px rgba(34, 211, 102, 0.3);
+}
+
+:root[data-theme="light"] .mx-send:disabled {
+    background: rgba(15, 18, 22, 0.06);
+    color: var(--text-subtle);
+    box-shadow: none;
+}
+
+/* --- Welcome orb --- */
+:root[data-theme="light"] .mx-welcome-orb {
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(15, 18, 22, 0.1);
+}
+
+:root[data-theme="light"] .mx-cta-btn {
+    box-shadow: 0 12px 26px -8px rgba(34, 211, 102, 0.3);
+}
+
+/* --- Toast --- */
+:root[data-theme="light"] .mx-toast {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(15, 18, 22, 0.1);
+    box-shadow: 0 18px 44px -10px rgba(20, 30, 40, 0.2);
+    color: var(--text-main);
+}
+
+/* --- Responsive sidebar border on mobile --- */
+@media (max-width: 900px) {
+    :root[data-theme="light"] .mx-sidebar {
+        border-bottom: 1px solid rgba(15, 18, 22, 0.07);
+    }
+}
+
+/* ==========================================================================
+   LIGHT THEME - porcelain chat finish
+   ========================================================================== */
+
+:root[data-theme="light"] .mx-shell {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(246, 251, 250, 0.82)),
+        linear-gradient(90deg, rgba(13, 150, 103, 0.04), transparent 54%, rgba(11, 138, 160, 0.045));
+    border-color: rgba(18, 45, 48, 0.1);
+    box-shadow:
+        0 1px 2px rgba(18, 45, 48, 0.06),
+        0 28px 70px -34px rgba(18, 45, 48, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+:root[data-theme="light"] .mx-shell::before {
+    background: linear-gradient(90deg, transparent 0%, rgba(13, 150, 103, 0.5) 28%, rgba(11, 138, 160, 0.45) 72%, transparent 100%);
+}
+
+:root[data-theme="light"] .mx-shell::after {
+    background:
+        linear-gradient(118deg, rgba(13, 150, 103, 0.055), transparent 34%, rgba(109, 91, 208, 0.04) 78%, transparent),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent);
+}
+
+:root[data-theme="light"] .mx-sidebar {
+    background: rgba(255, 255, 255, 0.56);
+    border-right-color: rgba(18, 45, 48, 0.09);
+}
+
+:root[data-theme="light"] .mx-sidebar-header,
+:root[data-theme="light"] .mx-thread-header,
+:root[data-theme="light"] .mx-composer {
+    border-color: rgba(18, 45, 48, 0.085);
+}
+
+:root[data-theme="light"] .mx-main {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.24), transparent 42%),
+        linear-gradient(180deg, rgba(248, 252, 251, 0.54), rgba(255, 255, 255, 0.3));
+}
+
+:root[data-theme="light"] .mx-search,
+:root[data-theme="light"] .mx-composer-row,
+:root[data-theme="light"] .mx-icon-btn,
+:root[data-theme="light"] .mx-outline-btn {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 252, 251, 0.92));
+    border-color: rgba(18, 45, 48, 0.11);
+    box-shadow:
+        0 1px 2px rgba(18, 45, 48, 0.035),
+        inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+:root[data-theme="light"] .mx-search:focus-within,
+:root[data-theme="light"] .mx-composer-row:focus-within {
+    background: #ffffff;
+    border-color: rgba(13, 150, 103, 0.48);
+    box-shadow:
+        0 0 0 3px rgba(13, 150, 103, 0.12),
+        0 12px 28px -18px rgba(8, 120, 79, 0.32);
+}
+
+:root[data-theme="light"] .mx-row:hover,
+:root[data-theme="light"] .mx-row.is-active {
+    background: rgba(18, 45, 48, 0.05);
+}
+
+:root[data-theme="light"] .mx-row-active-rail {
+    background: linear-gradient(180deg, #10a36d, #0b8aa0);
+    box-shadow: 0 0 12px rgba(13, 150, 103, 0.28);
+}
+
+:root[data-theme="light"] .is-theirs .mx-bubble {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 252, 251, 0.94));
+    border-color: rgba(18, 45, 48, 0.1);
+    box-shadow:
+        0 1px 2px rgba(18, 45, 48, 0.045),
+        0 10px 26px -22px rgba(18, 45, 48, 0.2);
+}
+
+:root[data-theme="light"] .is-mine .mx-bubble,
+:root[data-theme="light"] .mx-send,
+:root[data-theme="light"] .mx-cta-btn {
+    background: linear-gradient(135deg, #10a36d 0%, #08784f 58%, #076b75 100%);
+    color: #ffffff;
+    text-shadow: 0 1px 0 rgba(4, 45, 34, 0.2);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        0 14px 30px -16px rgba(8, 120, 79, 0.56);
+}
+
+:root[data-theme="light"] .mx-welcome-orb {
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(230, 247, 239, 0.46)),
+        linear-gradient(135deg, #edf7f3, #e9f4fb);
+    border-color: rgba(18, 45, 48, 0.1);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.88),
+        0 24px 50px -30px rgba(13, 150, 103, 0.34);
+}
+
+:root[data-theme="light"] .mx-welcome-orb-inner {
+    background:
+        radial-gradient(ellipse 60% 60% at 38% 34%, rgba(13, 150, 103, 0.28), transparent 62%),
+        radial-gradient(ellipse 60% 60% at 72% 78%, rgba(11, 138, 160, 0.2), transparent 62%);
+}
+
+:root[data-theme="light"] .mx-kbd,
+:root[data-theme="light"] kbd {
+    background: rgba(18, 45, 48, 0.055);
+    border-color: rgba(18, 45, 48, 0.09);
 }

@@ -33,9 +33,9 @@ const formatRelativeShort = (ts) => {
     const yest = new Date(now); yest.setDate(yest.getDate() - 1);
     if (isSameDay(yest, d)) return 'Yesterday';
     if ((now - d) / 86400000 < 7) {
-        return d.toLocaleDateString(undefined, { weekday: 'short' });
+        return d.toLocaleDateString('en-US', { weekday: 'short' });
     }
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
 const formatDateHeader = (ts) => {
@@ -45,8 +45,8 @@ const formatDateHeader = (ts) => {
     if (isSameDay(now, d)) return 'Today';
     const yest = new Date(now); yest.setDate(yest.getDate() - 1);
     if (isSameDay(yest, d)) return 'Yesterday';
-    if ((now - d) / 86400000 < 7) return d.toLocaleDateString(undefined, { weekday: 'long' });
-    return d.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+    if ((now - d) / 86400000 < 7) return d.toLocaleDateString('en-US', { weekday: 'long' });
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 };
 
 // ----- Message grouping -----
@@ -200,61 +200,65 @@ const MessageBubble = React.memo(function MessageBubble({
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </div>
 
-            <AnimatePresence>
-                {hovered && (
-                    <motion.div
-                        className="mx-bubble-actions"
-                        initial={{ opacity: 0, y: 4, scale: 0.96 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 4, scale: 0.96 }}
-                        transition={{ duration: 0.15 }}
-                    >
-                        <button
-                            type="button"
-                            title="React"
-                            className="mx-action-btn"
-                            onClick={() => setPickerOpen(v => !v)}
+                {/* Action toolbar lives inside the stack so its absolute
+                    positioning anchors to the bubble's bounding box (the stack
+                    shrinks to bubble width) instead of the full-width row,
+                    which used to push the toolbar off-screen. */}
+                <AnimatePresence>
+                    {hovered && (
+                        <motion.div
+                            className="mx-bubble-actions"
+                            initial={{ opacity: 0, y: 4, scale: 0.96 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 4, scale: 0.96 }}
+                            transition={{ duration: 0.15 }}
                         >
-                            <Smile size={15} />
-                        </button>
-                        <button type="button" title="Reply" className="mx-action-btn" onClick={() => onReply(msg)}>
-                            <Reply size={15} />
-                        </button>
-                        <button type="button" title="Copy" className="mx-action-btn" onClick={() => onCopy(msg)}>
-                            <Copy size={15} />
-                        </button>
-                        {mine && (
-                            <button type="button" title="Delete" className="mx-action-btn danger" onClick={() => onDelete(msg)}>
-                                <Trash2 size={15} />
+                            <button
+                                type="button"
+                                title="React"
+                                className="mx-action-btn"
+                                onClick={() => setPickerOpen(v => !v)}
+                            >
+                                <Smile size={15} />
                             </button>
-                        )}
-                        <AnimatePresence>
-                            {pickerOpen && (
-                                <motion.div
-                                    className="mx-reaction-picker"
-                                    initial={{ opacity: 0, y: 6, scale: 0.9 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: 6, scale: 0.9 }}
-                                    transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
-                                >
-                                    {QUICK_REACTIONS.map(e => (
-                                        <button
-                                            key={e}
-                                            type="button"
-                                            className="mx-reaction-picker-btn"
-                                            onClick={() => { onReact(msg.id, e); setPickerOpen(false); }}
-                                        >
-                                            <span>{e}</span>
-                                        </button>
-                                    ))}
-                                </motion.div>
+                            <button type="button" title="Reply" className="mx-action-btn" onClick={() => onReply(msg)}>
+                                <Reply size={15} />
+                            </button>
+                            <button type="button" title="Copy" className="mx-action-btn" onClick={() => onCopy(msg)}>
+                                <Copy size={15} />
+                            </button>
+                            {mine && (
+                                <button type="button" title="Delete" className="mx-action-btn danger" onClick={() => onDelete(msg)}>
+                                    <Trash2 size={15} />
+                                </button>
                             )}
-                        </AnimatePresence>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                            <AnimatePresence>
+                                {pickerOpen && (
+                                    <motion.div
+                                        className="mx-reaction-picker"
+                                        initial={{ opacity: 0, y: 6, scale: 0.9 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 6, scale: 0.9 }}
+                                        transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                                    >
+                                        {QUICK_REACTIONS.map(e => (
+                                            <button
+                                                key={e}
+                                                type="button"
+                                                className="mx-reaction-picker-btn"
+                                                onClick={() => { onReact(msg.id, e); setPickerOpen(false); }}
+                                            >
+                                                <span>{e}</span>
+                                            </button>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
     );
 });
@@ -412,18 +416,51 @@ const Chat = ({ user }) => {
         [allUsers, searchTerm]
     );
 
-    const filteredConversations = useMemo(
-        () => conversations.filter(conv => {
+    // Dedupe by the other member's id: legacy conversations created before the
+    // ID-separator switch (`_` → `__||__`) still live in Firestore, so the same
+    // pair of users can have two convo docs. Keep the one that actually has a
+    // last message (otherwise the most recent), and sum unread counts so badges
+    // reflect every duplicate the user hasn't read.
+    const filteredConversations = useMemo(() => {
+        const byOther = new Map();
+        for (const conv of conversations) {
             const otherId = conv.members.find(id => id !== user.id);
             const other = conv.memberData?.[otherId];
-            if (!other) return false;
-            return (
-                other.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (conv.lastMessage && conv.lastMessage.toLowerCase().includes(searchTerm.toLowerCase()))
-            );
-        }),
-        [conversations, searchTerm, user.id]
-    );
+            if (!otherId || !other) continue;
+
+            const existing = byOther.get(otherId);
+            const unread = conv.unreadCount?.[user.id] || 0;
+            if (!existing) {
+                byOther.set(otherId, { conv, unreadTotal: unread });
+                continue;
+            }
+            // Prefer a convo that has a real lastMessage over an empty stub.
+            const existingHasMsg = !!existing.conv.lastMessage;
+            const currentHasMsg = !!conv.lastMessage;
+            const totalUnread = existing.unreadTotal + unread;
+            if (!existingHasMsg && currentHasMsg) {
+                byOther.set(otherId, { conv, unreadTotal: totalUnread });
+            } else {
+                // conversations are already sorted updatedAt desc, so the
+                // existing entry is at least as fresh — just accumulate unread.
+                byOther.set(otherId, { conv: existing.conv, unreadTotal: totalUnread });
+            }
+        }
+
+        const term = searchTerm.toLowerCase();
+        const out = [];
+        for (const { conv, unreadTotal } of byOther.values()) {
+            const otherId = conv.members.find(id => id !== user.id);
+            const other = conv.memberData[otherId];
+            if (term && !(other.name?.toLowerCase().includes(term) ||
+                (conv.lastMessage && conv.lastMessage.toLowerCase().includes(term)))) {
+                continue;
+            }
+            out.push({ ...conv, unreadCount: { ...(conv.unreadCount || {}), [user.id]: unreadTotal } });
+        }
+        out.sort((a, b) => (b.updatedAt?.toMillis?.() || 0) - (a.updatedAt?.toMillis?.() || 0));
+        return out;
+    }, [conversations, searchTerm, user.id]);
 
     const timeline = useMemo(() => buildTimeline(messages), [messages]);
 

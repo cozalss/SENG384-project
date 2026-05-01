@@ -4,6 +4,17 @@ import { AnimatePresence } from 'framer-motion';
 
 import PageTransition from '../components/PageTransition';
 
+// Inject the spin keyframes once at module load instead of inlining a <style>
+// tag inside the RouteFallback render. Suspense fallback can re-mount on
+// every chunk retry, which previously stacked duplicate <style> tags in the
+// document head.
+if (typeof document !== 'undefined' && !document.getElementById('app-routes-spin-kf')) {
+  const styleEl = document.createElement('style');
+  styleEl.id = 'app-routes-spin-kf';
+  styleEl.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+  document.head.appendChild(styleEl);
+}
+
 // LandingPage stays eager — it's the first paint target for unauthenticated
 // visitors. Login is lazy so firebase + emailjs stay out of the landing-page
 // critical path (they are ~100KB+ gzip of JS that the landing does not use).
@@ -17,6 +28,8 @@ const MyPosts = lazy(() => import('../pages/MyPosts'));
 const Profile = lazy(() => import('../pages/Profile'));
 const AdminDashboard = lazy(() => import('../pages/AdminDashboard'));
 const Chat = lazy(() => import('../pages/Chat'));
+const PrivacyPolicy = lazy(() => import('../pages/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('../pages/TermsOfService'));
 
 // Minimal fallback — the first-paint snap class on <html> hides the body
 // anyway for the very first frame. After that, route changes show this.
@@ -32,7 +45,6 @@ const RouteFallback = () => (
       borderRadius: '50%',
       animation: 'spin 0.8s linear infinite'
     }} />
-    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
   </div>
 );
 
@@ -61,9 +73,11 @@ function AppRoutes({
   updatePostStatus,
   updateUser,
   deleteUser,
+  toggleSavedPost,
   addMeetingRequest,
   addInterest,
-  respondToMeeting
+  respondToMeeting,
+  cancelMeeting
 }) {
   const location = useLocation();
 
@@ -85,7 +99,15 @@ function AppRoutes({
 
           <Route path="/dashboard" element={
             <ProtectedRoute user={user}>
-              <PageTransition><Dashboard posts={posts} postsLoading={postsLoading} user={user} updateUser={updateUser} /></PageTransition>
+              <PageTransition>
+                <Dashboard
+                  posts={posts}
+                  postsLoading={postsLoading}
+                  user={user}
+                  updateUser={updateUser}
+                  toggleSavedPost={toggleSavedPost}
+                />
+              </PageTransition>
             </ProtectedRoute>
           } />
 
@@ -106,6 +128,7 @@ function AppRoutes({
                   addMeetingRequest={addMeetingRequest}
                   addInterest={addInterest}
                   respondToMeeting={respondToMeeting}
+                  cancelMeeting={cancelMeeting}
                 />
               </PageTransition>
             </ProtectedRoute>
@@ -134,6 +157,9 @@ function AppRoutes({
               <PageTransition><Chat user={user} /></PageTransition>
             </ProtectedRoute>
           } />
+
+          <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+          <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -8,13 +8,20 @@ import {
   addInterestToSubcol,
   addMeetingToSubcol,
   updateMeetingStatus,
+  cancelMeetingRequest as cancelMeetingInFirestore,
 } from '../services/firestore';
-import emailjs from '@emailjs/browser';
+import { arrayUnion } from 'firebase/firestore';
 
-// Initialize emailjs with VITE_EMAILJS_PUBLIC_KEY
-if (import.meta.env.VITE_EMAILJS_PUBLIC_KEY) {
-  emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
-}
+let emailjsInitialized = false;
+
+const getEmailJs = async () => {
+  const { default: emailjs } = await import('@emailjs/browser');
+  if (!emailjsInitialized && import.meta.env.VITE_EMAILJS_PUBLIC_KEY) {
+    emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+    emailjsInitialized = true;
+  }
+  return emailjs;
+};
 
 export function usePosts(user, addNotification) {
   // Start empty — mock data is only a fallback if Firebase init fails.
@@ -58,8 +65,11 @@ export function usePosts(user, addNotification) {
   // Automatic post expiry check (FR-13).
   // Runs when the realtime post list arrives, and afterwards every 5 minutes
   // to pick up posts that have crossed their expiry while the tab stayed open.
-  // (Previously ran every 60s on every posts-array change, which fired far
-  // more Firestore writes than needed — see audit.)
+  // The interval is the actual cadence; the effect re-binds whenever `posts`
+  // changes so the latest snapshot is always inspected. Depending only on
+  // `posts.length` (the previous shape) missed posts that flipped status
+  // while the array length stayed constant, so an Active post could cross
+  // its expiry without ever being marked Expired.
   useEffect(() => {
     let cancelled = false;
     const checkExpiry = () => {
@@ -67,7 +77,15 @@ export function usePosts(user, addNotification) {
       const now = Date.now();
       posts.forEach(p => {
         if (p.status === 'Active' && p.expiryDate && new Date(p.expiryDate).getTime() < now) {
-          updatePostInFirestore(p.id, { status: 'Expired' });
+          updatePostInFirestore(p.id, {
+            status: 'Expired',
+            statusHistory: arrayUnion({
+              status: 'Expired',
+              at: new Date().toISOString(),
+              byUserId: 'system',
+              byUserName: 'Auto-expiry',
+            }),
+          });
         }
       });
     };
@@ -77,17 +95,18 @@ export function usePosts(user, addNotification) {
       cancelled = true;
       clearInterval(interval);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [posts.length]);
+  }, [posts]);
 
   const addPost = async (newPost, isDraft = false) => {
     if (!user) return;
-    
+
+    const initialStatus = isDraft ? 'Draft' : 'Active';
+    const nowIso = new Date().toISOString();
     const postWithId = {
       ...newPost,
       id: `post-${Date.now()}`,
-      status: isDraft ? 'Draft' : 'Active',
-      createdAt: new Date().toISOString(),
+      status: initialStatus,
+      createdAt: nowIso,
       authorId: user.id,
       authorName: user.name,
       authorRole: user.role,
@@ -97,6 +116,12 @@ export function usePosts(user, addNotification) {
       // and avoids the 1MB Firestore document limit on popular posts.
       interestCount: 0,
       meetingCount: 0,
+      // Brief 4.5.1 — "View lifecycle history". We persist every status
+      // transition as an append-only log on the parent doc so admins can audit
+      // the path a post took without joining against the activity log.
+      statusHistory: [
+        { status: initialStatus, at: nowIso, byUserId: user.id, byUserName: user.name },
+      ],
     };
 
     await addPostToFirestore(postWithId);
@@ -104,6 +129,7 @@ export function usePosts(user, addNotification) {
     addNotification({
       type: isDraft ? 'post-draft' : 'post-created',
       title: isDraft ? 'Draft Saved' : 'Post Published',
+      targetUserId: user.id,
       message: isDraft
         ? `Your draft "${newPost.title}" has been saved.`
         : `Your announcement "${newPost.title}" is now live on the network.`
@@ -122,13 +148,43 @@ export function usePosts(user, addNotification) {
     });
   };
 
+  // Whitelist of fields that the post-edit UI is allowed to touch. Anything
+  // outside this set (authorId, status, createdAt, interestCount, etc.) must
+  // not be writable from the edit surface — devtools could otherwise call
+  // updatePost(id, { authorId: '<other>' }) and silently steal a post.
+  const EDITABLE_POST_FIELDS = new Set([
+    'title',
+    'explanation',
+    'highLevelIdea',
+    'expertiseNeeded',
+    'collaborationType',
+    'commitmentLevel',
+    'city',
+    'country',
+    'confidentiality',
+    'expiryDate',
+    'projectStage',
+    'domain',
+  ]);
+
   const updatePost = async (postId, updatedFields) => {
     if (!user) return;
-    await updatePostInFirestore(postId, updatedFields);
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+    if (post.authorId !== user.id && user.role !== 'Admin') return;
+
+    const safeFields = {};
+    for (const key of Object.keys(updatedFields || {})) {
+      if (EDITABLE_POST_FIELDS.has(key)) safeFields[key] = updatedFields[key];
+    }
+    if (Object.keys(safeFields).length === 0) return;
+
+    await updatePostInFirestore(postId, safeFields);
 
     addNotification({
       type: 'post-edited',
       title: 'Post Updated',
+      targetUserId: user.id,
       message: `Your announcement has been updated successfully.`
     });
 
@@ -147,12 +203,26 @@ export function usePosts(user, addNotification) {
 
   const updatePostStatus = async (postId, newStatus) => {
     if (!user) return;
-    await updatePostInFirestore(postId, { status: newStatus });
+    // Brief 4.5.1 — append the transition to the lifecycle history. arrayUnion
+    // is idempotent, so a double-click won't double-stamp the timeline; the
+    // payload includes a unique timestamp so legitimate repeated transitions
+    // (e.g. Active → Meeting Scheduled → Active again) all land cleanly.
+    const transition = {
+      status: newStatus,
+      at: new Date().toISOString(),
+      byUserId: user.id,
+      byUserName: user.name,
+    };
+    await updatePostInFirestore(postId, {
+      status: newStatus,
+      statusHistory: arrayUnion(transition),
+    });
 
     if (newStatus === 'CLOSED') {
       addNotification({
         type: 'post-closed',
         title: 'Partner Found',
+        targetUserId: user.id,
         message: 'Your announcement has been marked as Partner Found and closed.'
       });
     }
@@ -171,17 +241,54 @@ export function usePosts(user, addNotification) {
   };
 
   const addInterest = async (postId, interest) => {
-    if (!user) return;
+    if (!user) return { ok: false, reason: 'not-signed-in' };
     const post = posts.find(p => p.id === postId);
-    if (!post) return;
+    if (!post) return { ok: false, reason: 'post-not-found' };
+    if (post.authorId === user.id) return { ok: false, reason: 'is-author' };
 
     await addInterestToSubcol(postId, interest);
 
+    // Notify the post AUTHOR — this is the person who needs to know that
+    // someone wants to collaborate. (Previously the notification was global
+    // and untargeted, so it surfaced for the wrong user.)
     addNotification({
       type: 'interest',
-      title: 'Interest Expressed',
-      message: `${interest.userName} expressed interest in a collaboration.`
+      title: 'New Interest in Your Post',
+      targetUserId: post.authorId,
+      message: `${interest.userName} expressed interest in "${post.title}".`
     });
+
+    // Best-effort author email so they don't have to be on the site. Email
+    // failure does not block the in-app workflow — the in-app notification
+    // still reaches the author — but we surface the failure in the return so
+    // the caller can show a soft toast and the user knows the email side
+    // didn't go through (rate-limit, EmailJS outage, missing template).
+    let emailDelivered = null; // null = not attempted, true/false = result
+    const authorEmail = post.authorEmail || mockUsers.find(u => u.id === post.authorId)?.email;
+    if (authorEmail && import.meta.env.VITE_EMAILJS_SERVICE_ID && import.meta.env.VITE_EMAILJS_TEMPLATE_ID) {
+      try {
+        const emailjs = await getEmailJs();
+        await emailjs.send(
+          import.meta.env.VITE_EMAILJS_SERVICE_ID,
+          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+          {
+            project_title: post.title,
+            to_name: post.authorName,
+            from_name: user.name,
+            name: user.name,
+            to_email: authorEmail,
+            from_email: user.email,
+            meeting_slot: interest.message
+              ? `Interest message: ${interest.message}`
+              : 'No additional message.'
+          }
+        );
+        emailDelivered = true;
+      } catch (error) {
+        console.error('Failed to send interest email:', error);
+        emailDelivered = false;
+      }
+    }
 
     await addActivityLog({
       id: `log-${Date.now()}`,
@@ -194,12 +301,15 @@ export function usePosts(user, addNotification) {
       result: 'success',
       details: `Expressed interest in post ${postId}`
     });
+
+    return { ok: true, emailDelivered };
   };
 
   const addMeetingRequest = async (postId, meeting) => {
-    if (!user) return;
+    if (!user) return { ok: false, reason: 'not-signed-in' };
     const post = posts.find(p => p.id === postId);
-    if (!post) return;
+    if (!post) return { ok: false, reason: 'post-not-found' };
+    if (post.authorId === user.id) return { ok: false, reason: 'is-author' };
 
     const authorEmail = post.authorEmail || mockUsers.find(u => u.id === post.authorId)?.email;
     const authorName = post.authorName;
@@ -207,9 +317,13 @@ export function usePosts(user, addNotification) {
 
     await addMeetingToSubcol(postId, meeting);
 
-    // EmailJS Integration
-    if (authorEmail && import.meta.env.VITE_EMAILJS_SERVICE_ID) {
+    // EmailJS Integration. Email is best-effort — the in-app notification is
+    // the source of truth — but we report delivery in the return value so the
+    // proposer can be told if their email side failed (e.g. rate-limit).
+    let emailDelivered = null;
+    if (authorEmail && import.meta.env.VITE_EMAILJS_SERVICE_ID && import.meta.env.VITE_EMAILJS_TEMPLATE_ID) {
       try {
+        const emailjs = await getEmailJs();
         const templateParams = {
           project_title: postTitle,
           to_name: authorName,
@@ -225,16 +339,18 @@ export function usePosts(user, addNotification) {
           import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
           templateParams
         );
-        console.log('Meeting request email sent successfully to:', authorEmail);
+        emailDelivered = true;
       } catch (error) {
         console.error('Failed to send meeting request email:', error);
+        emailDelivered = false;
       }
     }
 
     addNotification({
       type: 'meeting-request',
       title: 'Meeting Requested',
-      message: `${meeting.proposedByName} proposed a meeting time.`
+      targetUserId: post.authorId,
+      message: `${meeting.proposedByName} proposed ${meeting.slot?.label || 'a time'} for "${post.title}".`
     });
 
     await addActivityLog({
@@ -248,19 +364,47 @@ export function usePosts(user, addNotification) {
       result: 'success',
       details: `Proposed meeting for post ${postId}`
     });
+
+    return { ok: true, emailDelivered };
   };
 
-  const respondToMeeting = async (postId, meetingId, status) => {
+  const respondToMeeting = async (postId, meetingId, status, meetingSnapshot = null) => {
     if (!user) return;
     const post = posts.find(p => p.id === postId);
     if (!post) return;
 
-    await updateMeetingStatus(postId, meetingId, status);
+    // updateMeetingStatus performs the Firestore write AND returns the meeting
+    // doc so we always have the proposer / slot label, even after a hard
+    // refresh that wiped the live snapshot from React state.
+    const fetched = await updateMeetingStatus(postId, meetingId, status);
 
+    const meeting = meetingSnapshot
+        || fetched
+        || (post.meetings || []).find(m => m && m.id === meetingId);
+    const proposerId = meeting?.proposedBy;
+    const slotLabel = meeting?.slot?.label || 'the proposed time';
+
+    // Notify the meeting requester (the OTHER side) of the decision.
+    if (proposerId && proposerId !== user.id) {
+      addNotification({
+        type: status === 'accepted' ? 'meeting-accepted' : 'meeting-declined',
+        title: status === 'accepted' ? 'Meeting Accepted' : 'Meeting Declined',
+        targetUserId: proposerId,
+        message: status === 'accepted'
+          ? `${post.authorName} accepted your meeting for "${post.title}" at ${slotLabel}.`
+          : `${post.authorName} declined your meeting for "${post.title}".`
+      });
+    }
+
+    // Echo confirmation to the responder so the bell shows the outcome on
+    // their side too.
     addNotification({
       type: status === 'accepted' ? 'meeting-accepted' : 'meeting-declined',
-      title: status === 'accepted' ? 'Meeting Accepted' : 'Meeting Declined',
-      message: `You have ${status} the meeting request.`
+      title: status === 'accepted' ? 'You accepted a meeting' : 'You declined a meeting',
+      targetUserId: user.id,
+      message: status === 'accepted'
+        ? `Meeting confirmed for "${post.title}" — ${slotLabel}.`
+        : `You declined the meeting for "${post.title}".`
     });
 
     await addActivityLog({
@@ -276,5 +420,53 @@ export function usePosts(user, addNotification) {
     });
   };
 
-  return { posts, postsLoading, addPost, updatePost, updatePostStatus, addInterest, addMeetingRequest, respondToMeeting };
+  // Brief 4.4 — proposer-side "Cancel meeting request". Allowed only when the
+  // meeting is still pending. After cancellation, the post author gets an
+  // in-app notification so they aren't waiting on a slot that's no longer on
+  // the table.
+  const cancelMeeting = async (postId, meetingId) => {
+    if (!user) return { ok: false, reason: 'not-signed-in' };
+    const post = posts.find(p => p.id === postId);
+    if (!post) return { ok: false, reason: 'post-not-found' };
+
+    const result = await cancelMeetingInFirestore(postId, meetingId);
+    if (!result.ok) return result;
+
+    const slotLabel = result.meeting?.slot?.label || 'the proposed time';
+
+    // Notify the post author — only if the cancelling user isn't the author
+    // themselves (defensive; in normal flow only proposers cancel).
+    if (post.authorId && post.authorId !== user.id) {
+      addNotification({
+        type: 'meeting-cancelled',
+        title: 'Meeting Request Cancelled',
+        targetUserId: post.authorId,
+        message: `${user.name} cancelled their meeting request for "${post.title}" (${slotLabel}).`,
+      });
+    }
+
+    // Echo to the proposer so the bell reflects their own action.
+    addNotification({
+      type: 'meeting-cancelled',
+      title: 'Meeting cancelled',
+      targetUserId: user.id,
+      message: `You cancelled your meeting request for "${post.title}".`,
+    });
+
+    await addActivityLog({
+      id: `log-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      userId: user.id,
+      userName: user.name,
+      role: user.role,
+      actionType: 'MEETING_CANCEL',
+      targetEntity: postId,
+      result: 'success',
+      details: `Cancelled meeting ${meetingId}`,
+    });
+
+    return { ok: true };
+  };
+
+  return { posts, postsLoading, addPost, updatePost, updatePostStatus, addInterest, addMeetingRequest, respondToMeeting, cancelMeeting };
 }

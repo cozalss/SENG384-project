@@ -1,23 +1,21 @@
  
 import { motion } from 'framer-motion';
 
-// Kept intentionally light: no scale (forces compositing on the whole subtree),
-// no staggerChildren (spawns many concurrent animations mid-route change).
-// Short durations — the previous 0.46s total felt like dead time on fast
-// machines; keep the fade below the user's "this is a wait" threshold.
+// Tight, near-instant transitions — keep the gap between routes short so
+// the app shell backdrop doesn't read as a flash. Previous version had a
+// noticeable opacity gap during which the shell's backdrop was visible.
 const pageVariants = {
-    initial: { opacity: 0, y: 6 },
+    initial: { opacity: 0, y: 4 },
     animate: {
         opacity: 1,
         y: 0,
-        transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] },
+        transition: { duration: 0.18, ease: [0.22, 1, 0.36, 1] },
     },
     exit: {
-        // Match the enter easing token (0.22, 1, 0.36, 1) — pages feel "soft
-        // both ways" instead of snappy-out / soft-in. The Material-style
-        // ease-in (0.4, 0, 1, 1) clashed with the premium enter curve.
+        // Snap exit — fading the outgoing page out slowly is what made the
+        // backdrop visible during navigations. Cut to ~one frame.
         opacity: 0,
-        transition: { duration: 0.1, ease: [0.22, 1, 0.36, 1] },
+        transition: { duration: 0.04, ease: [0.22, 1, 0.36, 1] },
     },
 };
 

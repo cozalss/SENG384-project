@@ -370,6 +370,8 @@ erDiagram
 | `/chat` | 🔓 Authenticated | Real-time direct messages |
 | `/profile` | 🔓 Authenticated | Profile, GDPR export, account controls |
 | `/admin` | 👑 Admin only | Users, posts, logs, metrics, CSV export |
+| `/privacy` | 🌍 Public | Privacy policy & data handling notice |
+| `/terms` | 🌍 Public | Terms of service |
 
 ---
 
@@ -440,6 +442,11 @@ Firebase configuration currently lives in `src/firebase.js`. For production, mov
 | `npm run lint` | 🧹 Run ESLint against `src/` |
 | `npm run test` | ✅ Run Vitest once |
 | `npm run test:watch` | 🔁 Run Vitest in watch mode |
+| `node take-screenshots.js` | 📸 Refresh `docs/screenshots/` from a running dev server |
+| `python docs/generate_diagrams.py` | 🖼️ Regenerate UML & architecture diagrams |
+| `python docs/generate_srs.py` | 📘 Build the SRS `.docx` |
+| `python docs/generate_sdd.py` | 📗 Build the SDD `.docx` |
+| `python docs/generate_userguide.py` | 📕 Build the User Guide `.docx` |
 
 ---
 
@@ -458,10 +465,13 @@ Seng384/
     ├── 🔥 firebase.js
     ├── 📐 constants/landingData.jsx
     ├── 🧩 components/
-    │   ├── 🎬 landing/             # Hero • CinematicStage • BentoFeatures…
+    │   ├── 🎬 landing/             # Hero • BentoFeatures • TwoSides…
     │   ├── 🪟 CommandPalette.jsx
     │   ├── 🔔 Notifications.jsx
     │   ├── 🍞 ToastProvider.jsx
+    │   ├── 🛡️  GlobalErrorBoundary.jsx
+    │   ├── 📡 NetworkStatus.jsx
+    │   ├── 🎬 CinematicPreloader.jsx
     │   └── 🧭 WizardProgress.jsx
     ├── 🪝 hooks/                   # useAuth • usePosts • useChat …
     ├── 📄 pages/                   # Landing • Dashboard • PostDetail …

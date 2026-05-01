@@ -11,18 +11,26 @@ import { useEffect, useState, useRef } from 'react';
  */
 const SECTIONS = [
     { id: 'hero', label: 'Open' },
-    { id: 'premise', label: 'Start here' },
-    { id: 'narrative', label: 'Why it matters' },
-    { id: 'how-it-works', label: 'How it works' },
-    { id: 'two-sides', label: 'Two sides' },
-    { id: 'capabilities', label: 'Capabilities' },
+    { id: 'premise', label: 'Premise' },
+    { id: 'product', label: 'The Product' },
+    { id: 'two-sides', label: 'Two Sides' },
+    { id: 'network', label: 'Filters' },
+    { id: 'trust', label: 'Trust' },
+    { id: 'spotlight', label: 'Demo Flow' },
     { id: 'final-cta', label: 'Join' },
 ];
+
+const getSectionElement = (id) => (
+    document.getElementById(id) ||
+    (id === 'hero' ? document.querySelector('.px-hero') : null)
+);
 
 const SectionNavDots = () => {
     const [active, setActive] = useState(0);
     const [visible, setVisible] = useState(false);
     const tickingRef = useRef(false);
+    const activeRef = useRef(0);
+    const visibleRef = useRef(false);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -38,10 +46,7 @@ const SectionNavDots = () => {
             let bestIdx = 0;
             let bestDist = Infinity;
             SECTIONS.forEach((s, i) => {
-                let el;
-                el = s.id === 'hero'
-                    ? document.querySelector('.px-hero')
-                    : document.getElementById(s.id);
+                const el = getSectionElement(s.id);
                 if (!el) return;
                 const r = el.getBoundingClientRect();
                 const center = r.top + r.height / 2;
@@ -55,8 +60,16 @@ const SectionNavDots = () => {
             if (tickingRef.current) return;
             tickingRef.current = true;
             requestAnimationFrame(() => {
-                setActive(findIndex());
-                setVisible(window.scrollY > 80);
+                const nextActive = findIndex();
+                const nextVisible = window.scrollY > 80;
+                if (activeRef.current !== nextActive) {
+                    activeRef.current = nextActive;
+                    setActive(nextActive);
+                }
+                if (visibleRef.current !== nextVisible) {
+                    visibleRef.current = nextVisible;
+                    setVisible(nextVisible);
+                }
                 tickingRef.current = false;
             });
         };
@@ -67,12 +80,12 @@ const SectionNavDots = () => {
     }, []);
 
     const jump = (id) => {
-        let el;
-        el = id === 'hero'
-            ? document.querySelector('.px-hero')
-            : document.getElementById(id);
+        const el = getSectionElement(id);
         if (!el) return;
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Smooth scroll bypasses the user's prefers-reduced-motion preference.
+        // Honor it explicitly so motion-sensitive users get an instant jump.
+        const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
     };
 
     return (

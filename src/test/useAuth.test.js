@@ -40,15 +40,15 @@ describe('useAuth', () => {
     });
 
     it('updates user on legacy (id, fields) call shape', async () => {
-        const saved = { id: 'u1', name: 'A', city: 'Ankara' };
+        const saved = { id: 'u1', name: 'A', city: 'London' };
         localStorage.setItem('health_ai_user', JSON.stringify(saved));
         const { result } = renderHook(() => useAuth());
 
         await act(async () => {
-            await result.current.updateUser('u1', { city: 'Istanbul' });
+            await result.current.updateUser('u1', { city: 'New York' });
         });
 
-        expect(result.current.user.city).toBe('Istanbul');
+        expect(result.current.user.city).toBe('New York');
     });
 
     it('logout clears user and localStorage', async () => {

@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, CheckCircle2, FileText, MapPin, Globe, Briefcase, Tag, Clock, LockKeyhole, Shield, Sparkles, Send, Edit3, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, FileText, MapPin, Globe, Briefcase, Tag, Clock, LockKeyhole, Shield, Sparkles, Send, Edit3, AlertCircle, HelpCircle } from 'lucide-react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAnimReady } from '../hooks/useAnimReady';
+import { useToast } from '../hooks/useToast';
 import PxSelect from '../components/PxSelect';
 import WizardProgress from '../components/WizardProgress';
 
 const CreatePost = ({ user, addPost }) => {
     const navigate = useNavigate();
     const animReady = useAnimReady();
+    const toast = useToast();
     const [step, setStep] = useState(1);
     const totalSteps = 3;
 
@@ -29,6 +31,7 @@ const CreatePost = ({ user, addPost }) => {
     });
 
     const [submitted, setSubmitted] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
     // Field-level validation — populated on submit attempt. Keys match formData.
     const [fieldErrors, setFieldErrors] = useState({});
@@ -50,34 +53,23 @@ const CreatePost = ({ user, addPost }) => {
         { value: 'pre-deployment', label: 'Pre-Deployment', icon: '🚀', desc: 'Ready for market entry' }
     ];
 
-    const handleSubmit = () => {
-        setError('');
-        const errs = {};
-        if (!formData.title.trim()) errs.title = 'Title is required.';
-        if (!formData.explanation.trim()) errs.explanation = 'Description is required.';
-        if (!formData.expertiseNeeded.trim()) errs.expertiseNeeded = 'Tell us what expertise you need.';
-        if (Object.keys(errs).length > 0) {
-            setFieldErrors(errs);
-            setError('Please complete the highlighted fields before publishing.');
-            // Jump to the earliest step containing an error so the user can see it.
-            if (errs.title || errs.explanation) setStep(1);
-            else if (errs.expertiseNeeded) setStep(2);
-            return;
-        }
-        setFieldErrors({});
+    const TITLE_MAX = 140;
+    const EXPLANATION_MAX = 4000;
+    const EXPERTISE_MAX = 1000;
+    const HIGH_LEVEL_MAX = 4000;
 
+    const buildPost = (status) => {
         const now = new Date();
         const expiry = new Date(now);
         expiry.setDate(expiry.getDate() + formData.expiryDays);
-
-        const newPost = {
-            id: `post-${Date.now()}`,
-            title: formData.title,
+        return {
+            id: `post-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            title: formData.title.trim(),
             domain: formData.domain,
             projectStage: formData.projectStage,
-            explanation: formData.explanation,
-            highLevelIdea: formData.highLevelIdea,
-            expertiseNeeded: formData.expertiseNeeded,
+            explanation: formData.explanation.trim(),
+            highLevelIdea: formData.highLevelIdea?.trim() || '',
+            expertiseNeeded: formData.expertiseNeeded.trim(),
             collaborationType: formData.collaborationType,
             commitmentLevel: formData.commitmentLevel,
             city: formData.city || user?.city,
@@ -88,15 +80,76 @@ const CreatePost = ({ user, addPost }) => {
             authorRole: user?.role,
             createdAt: now.toISOString(),
             expiryDate: expiry.toISOString(),
-            status: 'Active',
-            interests: [],
-            meetings: []
+            status,
         };
+    };
 
-        if (addPost) {
-            addPost(newPost);
+    const handleSaveDraft = async () => {
+        if (submitting) return;
+        setError('');
+        const titleTrimmed = formData.title.trim();
+        if (!titleTrimmed) {
+            setFieldErrors({ title: 'Drafts still need a title so you can find them later.' });
+            setError('Please add a title before saving as draft.');
+            setStep(1);
+            return;
         }
-        setSubmitted(true);
+        setFieldErrors({});
+        setSubmitting(true);
+        try {
+            // usePosts.addPost overrides the inline status from buildPost; the
+            // hook's second argument (isDraft) is what actually decides whether
+            // the post lands as 'Draft' or 'Active'. Without this flag, drafts
+            // were silently being published as Active.
+            if (addPost) await addPost(buildPost('Draft'), true);
+            toast.success('Saved to My Posts as a draft. You can publish whenever you are ready.', { title: 'Draft saved' });
+            navigate('/my-posts');
+        } catch (err) {
+            console.error('Save draft failed:', err);
+            setError('Could not save draft. Please try again.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleSubmit = async () => {
+        if (submitting) return; // guard against double-clicks during the await
+        setError('');
+        const errs = {};
+        const titleTrimmed = formData.title.trim();
+        const explanationTrimmed = formData.explanation.trim();
+        const expertiseTrimmed = formData.expertiseNeeded.trim();
+        if (!titleTrimmed) errs.title = 'Title is required.';
+        else if (titleTrimmed.length > TITLE_MAX) errs.title = `Title is too long (max ${TITLE_MAX} chars).`;
+        if (!explanationTrimmed) errs.explanation = 'Description is required.';
+        else if (explanationTrimmed.length > EXPLANATION_MAX) errs.explanation = `Description is too long (max ${EXPLANATION_MAX} chars).`;
+        if (!expertiseTrimmed) errs.expertiseNeeded = 'Tell us what expertise you need.';
+        else if (expertiseTrimmed.length > EXPERTISE_MAX) errs.expertiseNeeded = `Required expertise is too long (max ${EXPERTISE_MAX} chars).`;
+        if ((formData.highLevelIdea || '').length > HIGH_LEVEL_MAX) {
+            errs.highLevelIdea = `Technical blueprint is too long (max ${HIGH_LEVEL_MAX} chars).`;
+        }
+        if (Object.keys(errs).length > 0) {
+            setFieldErrors(errs);
+            setError('Please complete the highlighted fields before publishing.');
+            // Jump to the earliest step containing an error so the user can see it.
+            if (errs.title || errs.explanation) setStep(1);
+            else if (errs.expertiseNeeded || errs.highLevelIdea) setStep(2);
+            return;
+        }
+        setFieldErrors({});
+
+        setSubmitting(true);
+        try {
+            if (addPost) {
+                await addPost(buildPost('Active'), false);
+            }
+            setSubmitted(true);
+        } catch (err) {
+            console.error('Publish post failed:', err);
+            setError('Could not publish your announcement. Please try again.');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const nextStep = () => { if (step < totalSteps) setStep(step + 1); };
@@ -118,13 +171,13 @@ const CreatePost = ({ user, addPost }) => {
                         transition={{ delay: 0.2, type: 'spring', damping: 12 }}
                         style={{
                             width: '76px', height: '76px', borderRadius: '22px',
-                            background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+                            background: 'var(--brand-gradient, linear-gradient(135deg, var(--primary), var(--accent)))',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             margin: '0 auto 26px',
-                            boxShadow: '0 18px 44px rgba(96, 165, 250, 0.4)'
+                            boxShadow: 'var(--brand-avatar-shadow, 0 18px 44px rgba(96, 165, 250, 0.4))'
                         }}
                     >
-                        <CheckCircle2 size={36} color="#070b0a" strokeWidth={2.5} />
+                        <CheckCircle2 size={36} color="var(--fg-on-accent)" strokeWidth={2.5} />
                     </motion.div>
                     <h2 style={{ fontSize: '30px', marginBottom: '12px', fontFamily: 'var(--font-heading)', letterSpacing: '-0.035em', fontWeight: '800' }}>
                         Published <span style={{
@@ -262,14 +315,14 @@ const CreatePost = ({ user, addPost }) => {
                                                 onClick={() => setFormData({ ...formData, projectStage: s.value })}
                                                 style={{
                                                     padding: '16px', borderRadius: '14px', cursor: 'pointer',
-                                                    background: formData.projectStage === s.value ? 'rgba(96, 165, 250, 0.08)' : 'var(--background-alt)',
-                                                    border: `1px solid ${formData.projectStage === s.value ? 'rgba(96, 165, 250, 0.3)' : 'rgba(255,255,255,0.06)'}`,
+                                                    background: formData.projectStage === s.value ? 'var(--selected-bg, rgba(96, 165, 250, 0.08))' : 'var(--background-alt)',
+                                                    border: `1px solid ${formData.projectStage === s.value ? 'var(--selected-border, rgba(96, 165, 250, 0.3))' : 'var(--border)'}`,
                                                     transition: 'all 0.25s',
-                                                    boxShadow: formData.projectStage === s.value ? '0 0 20px rgba(96, 165, 250,0.08)' : 'none'
+                                                    boxShadow: formData.projectStage === s.value ? '0 12px 28px -22px rgba(8, 120, 79, 0.36)' : 'none'
                                                 }}
                                             >
                                                 <div style={{ fontSize: '18px', marginBottom: '6px' }}>{s.icon}</div>
-                                                <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '3px', color: formData.projectStage === s.value ? '#a5b4fc' : 'var(--text-main)' }}>{s.label}</div>
+                                                <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '3px', color: formData.projectStage === s.value ? 'var(--selected-text, #a5b4fc)' : 'var(--text-main)' }}>{s.label}</div>
                                                 <div style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>{s.desc}</div>
                                             </div>
                                         ))}
@@ -352,7 +405,27 @@ const CreatePost = ({ user, addPost }) => {
                                 </div>
 
                                 <div className="flex-col gap-2">
-                                    <label className="input-lux-label flex items-center gap-2" style={{ display: 'inline-flex' }}><LockKeyhole size={14} /> Confidentiality Level</label>
+                                    <label className="input-lux-label flex items-center gap-2" style={{ display: 'inline-flex' }}>
+                                        <LockKeyhole size={14} /> Confidentiality Level
+                                        <span
+                                            tabIndex={0}
+                                            role="tooltip"
+                                            aria-label="A Non-Disclosure Agreement is a lightweight in-platform acknowledgement. When an interested partner clicks Express Interest, they are asked to accept the NDA before they can read any details you marked confidential. This protects your high-level idea and intellectual property from casual browsing."
+                                            title="A Non-Disclosure Agreement is a lightweight in-platform acknowledgement. When an interested partner clicks Express Interest, they are asked to accept the NDA before they can read any details you marked confidential. This protects your high-level idea and intellectual property from casual browsing."
+                                            style={{
+                                                display: 'inline-flex', alignItems: 'center',
+                                                color: 'var(--text-subtle)', cursor: 'help',
+                                                marginLeft: 4,
+                                            }}
+                                        >
+                                            <HelpCircle size={13} />
+                                        </span>
+                                    </label>
+                                    <p className="text-xs text-muted" style={{ lineHeight: 1.55, marginTop: -4, marginBottom: 4 }}>
+                                        Choose <strong>Public</strong> when the information is safe to disclose openly.
+                                        Choose <strong>NDA Protected</strong> if your high-level idea contains
+                                        intellectual property (IP) you want shielded until a partner accepts the NDA.
+                                    </p>
                                     <div className="create-post-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                                         {[
                                             { value: 'overview-public', label: 'Public Info', desc: 'Everyone can see details', icon: <Globe size={18} /> },
@@ -363,13 +436,13 @@ const CreatePost = ({ user, addPost }) => {
                                                 onClick={() => setFormData({ ...formData, confidentiality: opt.value })}
                                                 style={{
                                                     padding: '20px', cursor: 'pointer', borderRadius: '14px',
-                                                    background: formData.confidentiality === opt.value ? 'rgba(96, 165, 250, 0.08)' : 'var(--background-alt)',
-                                                    border: `1px solid ${formData.confidentiality === opt.value ? 'rgba(96, 165, 250, 0.3)' : 'rgba(255,255,255,0.06)'}`,
+                                                    background: formData.confidentiality === opt.value ? 'var(--selected-bg, rgba(96, 165, 250, 0.08))' : 'var(--background-alt)',
+                                                    border: `1px solid ${formData.confidentiality === opt.value ? 'var(--selected-border, rgba(96, 165, 250, 0.3))' : 'var(--border)'}`,
                                                     transition: 'all 0.25s', textAlign: 'center'
                                                 }}
                                             >
                                                 <div style={{ margin: '0 auto 10px', color: formData.confidentiality === opt.value ? 'var(--primary-light)' : 'var(--text-subtle)' }}>{opt.icon}</div>
-                                                <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px', color: formData.confidentiality === opt.value ? '#a5b4fc' : 'var(--text-main)' }}>{opt.label}</div>
+                                                <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px', color: formData.confidentiality === opt.value ? 'var(--selected-text, #a5b4fc)' : 'var(--text-main)' }}>{opt.label}</div>
                                                 <div style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>{opt.desc}</div>
                                             </div>
                                         ))}
@@ -396,7 +469,7 @@ const CreatePost = ({ user, addPost }) => {
                 </AnimatePresence>
 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between items-center mt-10" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '24px' }}>
+                <div className="flex justify-between items-center mt-10" style={{ borderTop: '1px solid var(--border)', paddingTop: '24px' }}>
                     <div>
                         {step > 1 && (
                             <button type="button" onClick={prevStep} className="px-btn ghost">
@@ -406,13 +479,30 @@ const CreatePost = ({ user, addPost }) => {
                     </div>
                     <div className="flex gap-3">
                         {step < totalSteps ? (
-                            <button type="button" onClick={nextStep} className="px-btn primary">
+                            <button type="button" onClick={nextStep} className="px-btn primary" disabled={submitting}>
                                 Next Step <ArrowRight size={15} />
                             </button>
                         ) : (
-                            <button type="button" id="publish-post-btn" onClick={handleSubmit} className="px-btn primary lg">
-                                <Send size={15} /> Publish announcement
-                            </button>
+                            <>
+                                <button
+                                    type="button"
+                                    id="save-draft-btn"
+                                    onClick={handleSaveDraft}
+                                    className="px-btn ghost lg"
+                                    disabled={submitting}
+                                >
+                                    <FileText size={15} /> Save as Draft
+                                </button>
+                                <button
+                                    type="button"
+                                    id="publish-post-btn"
+                                    onClick={handleSubmit}
+                                    className="px-btn primary lg"
+                                    disabled={submitting}
+                                >
+                                    <Send size={15} /> {submitting ? 'Publishing…' : 'Publish announcement'}
+                                </button>
+                            </>
                         )}
                     </div>
                 </div>

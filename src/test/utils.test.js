@@ -7,8 +7,8 @@ import { describe, it, expect } from 'vitest';
 
 describe('post filter logic', () => {
     const sample = [
-        { id: 'p1', title: 'AI Diagnostics Platform', explanation: 'ECG anomaly detection', domain: 'AI Diagnostics', expertiseNeeded: 'Cardiology', authorRole: 'Engineer', status: 'Active', city: 'Istanbul', country: 'TR', projectStage: 'prototype developed' },
-        { id: 'p2', title: 'Wearable Glucose Monitor', explanation: 'Non-invasive sensor', domain: 'Wearable Tech', expertiseNeeded: 'Clinical trials', authorRole: 'Healthcare Professional', status: 'CLOSED', city: 'Ankara', country: 'TR', projectStage: 'pilot testing' },
+        { id: 'p1', title: 'AI Diagnostics Platform', explanation: 'ECG anomaly detection', domain: 'AI Diagnostics', expertiseNeeded: 'Cardiology', authorRole: 'Engineer', status: 'Active', city: 'New York', country: 'US', projectStage: 'prototype developed' },
+        { id: 'p2', title: 'Wearable Glucose Monitor', explanation: 'Non-invasive sensor', domain: 'Wearable Tech', expertiseNeeded: 'Clinical trials', authorRole: 'Healthcare Professional', status: 'CLOSED', city: 'London', country: 'UK', projectStage: 'pilot testing' },
         { id: 'p3', title: 'Deleted item', explanation: 'x', domain: 'AI Diagnostics', status: 'DELETED', authorRole: 'Engineer', city: 'x', country: 'x', projectStage: 'idea', expertiseNeeded: 'x' }
     ];
 

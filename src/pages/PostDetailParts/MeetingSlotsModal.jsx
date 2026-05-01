@@ -1,5 +1,5 @@
-import { Calendar, Send, Video, X } from 'lucide-react';
- 
+import { Calendar, Loader2, Send, Video, X } from 'lucide-react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAnimReady } from '../../hooks/useAnimReady';
 
@@ -10,6 +10,7 @@ const MeetingSlotsModal = ({
     selectedSlot,
     onSelectSlot,
     onSend,
+    submitting = false,
 }) => {
     const animReady = useAnimReady();
 
@@ -21,14 +22,20 @@ const MeetingSlotsModal = ({
                         initial={animReady ? { opacity: 0, scale: 0.92, y: 20 } : false}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.92, y: 20 }}
-                        className="glass-panel modal-content"
-                        style={{ maxWidth: '650px', borderRadius: '24px', margin: 'auto' }}
+                        transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+                        className="glass-panel modal-content premium-card premium-card--halo"
+                        style={{
+                            maxWidth: '650px', borderRadius: '24px', margin: 'auto',
+                            '--pc-glow': 'rgba(34, 211, 102, 0.45)',
+                            '--pc-glow-soft': 'rgba(34, 211, 102, 0.18)',
+                        }}
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="slots-modal-title"
                     >
+                        <span className="premium-card-halo" aria-hidden="true" />
                         <div className="flex items-center gap-4 mb-8" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
-                            <div style={{ background: 'rgba(96, 165, 250, 0.12)', padding: '12px', borderRadius: '16px', boxShadow: '0 0 20px rgba(96, 165, 250, 0.1)' }}>
+                            <div style={{ background: 'var(--brand-soft-bg, rgba(96, 165, 250, 0.12))', padding: '12px', borderRadius: '16px', boxShadow: '0 12px 28px -22px rgba(8, 120, 79, 0.42)' }}>
                                 <Calendar color="var(--primary-light)" size={32} />
                             </div>
                             <div style={{ flex: 1 }}>
@@ -91,9 +98,17 @@ const MeetingSlotsModal = ({
                         </div>
 
                         <div className="px-modal-footer">
-                            <button type="button" className="px-btn ghost" onClick={onClose}>Cancel</button>
-                            <button type="button" className="px-btn primary" disabled={!selectedSlot} onClick={onSend}>
-                                <Send size={16} /> Send Meeting Request
+                            <button type="button" className="px-btn ghost" onClick={onClose} disabled={submitting}>Cancel</button>
+                            <button type="button" className="px-btn primary" disabled={!selectedSlot || submitting} onClick={onSend}>
+                                {submitting ? (
+                                    <>
+                                        <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Sending…
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send size={16} /> Send Meeting Request
+                                    </>
+                                )}
                             </button>
                         </div>
                     </motion.div>

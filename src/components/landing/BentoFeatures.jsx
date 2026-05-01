@@ -18,13 +18,14 @@ const TiltCard = ({ children, tiltMax = 7, style, ...rest }) => {
     return (
         <motion.div
             variants={cardVariants}
-            className="bento-card"
+            className="bento-card premium-card premium-card--halo"
             onMouseMove={tilt.onMouseMove}
             onMouseEnter={tilt.onMouseEnter}
             onMouseLeave={tilt.onMouseLeave}
             style={style}
             {...rest}
         >
+            <span className="premium-card-halo" aria-hidden="true" />
             {children}
         </motion.div>
     );
@@ -32,7 +33,7 @@ const TiltCard = ({ children, tiltMax = 7, style, ...rest }) => {
 
 const BentoFeatures = ({ isMobile }) => {
     return (
-        <section className="container px-capabilities-section" style={{
+        <section className="container px-capabilities-section landing-cinema-section" style={{
             maxWidth: '1200px',
             // Unified to landing standard rhythm — was 100/140px which broke
             // the SectionLabel cadence. Now matches other section bottom margins.
@@ -44,11 +45,11 @@ const BentoFeatures = ({ isMobile }) => {
                     <span className="eyebrow">
                         <Sparkles size={12} /> Platform Capabilities
                     </span>
-                    <h2 style={{ fontSize: isMobile ? '32px' : '52px', marginBottom: '20px', letterSpacing: '-0.04em', lineHeight: '1.05' }}>
-                        Built for <span className="text-gradient-aurora">Trust & Speed</span>
+                    <h2 style={{ fontSize: isMobile ? '32px' : '52px', marginBottom: '20px', letterSpacing: 0, lineHeight: '1.05' }}>
+                        Built around the <span className="text-gradient-aurora">implemented workflow</span>
                     </h2>
                     <p className="text-muted" style={{ fontSize: isMobile ? '15px' : '18px', maxWidth: '620px', margin: '0 auto', lineHeight: '1.7' }}>
-                        Everything a health-tech innovator needs to discover the right cross-disciplinary partner — without compromising early-stage IP.
+                        These are the main modules visible in the demo: post creation, protected details, meeting coordination, chat, profile data controls, and admin oversight.
                     </p>
                 </div>
             </ScrollReveal>
@@ -70,8 +71,10 @@ const BentoFeatures = ({ isMobile }) => {
                     style={{
                         gridColumn: isMobile ? 'span 1' : 'span 4',
                         padding: isMobile ? '28px' : '44px', minHeight: isMobile ? '320px' : '380px',
-                        background: 'linear-gradient(135deg, rgba(96, 165, 250, 0.12), rgba(34, 211, 238, 0.05), rgba(15, 23, 42, 0.6))',
-                        position: 'relative', overflow: 'hidden'
+                        background: 'linear-gradient(135deg, rgba(34, 211, 102, 0.13), rgba(16, 185, 129, 0.05), rgba(15, 23, 22, 0.62))',
+                        position: 'relative', overflow: 'hidden',
+                        '--pc-glow': 'rgba(34, 211, 102, 0.55)',
+                        '--pc-glow-soft': 'rgba(34, 211, 102, 0.18)',
                     }}
                 >
                     <div className="corner-accent corner-tl" />
@@ -82,52 +85,52 @@ const BentoFeatures = ({ isMobile }) => {
                     {/* Decorative dot grid */}
                     <div style={{
                         position: 'absolute', inset: 0,
-                        backgroundImage: 'radial-gradient(rgba(96, 165, 250,0.12) 1px, transparent 1px)',
+                        backgroundImage: 'radial-gradient(rgba(34, 211, 102, 0.14) 1px, transparent 1px)',
                         backgroundSize: '28px 28px',
                         mask: 'radial-gradient(ellipse 70% 60% at 80% 20%, black, transparent)',
                         WebkitMask: 'radial-gradient(ellipse 70% 60% at 80% 20%, black, transparent)',
-                        opacity: 0.6, pointerEvents: 'none'
+                        opacity: 0.55, pointerEvents: 'none'
                     }} />
 
                     <div style={{ position: 'relative', zIndex: 2, maxWidth: '540px' }}>
                         <div style={{
                             display: 'inline-flex', alignItems: 'center', gap: '8px',
                             padding: '6px 14px', borderRadius: '999px',
-                            background: 'rgba(96, 165, 250, 0.12)', border: '1px solid rgba(96, 165, 250, 0.25)',
-                            fontSize: '11px', fontWeight: '700', color: 'var(--badge-primary-text)',
-                            textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '24px'
+                            background: 'rgba(34, 211, 102, 0.10)', border: '1px solid rgba(34, 211, 102, 0.28)',
+                            fontSize: '11px', fontWeight: '700', color: 'hsl(119 80% 70%)',
+                            textTransform: 'uppercase', letterSpacing: 0, marginBottom: '24px'
                         }}>
                             <Sparkles size={11} /> Flagship Feature
                         </div>
                         <div style={{
                             width: '64px', height: '64px', borderRadius: '18px',
-                            background: 'linear-gradient(135deg, #60a5fa, #93c5fd)',
+                            background: 'linear-gradient(135deg, hsl(119 99% 56%), hsl(155 80% 65%))',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            color: 'white', marginBottom: '24px',
-                            boxShadow: '0 12px 32px rgba(96, 165, 250, 0.4), inset 0 1px 0 rgba(255,255,255,0.3)'
+                            color: 'hsl(0 0% 6%)', marginBottom: '24px',
+                            boxShadow: '0 12px 32px rgba(34, 211, 102, 0.4), inset 0 1px 0 rgba(255,255,255,0.32)'
                         }}>
                             <Users size={30} />
                         </div>
-                        <h3 style={{ fontSize: isMobile ? '24px' : '30px', marginBottom: '14px', letterSpacing: '-0.02em' }}>
-                            Structured Partner Discovery
+                        <h3 style={{ fontSize: isMobile ? '24px' : '30px', marginBottom: '14px', letterSpacing: 0 }}>
+                            Structured announcement wizard
                         </h3>
                         <p className="text-muted" style={{ fontSize: isMobile ? '14px' : '16px', lineHeight: '1.75', marginBottom: '28px' }}>
-                            Post announcements describing your project and the expertise you need. Browse posts from the other side of the bridge — engineers meet clinicians, clinicians meet engineers.
+                            Users create announcements with title, domain, project stage, description, required expertise, location, collaboration type, expiry, and confidentiality settings.
                         </p>
 
                         {/* Mini bridge illustration */}
                         <div style={{
                             display: 'flex', alignItems: 'center', gap: '12px',
                             padding: '14px 18px', borderRadius: '14px',
-                            background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.06)',
+                            background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.06)',
                             maxWidth: '400px'
                         }}>
                             <div style={{
                                 width: '34px', height: '34px', borderRadius: '10px',
-                                background: 'linear-gradient(135deg, rgba(96, 165, 250,0.2), rgba(96, 165, 250,0.08))',
-                                border: '1px solid rgba(96, 165, 250,0.3)',
+                                background: 'linear-gradient(135deg, rgba(34, 211, 102, 0.22), rgba(34, 211, 102, 0.08))',
+                                border: '1px solid rgba(34, 211, 102, 0.32)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                color: 'var(--primary-light)', flexShrink: 0
+                                color: 'hsl(119 99% 60%)', flexShrink: 0
                             }}>
                                 <Cpu size={16} />
                             </div>
@@ -137,29 +140,29 @@ const BentoFeatures = ({ isMobile }) => {
                                     transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                                     style={{
                                         position: 'absolute', top: '-2px', width: '6px', height: '6px',
-                                        borderRadius: '50%', background: 'var(--primary-light)',
-                                        boxShadow: '0 0 12px var(--primary-light)'
+                                        borderRadius: '50%', background: 'hsl(119 99% 60%)',
+                                        boxShadow: '0 0 12px hsl(119 99% 60%)'
                                     }}
                                 />
                             </div>
-                            <Network size={14} color="var(--text-subtle)" />
+                            <Network size={14} color="rgba(255,255,255,0.4)" />
                             <div style={{ flex: 1, position: 'relative', height: '2px', background: 'rgba(255,255,255,0.08)', borderRadius: '1px' }}>
                                 <motion.div
                                     animate={{ x: ['100%', '0%', '100%'] }}
                                     transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                                     style={{
                                         position: 'absolute', top: '-2px', width: '6px', height: '6px',
-                                        borderRadius: '50%', background: 'var(--secondary)',
-                                        boxShadow: '0 0 12px var(--secondary)'
+                                        borderRadius: '50%', background: 'hsl(180 75% 65%)',
+                                        boxShadow: '0 0 12px hsl(180 75% 65%)'
                                     }}
                                 />
                             </div>
                             <div style={{
                                 width: '34px', height: '34px', borderRadius: '10px',
-                                background: 'linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.08))',
-                                border: '1px solid rgba(16,185,129,0.3)',
+                                background: 'linear-gradient(135deg, rgba(34, 211, 238, 0.22), rgba(34, 211, 238, 0.08))',
+                                border: '1px solid rgba(34, 211, 238, 0.32)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                color: 'var(--secondary)', flexShrink: 0
+                                color: 'hsl(180 75% 65%)', flexShrink: 0
                             }}>
                                 <Stethoscope size={16} />
                             </div>
@@ -188,16 +191,16 @@ const BentoFeatures = ({ isMobile }) => {
                     }}>
                         <ShieldCheck size={26} />
                     </div>
-                    <h3 style={{ fontSize: isMobile ? '19px' : '22px', marginBottom: '12px', letterSpacing: '-0.02em' }}>
-                        Controlled IP Disclosure
+                    <h3 style={{ fontSize: isMobile ? '19px' : '22px', marginBottom: '12px', letterSpacing: 0 }}>
+                        NDA-protected technical details
                     </h3>
                     <p className="text-muted" style={{ fontSize: '14px', lineHeight: '1.7', marginBottom: '20px' }}>
-                        NDA-gated meetings. No technical docs. No patient data. Ever.
+                        If a post is marked NDA Protected, the technical blueprint stays hidden until the viewer expresses interest and accepts the non-disclosure terms.
                     </p>
 
                     {/* Decorative lock badges */}
                     <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {['NDA acceptance required', 'Zero IP storage', 'Full audit trail'].map((t, i) => (
+                        {['Interest record stored', 'Blueprint gate enforced', 'Author notified'].map((t, i) => (
                             <div key={i} className="flex items-center gap-2" style={{
                                 fontSize: '12px', color: 'var(--badge-accent-text)',
                                 padding: '7px 12px', borderRadius: '10px',
@@ -214,7 +217,10 @@ const BentoFeatures = ({ isMobile }) => {
                     style={{
                         gridColumn: isMobile ? 'span 1' : 'span 2',
                         padding: isMobile ? '28px' : '32px', height: '100%',
-                        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(15, 23, 42, 0.6))'
+                        background: 'linear-gradient(135deg, rgba(34, 211, 102, 0.08), rgba(34, 211, 238, 0.07), rgba(15, 23, 42, 0.58))',
+                        borderColor: 'rgba(34, 211, 238, 0.14)',
+                        '--pc-glow': 'rgba(34, 211, 238, 0.5)',
+                        '--pc-glow-soft': 'rgba(34, 211, 102, 0.16)',
                     }}
                 >
                     <div className="corner-accent corner-tr" />
@@ -222,18 +228,18 @@ const BentoFeatures = ({ isMobile }) => {
 
                     <div style={{
                         width: '56px', height: '56px', borderRadius: '16px',
-                        background: 'linear-gradient(135deg, #f59e0b, #fcd34d)',
+                        background: 'linear-gradient(135deg, hsl(119 99% 56%), hsl(180 75% 62%))',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'white', marginBottom: '20px',
-                        boxShadow: '0 12px 28px rgba(245, 158, 11, 0.35)'
+                        color: 'hsl(0 0% 6%)', marginBottom: '20px',
+                        boxShadow: '0 12px 28px rgba(34, 211, 238, 0.26), 0 0 28px rgba(34, 211, 102, 0.12)'
                     }}>
                         <Shield size={26} />
                     </div>
-                    <h3 style={{ fontSize: isMobile ? '19px' : '22px', marginBottom: '12px', letterSpacing: '-0.02em' }}>
-                        GDPR Compliant
+                    <h3 style={{ fontSize: isMobile ? '19px' : '22px', marginBottom: '12px', letterSpacing: 0 }}>
+                        Profile export and deletion controls
                     </h3>
                     <p className="text-muted" style={{ fontSize: '14px', lineHeight: '1.7' }}>
-                        Minimal data collection. Right to delete. Right to export. Built around GDPR Articles 15, 17, and 20.
+                        The Profile page includes a JSON data export and account deletion action, so the demo can show user-facing data rights controls.
                     </p>
                 </TiltCard>
 
@@ -257,19 +263,16 @@ const BentoFeatures = ({ isMobile }) => {
                     }}>
                         <Handshake size={26} />
                     </div>
-                    <h3 style={{ fontSize: isMobile ? '19px' : '22px', marginBottom: '12px', letterSpacing: '-0.02em' }}>
-                        Meeting Workflow
+                    <h3 style={{ fontSize: isMobile ? '19px' : '22px', marginBottom: '12px', letterSpacing: 0 }}>
+                        Meeting requests and chat
                     </h3>
                     <p className="text-muted" style={{ fontSize: '14px', lineHeight: '1.7' }}>
-                        Express interest, propose slots, schedule over Zoom or Teams. The platform facilitates — never stores.
+                        After interest is accepted, users propose external Zoom or Teams meeting slots, receive notifications, and continue the collaboration in real-time chat.
                     </p>
                 </TiltCard>
 
-                {/* The "Pan-European Reach, Under 3 Minutes" bento card with the
-                    "3m post time / 30s meet request / 12+ countries / 24h avg
-                    response" stat cluster was removed. Those numbers were
-                    fabricated marketing claims, inappropriate for a senior
-                    project that hasn't actually run on those volumes. */}
+                {/* A previous metrics card was removed because the project has
+                    not collected production usage statistics yet. */}
             </motion.div>
         </section>
     );

@@ -1,0 +1,115 @@
+HEALTH AI — Demo Anlatımı (Türkçe TTS metni)
+=============================================
+
+Kullanım:
+- ElevenLabs / Google TTS / Murf gibi bir araca direkt yapıştır.
+- Her sahne kendi paragrafında, sahneler arası kısa duraklamayı kendi sesinle / aracın "Pause" değişkeniyle ayarla.
+- Türkçe ses modeli seç (ElevenLabs'te Turkish'i destekleyen ses, Google'da tr-TR-Wavenet-E gibi).
+- İngilizce terimler (Dashboard, Save as Draft, NDA) doğal Türkçe okumayla bırakıldı; TTS bazen "/" ya da "—" karakterinde yutkunabilir, virgülle düzelttim.
+- Hedef tempo: dakikada ~150 kelime. Toplam okuma süresi yaklaşık dört buçuk dakika.
+
+---
+
+[AÇILIŞ]
+
+Merhaba. Bu video, SENG üç seksen dört dersi kapsamında geliştirdiğimiz HEALTH AI platformunun demosudur. HEALTH AI; sağlık profesyonelleri ile mühendisleri NDA korumalı bir iş birliği akışında bir araya getiren bir web uygulamasıdır. Kullanım kılavuzunda tanımlı altı senaryoyu sırayla göstereceğim.
+
+---
+
+[SAHNE BİR — KAYIT VE GİRİŞ]
+
+İlk olarak giriş ekranını gösteriyorum. Sol tarafta animasyonlu kinematik bir görsel, sağ tarafta ise giriş formu yer alıyor.
+
+Önce kayıt sekmesinden nokta E-D-U kontrolünü test ediyorum. demo at gmail nokta com gibi sıradan bir mail giriyorum. Gördüğünüz gibi sistem reddediyor ve sadece nokta E-D-U kurumsal mailleri kabul ettiğini söylüyor. Bu, akademik kurum doğrulamamızın temel garantisidir.
+
+Sistemde daha önce kayıtlı bir Engineer hesabım var. Sign In sekmesine geçiyorum, kurumsal mailimi ve şifremi giriyorum. Sign In butonuna basıyorum.
+
+Doğrudan Dashboard ekranına yönlendirildim. Burada feed, filtreler ve kullanıcı menüsü görünüyor.
+
+---
+
+[SAHNE İKİ — POST OLUŞTURMA VE YÖNETİMİ]
+
+Şimdi bir iş birliği ilanı oluşturacağım. Üst menüden Create Post butonuna basıyorum. Karşıma üç adımlı bir post sihirbazı çıkıyor.
+
+İlk adımda temel bilgileri giriyorum: başlık olarak Bedside ECG Anomaly Detection, alan olarak Cardiology, proje aşaması olarak Idea Stage seçiyorum. Ardından açıklamaya proje detaylarını yazıyorum.
+
+İkinci adımda istediğim uzmanlığı belirtiyorum: ML Signal Processing. Co-development işbirliği türünü seçiyorum.
+
+Üçüncü adımda şehri Ankara, gizlilik seviyesini NDA Protected olarak işaretliyorum. Bu, hassas blueprint'in NDA kabul edilmeden başkalarına gösterilmemesini sağlıyor.
+
+Önce Save as Draft butonuyla taslak olarak kaydediyorum. My Posts sayfasında ilanım Draft rozetiyle çıkıyor. Şu an kimseye görünmüyor, sadece bana özel.
+
+Yan tarafındaki Publish butonuyla yayına alıyorum. Statü anında Active oluyor. İlan artık feed'de görünür hale geldi.
+
+Yayında olan bir ilanımı da düzenleyebilirim. Edit modal'ını açıp açıklamaya bir cümle ekliyorum, kaydediyorum. Toast bildirimi güncellemeyi onaylıyor.
+
+Ayrıca her ilanımın yanında bir Delete butonu da bulunuyor; kullanıcı kendi içeriğini istediği zaman silebiliyor.
+
+Dashboard'a döndüğümde kendi ilanımla birlikte sistemdeki örnek veriler de görünüyor. Cardiology, Radiology, Biomedical, ML Signal gibi farklı disiplinlerden ilanlar var. Her kart, alana özel bir ikon ve renk paletiyle ayırt ediliyor.
+
+---
+
+[SAHNE ÜÇ — ARAMA VE FİLTRELEME]
+
+Üstte arama kutusu var. ECG yazdığımda başlığında veya açıklamasında bu kelime geçen ilanlar anında listeye düşüyor.
+
+Şimdi filtreleri uyguluyorum. Domain filtresinden Cardiology seçiyorum. İkinci filtre olarak şehri Ankara yapıyorum. Sonuç listesi anında daralıyor; sadece bu iki kriteri karşılayan ilanlar gözüküyor.
+
+Sağ tarafta Clear filters butonu çıkıyor. Tıkladığımda tüm filtreler sıfırlanıyor ve ilanlar Match Score'a göre tekrar listeleniyor.
+
+---
+
+[SAHNE DÖRT — TOPLANTI TALEBİ]
+
+Şimdi farklı bir kullanıcı perspektifinden devam ediyorum. Mühendis hesabımdan çıkış yapıp, sağlık profesyoneli rolündeki test hesabıyla giriş yapıyorum. Dashboard içerikleri rolüme göre değişti.
+
+Feed'den ilgilendiğim bir Cardiology ilanına tıklıyorum. Post detay sayfasında başlık, alan, şehir, açıklama, ilan sahibinin Author Card'ı ve sağda Workflow Action Panel görünüyor. Ancak hassas teknik blueprint kısmı şu anda kilitli; NDA kabul edilmeden erişilemiyor.
+
+Express Interest butonuna basıyorum. Açılan modal'da kısa bir mesaj yazıp gönderiyorum. İlan sahibine bildirim gitti.
+
+Toplantı talebine geçtiğimde karşıma NDA modal'ı çıkıyor. Burada gizlilik şartları, veri kullanım sınırları ve sorumluluklar yazıyor. Onay kutusunu işaretleyip Accept NDA butonuna basıyorum. Artık kilitli içerik açıldı.
+
+Sistem önümüzdeki beş iş günü için her gün saat onda, on dörtte ve on altıda olmak üzere toplam on beş zaman dilimi öneriyor. Hafta sonu otomatik hariç tutuluyor. Bir Salı on dört saat dilimini seçip gönderiyorum.
+
+Şimdi ilan sahibi olan Engineer hesabıma geri dönüyorum. Bildirim panelinde Yeni toplantı talebi bildirimi görünüyor.
+
+Post detayına gidiyorum. Workflow Action Panel'de bekleyen toplantı talebini görüyorum. Accept butonuna basıyorum, talep onaylandı.
+
+İlanın statüsü artık Meeting Scheduled olarak güncellendi. Bu noktadan sonra iki taraf chat üzerinden iletişime devam edebiliyor.
+
+---
+
+[SAHNE BEŞ — ADMIN PANELİ]
+
+Şimdi yönetici hesabıyla giriş yapıyorum. Admin Dashboard açılıyor. Üstte dört istatistik kartı görünüyor: Total Users, Total Announcements, Active Projects ve Monitored Events sayıları.
+
+Users sekmesine geçiyorum. Tüm kullanıcılar isim, e-posta, rol ve hesap durumuyla listeleniyor. Role filtresinden Healthcare Professional seçtiğimde liste sadece sağlık profesyonellerini gösteriyor. Her kullanıcı satırında Suspend veya Reactivate butonu da bulunuyor.
+
+Posts sekmesinde tüm ilanlar yönetiliyor. Şehir, alan ve statü filtreleri var. Bir statü rozetine tıkladığımda ilanın lifecycle timeline'ı açılıyor. Draft, Active, Meeting Scheduled gibi geçişleri tarih damgalarıyla görebiliyorum.
+
+Şimdi uygunsuz bulduğum bir test ilanını siliyorum. Onay diyaloğunu kabul ediyorum. İlan kaldırıldı ve aksiyon log'lara düştü.
+
+Logs sekmesi tüm sistem aktivitelerini gösteriyor. Aksiyon türü, kullanıcı rolü ve serbest metin araması ile filtreleyebiliyorum. Az önce sildiğim ilanın POST DELETED kaydı en üstte: kim, ne zaman, hangi kayıt için yapıldı net şekilde görünüyor. Sistem ayrıca yirmi dört ay retention politikasıyla eski logları otomatik temizliyor.
+
+Son olarak logları CSV olarak dışa aktarıyorum. Dosya bilgisayara iniyor; bu, denetim ve raporlama için kullanılabilir.
+
+---
+
+[SAHNE ALTI — PROFİL VE GDPR]
+
+Son senaryoda Profile sayfasına geçiyorum. Üst tarafta avatar, isim, rol ve kullanıcı istatistikleri görünüyor. Toplam ilan, gönderilen ilgi ve tamamlanan toplantı sayıları gibi.
+
+Edit Profile ile düzenleme moduna geçiyorum. İsim, şehir, ülke ve kurum bilgilerimi güncelleyebiliyorum. Bir alanı değiştirip kaydediyorum. Toast bildirimi Profile updated diyor.
+
+GDPR uyumluluğu kapsamında Export My Data butonu var. Tıkladığımda kullanıcı verilerim, ilanlarım ve aktivitelerim JSON formatında bilgisayara iniyor.
+
+Delete Account butonuna tıkladığımda uyarı modal'ı açılıyor. İşlemin geri alınamayacağı, tüm ilanların ve mesajların silineceği belirtiliyor. Demoda gerçekten silmiyorum; Cancel ile çıkıyorum.
+
+Son olarak Navbar'daki bildirim çanına tıklıyorum. Açılan panelde toplantı talebi, NDA kabul, post statü değişikliği gibi sistem bildirimleri kronolojik sırayla listeleniyor. Her bildirim okundu okunmadı durumunu da koruyor.
+
+---
+
+[KAPANIŞ]
+
+HEALTH AI demosu burada tamamlanıyor. Kayıt ve nokta E-D-U doğrulama, post yaşam döngüsü, arama ve filtreleme, NDA korumalı toplantı akışı, admin yönetimi ve GDPR uyumluluğu; kullanım kılavuzundaki tüm senaryoları kapsadık. İzlediğiniz için teşekkürler.

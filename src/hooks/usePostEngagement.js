@@ -58,5 +58,5 @@ export function usePostEngagement(postId) {
         };
     }, [postId]);
 
-    return { interests, meetings, loaded };
+    return { interests, meetings, engagementLoaded: loaded };
 }

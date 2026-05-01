@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Cpu, Stethoscope, FileText, Lock, BookOpen, Shield, Rocket, CheckCircle2 } from 'lucide-react';
+import { useTilt } from '../../hooks/useInteractiveFX';
 
 /**
  * TwoSides — split-pane "Engineer ↔ Clinician" view.
@@ -10,25 +11,27 @@ import { Cpu, Stethoscope, FileText, Lock, BookOpen, Shield, Rocket, CheckCircle
  * Sentinel-aligned palette with cleaner copy.
  */
 const ENGINEER_ACTIONS = [
-    { icon: FileText, text: 'Post tech stack & open problem' },
-    { icon: Stethoscope, text: 'Find clinical domain expertise' },
-    { icon: Lock, text: 'Schedule NDA-protected meetings' },
-    { icon: CheckCircle2, text: 'Mark Partner Found when matched' },
+    { icon: FileText, text: 'Create or browse announcements that need engineering expertise' },
+    { icon: Stethoscope, text: 'Filter posts by domain, project stage, city, and required expertise' },
+    { icon: Lock, text: 'Accept NDA terms before protected blueprint details are shown' },
+    { icon: CheckCircle2, text: 'Message the author and propose an external meeting slot' },
 ];
 
 const CLINICIAN_ACTIONS = [
-    { icon: BookOpen, text: 'Describe a real bedside need' },
-    { icon: Cpu, text: 'Find engineers who can build it' },
-    { icon: Shield, text: 'Safe, structured first contact' },
-    { icon: Rocket, text: 'Move directly to collaboration' },
+    { icon: BookOpen, text: 'Describe a clinical workflow problem or health-tech project idea' },
+    { icon: Cpu, text: 'Choose the engineering expertise needed for the collaboration' },
+    { icon: Shield, text: 'Mark technical details as public or NDA protected' },
+    { icon: Rocket, text: 'Review interest, meeting requests, and close posts as Partner Found' },
 ];
 
 const PersonaCard = ({ side, title, role, accent, icon, actions, delay }) => {
     const RoleIcon = icon;
+    const tilt = useTilt({ max: 7, scale: 1.02 });
 
     return (
         <motion.div
-            className="px-persona-card"
+            {...tilt}
+            className="px-persona-card premium-card premium-card--halo"
             initial={{ opacity: 0, x: side === 'left' ? -24 : 24 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-120px' }}
@@ -43,12 +46,16 @@ const PersonaCard = ({ side, title, role, accent, icon, actions, delay }) => {
                 WebkitBackdropFilter: 'blur(20px) saturate(120%)',
                 overflow: 'hidden',
                 boxShadow: '0 1px 2px rgba(0,0,0,0.22), 0 28px 56px -24px rgba(0,0,0,0.5)',
+                '--pc-glow': accent.rail,
+                '--pc-glow-soft': accent.chipBg,
             }}
         >
+        <span className="premium-card-halo" aria-hidden="true" />
         {/* Top accent rail */}
         <span style={{
             position: 'absolute', top: 0, left: 0, right: 0, height: 2,
             background: `linear-gradient(90deg, ${accent.rail}, transparent)`,
+            zIndex: 4,
         }} />
 
         <span style={{
@@ -62,9 +69,11 @@ const PersonaCard = ({ side, title, role, accent, icon, actions, delay }) => {
             color: accent.ink,
             fontSize: 11,
             fontWeight: 700,
-            letterSpacing: '0.14em',
+            letterSpacing: 0,
             textTransform: 'uppercase',
             marginBottom: 22,
+            position: 'relative',
+            zIndex: 4,
         }}>
             <RoleIcon size={11} /> {role}
         </span>
@@ -73,10 +82,12 @@ const PersonaCard = ({ side, title, role, accent, icon, actions, delay }) => {
             margin: 0,
             fontSize: 'clamp(1.4rem, 2.6vw, 1.85rem)',
             fontWeight: 600,
-            letterSpacing: '-0.03em',
+            letterSpacing: 0,
             lineHeight: 1.15,
             color: 'hsl(0 0% 96%)',
             marginBottom: 12,
+            position: 'relative',
+            zIndex: 4,
         }}>
             {title}
         </h3>
@@ -84,6 +95,8 @@ const PersonaCard = ({ side, title, role, accent, icon, actions, delay }) => {
         <ul style={{
             listStyle: 'none', padding: 0, margin: '20px 0 0',
             display: 'flex', flexDirection: 'column', gap: 8,
+            position: 'relative',
+            zIndex: 4,
         }}>
             {actions.map((a, i) => {
                 const ActionIcon = a.icon;
@@ -131,6 +144,7 @@ const TwoSides = () => {
 
     return (
         <section
+            className="two-sides-section landing-cinema-section"
             style={{
                 position: 'relative',
                 /* Unified to the landing standard: clamp(3.5rem, 7vw, 5.5rem)
@@ -139,6 +153,10 @@ const TwoSides = () => {
                 fontFamily: 'Sora, sans-serif',
             }}
         >
+            <div className="two-sides-bridge-signal" aria-hidden="true">
+                <span className="two-sides-bridge-line" />
+                <span className="two-sides-bridge-pulse" />
+            </div>
             <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
                 {/* Heading */}
                 <motion.div
@@ -154,26 +172,26 @@ const TwoSides = () => {
                         fontSize: 'clamp(1.75rem, 4vw, 3rem)',
                         fontWeight: 600,
                         lineHeight: 1.05,
-                        letterSpacing: '-0.035em',
+                        letterSpacing: 0,
                         color: 'hsl(0 0% 96%)',
                     }}>
-                        Whichever side <em style={{
+                        Built for both <em style={{
                             fontFamily: "'Instrument Serif', Georgia, serif",
                             fontStyle: 'italic',
                             fontWeight: 400,
                             color: 'hsl(119 99% 56%)',
-                        }}>you're on</em>.
+                        }}>project roles</em>.
                     </h2>
                     <p style={{
                         marginTop: 14,
                         fontSize: 'clamp(0.95rem, 1.3vw, 1.1rem)',
-                        color: 'hsl(0 0% 70%)',
+                        color: 'hsl(0 0% 76%)',
                         fontWeight: 300,
                         lineHeight: 1.6,
                         maxWidth: '50ch',
                         marginInline: 'auto',
                     }}>
-                        Each persona gets the right tools, with the right safeguards, and a workflow tuned to how they actually work.
+                        Healthcare professionals and engineers use the same post lifecycle: publish, discover, express interest, accept NDA terms when required, schedule, chat, and close the announcement.
                     </p>
                 </motion.div>
 

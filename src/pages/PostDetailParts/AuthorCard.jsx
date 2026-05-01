@@ -28,10 +28,10 @@ const AuthorCard = ({ post, isAuthor, accentGradient }) => {
                     whileHover={{ scale: 1.06, rotate: 4 }}
                     style={{
                         width: '42px', height: '42px', borderRadius: '13px',
-                        background: accentGradient,
+                        background: 'var(--brand-gradient, ' + accentGradient + ')',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '17px', fontWeight: '800', color: '#070b0a',
-                        boxShadow: '0 8px 22px rgba(96, 165, 250, 0.3)'
+                        fontSize: '17px', fontWeight: '800', color: 'var(--fg-on-accent)',
+                        boxShadow: 'var(--brand-avatar-shadow, 0 8px 22px rgba(96, 165, 250, 0.3))'
                     }}
                     aria-hidden="true"
                 >
@@ -48,9 +48,9 @@ const AuthorCard = ({ post, isAuthor, accentGradient }) => {
                         onClick={() => navigate('/chat', { state: { recipient: { id: post.authorId, name: authorName, role: authorRole } } })}
                         style={{
                             marginLeft: 'auto',
-                            background: 'rgba(96, 165, 250, 0.08)',
-                            border: '1px solid rgba(96, 165, 250, 0.22)',
-                            color: '#93c5fd',
+                            background: 'var(--brand-soft-bg, rgba(96, 165, 250, 0.08))',
+                            border: '1px solid var(--brand-soft-border, rgba(96, 165, 250, 0.22))',
+                            color: 'var(--brand-soft-text, #93c5fd)',
                             padding: '8px 13px',
                             borderRadius: '10px',
                             cursor: 'pointer',

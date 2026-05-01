@@ -40,12 +40,18 @@ const EditPostModal = ({
                         initial={animReady ? { opacity: 0, scale: 0.92, y: 20 } : false}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.92, y: 20 }}
-                        className="glass-panel modal-content"
-                        style={{ borderRadius: '24px', maxWidth: '600px', margin: 'auto' }}
+                        transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+                        className="glass-panel modal-content premium-card premium-card--halo"
+                        style={{
+                            borderRadius: '24px', maxWidth: '600px', margin: 'auto',
+                            '--pc-glow': 'rgba(34, 211, 238, 0.45)',
+                            '--pc-glow-soft': 'rgba(34, 211, 238, 0.18)',
+                        }}
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="edit-modal-title"
                     >
+                        <span className="premium-card-halo" aria-hidden="true" />
                         <div className="flex items-center gap-4 mb-8" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
                             <div style={{ background: 'rgba(34, 211, 238, 0.12)', padding: '12px', borderRadius: '16px' }}>
                                 <Edit3 color="var(--accent-light)" size={32} />

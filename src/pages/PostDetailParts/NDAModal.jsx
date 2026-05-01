@@ -1,5 +1,5 @@
-import { CheckCircle2, MessageSquare, Send, ShieldAlert, X } from 'lucide-react';
- 
+import { CheckCircle2, Loader2, MessageSquare, Send, ShieldAlert, X } from 'lucide-react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAnimReady } from '../../hooks/useAnimReady';
 
@@ -11,6 +11,7 @@ const NDAModal = ({
     interestMessage,
     onChangeMessage,
     onSubmit,
+    submitting = false,
 }) => {
     const animReady = useAnimReady();
 
@@ -22,12 +23,18 @@ const NDAModal = ({
                         initial={animReady ? { opacity: 0, scale: 0.92, y: 20 } : false}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.92, y: 20 }}
-                        className="glass-panel modal-content"
-                        style={{ borderRadius: '24px', maxWidth: '580px', margin: 'auto' }}
+                        transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+                        className="glass-panel modal-content premium-card premium-card--halo"
+                        style={{
+                            borderRadius: '24px', maxWidth: '580px', margin: 'auto',
+                            '--pc-glow': 'rgba(239, 68, 68, 0.45)',
+                            '--pc-glow-soft': 'rgba(239, 68, 68, 0.18)',
+                        }}
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="nda-modal-title"
                     >
+                        <span className="premium-card-halo" aria-hidden="true" />
                         <div className="flex items-center gap-4 mb-8" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
                             <div style={{ background: 'rgba(239, 68, 68, 0.12)', padding: '12px', borderRadius: '16px', boxShadow: '0 0 20px rgba(239, 68, 68, 0.1)' }}>
                                 <ShieldAlert color="var(--error)" size={32} />
@@ -70,11 +77,11 @@ const NDAModal = ({
                         <button
                             className="nda-checkbox-wrapper"
                             style={{
-                                background: acceptedNda ? 'rgba(96, 165, 250, 0.08)' : 'var(--background-alt)',
+                                background: acceptedNda ? 'var(--selected-bg, rgba(96, 165, 250, 0.08))' : 'var(--background-alt)',
                                 padding: '24px',
                                 borderRadius: '18px',
                                 border: '1px solid',
-                                borderColor: acceptedNda ? 'rgba(96, 165, 250, 0.3)' : 'rgba(255,255,255,0.06)',
+                                borderColor: acceptedNda ? 'var(--selected-border, rgba(96, 165, 250, 0.3))' : 'rgba(255,255,255,0.06)',
                                 cursor: 'pointer',
                                 transition: 'all 0.3s ease',
                                 display: 'flex',
@@ -95,7 +102,7 @@ const NDAModal = ({
                                 background: acceptedNda ? 'var(--primary)' : 'transparent',
                                 flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 transition: 'all 0.25s', marginTop: '2px',
-                                boxShadow: acceptedNda ? '0 0 15px rgba(96, 165, 250, 0.4)' : 'none'
+                                boxShadow: acceptedNda ? '0 12px 28px -22px rgba(8, 120, 79, 0.42)' : 'none'
                             }}>
                                 {acceptedNda && <CheckCircle2 size={16} color="white" strokeWidth={3} />}
                             </div>
@@ -105,9 +112,17 @@ const NDAModal = ({
                         </button>
 
                         <div className="px-modal-footer">
-                            <button type="button" className="px-btn ghost" onClick={onClose}>Cancel</button>
-                            <button type="button" className="px-btn primary" disabled={!acceptedNda} onClick={onSubmit}>
-                                Accept & Express Interest <Send size={16} />
+                            <button type="button" className="px-btn ghost" onClick={onClose} disabled={submitting}>Cancel</button>
+                            <button type="button" className="px-btn primary" disabled={!acceptedNda || submitting} onClick={onSubmit}>
+                                {submitting ? (
+                                    <>
+                                        <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Sending…
+                                    </>
+                                ) : (
+                                    <>
+                                        Accept &amp; Express Interest <Send size={16} />
+                                    </>
+                                )}
                             </button>
                         </div>
                     </motion.div>

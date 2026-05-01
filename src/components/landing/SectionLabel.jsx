@@ -43,13 +43,21 @@ const SectionLabel = ({ id, n, label, accent = 'hsl(119 99% 56%)' }) => (
             whiteSpace: 'nowrap',
             flexShrink: 0,
         }}>
-            <span
+            <motion.span
                 aria-hidden="true"
+                animate={{
+                    boxShadow: [
+                        `0 0 6px ${accent}`,
+                        `0 0 14px ${accent}`,
+                        `0 0 6px ${accent}`,
+                    ],
+                }}
+                transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
                 style={{
                     width: 6, height: 6, borderRadius: '50%',
                     background: accent,
-                    boxShadow: `0 0 8px ${accent}`,
                     transform: 'translateY(-1px)',
+                    flexShrink: 0,
                 }}
             />
             {n} <span style={{ color: 'hsl(0 0% 60%)', margin: '0 4px' }}>—</span> {label}

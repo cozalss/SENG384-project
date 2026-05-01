@@ -5,7 +5,45 @@ import { UserCircle, MapPin, Building, Globe, Mail, Briefcase, Download, Trash2,
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAnimReady } from '../hooks/useAnimReady';
 import { useToast } from '../hooks/useToast';
+import { useTilt } from '../hooks/useInteractiveFX';
 import AnimatedCounter from '../components/AnimatedCounter';
+
+const ProfileStatTile = ({ value, label, color }) => {
+    const tilt = useTilt({ max: 7, scale: 1.025 });
+    return (
+        <motion.div
+            {...tilt}
+            transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+            className="px-stat-card premium-card premium-card--soft"
+            style={{ position: 'relative', overflow: 'hidden' }}
+        >
+            <div className="px-stat-card-glow" aria-hidden="true" />
+            <div style={{
+                position: 'relative',
+                zIndex: 3,
+                fontSize: '28px',
+                fontWeight: 600,
+                color,
+                fontFamily: 'var(--font-heading)',
+                letterSpacing: '-0.035em',
+                lineHeight: 1,
+                fontVariantNumeric: 'tabular-nums',
+            }}>
+                <AnimatedCounter value={value} duration={900} />
+            </div>
+            <div style={{
+                position: 'relative',
+                zIndex: 3,
+                fontSize: 10,
+                color: 'var(--text-subtle)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                fontWeight: 600,
+                marginTop: 6,
+            }}>{label}</div>
+        </motion.div>
+    );
+};
 
 const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
     const navigate = useNavigate();
@@ -78,10 +116,10 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
     // at-a-glance, but both now sit in the same "warm + organic" family rather
     // than the cool navy-blue that fought the background.
     const accentGradient = user?.role === 'Engineer'
-        ? 'linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%)'
+        ? 'linear-gradient(135deg, hsl(119 99% 56%) 0%, hsl(119 99% 50%) 55%, hsl(119 99% 44%) 100%)'
         : 'linear-gradient(135deg, #34d399, #6ee7b7)';
     const accentShadow = user?.role === 'Engineer'
-        ? '0 18px 42px rgba(249, 168, 96, 0.35), inset 0 2px 0 rgba(255,255,255,0.25)'
+        ? '0 18px 42px rgba(34, 211, 102, 0.35), inset 0 2px 0 rgba(255,255,255,0.25)'
         : '0 18px 42px rgba(52, 211, 153, 0.32), inset 0 2px 0 rgba(255,255,255,0.22)';
 
     return (
@@ -169,7 +207,7 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                             width: '92px', height: '92px', borderRadius: '26px',
                             background: accentGradient,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            margin: '0 auto 20px', fontSize: '38px', fontWeight: 700, color: '#1a1012',
+                            margin: '0 auto 20px', fontSize: '38px', fontWeight: 700, color: 'var(--fg-on-accent)',
                             fontFamily: 'var(--font-heading)',
                             letterSpacing: '-0.03em',
                             boxShadow: accentShadow,
@@ -183,14 +221,14 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                         {user?.role}
                     </span>
 
-                    <div style={{ margin: '20px 0', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)' }} />
+                    <div style={{ margin: '20px 0', height: '1px', background: 'linear-gradient(90deg, transparent, var(--border), transparent)' }} />
 
                     <div className="flex-col gap-3" style={{ textAlign: 'left' }}>
                         {[
                             { icon: <Mail size={15} />, label: user?.email },
                             { icon: <Building size={15} />, label: user?.institution },
                             { icon: <MapPin size={15} />, label: `${user?.city}, ${user?.country}` },
-                            { icon: <Calendar size={15} />, label: `Joined ${new Date(user?.registeredAt).toLocaleDateString()}` }
+                            { icon: <Calendar size={15} />, label: `Joined ${new Date(user?.registeredAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` }
                         ].map((item, i) => (
                             <div key={i} className="flex items-center gap-3 text-muted text-sm" style={{ padding: '6px 0' }}>
                                 <span style={{ color: 'var(--text-subtle)' }}>{item.icon}</span>
@@ -203,39 +241,10 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginTop: '24px' }}>
                         {[
                             { value: myPosts.length, label: 'Total', color: 'var(--text-main)' },
-                            { value: activePosts, label: 'Active', color: '#f5c48a' },
+                            { value: activePosts, label: 'Active', color: 'var(--brand-soft-text)' },
                             { value: closedPosts, label: 'Closed', color: '#67e8f9' }
                         ].map((s, i) => (
-                            <motion.div
-                                key={i}
-                                whileHover={{ y: -2 }}
-                                transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
-                                className="px-stat-card"
-                                style={{ position: 'relative', overflow: 'hidden' }}
-                            >
-                                <div className="px-stat-card-glow" aria-hidden="true" />
-                                <div style={{
-                                    position: 'relative',
-                                    fontSize: '28px',
-                                    fontWeight: 600,
-                                    color: s.color,
-                                    fontFamily: 'var(--font-heading)',
-                                    letterSpacing: '-0.035em',
-                                    lineHeight: 1,
-                                    fontVariantNumeric: 'tabular-nums',
-                                }}>
-                                    <AnimatedCounter value={s.value} duration={900} />
-                                </div>
-                                <div style={{
-                                    position: 'relative',
-                                    fontSize: 10,
-                                    color: 'var(--text-subtle)',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.14em',
-                                    fontWeight: 600,
-                                    marginTop: 6,
-                                }}>{s.label}</div>
-                            </motion.div>
+                            <ProfileStatTile key={i} value={s.value} label={s.label} color={s.color} />
                         ))}
                     </div>
                 </motion.div>
@@ -250,7 +259,7 @@ const Profile = ({ user, updateUser, deleteUser, posts, logout }) => {
                         transition={{ delay: 0.1 }}
                         className="editorial-panel"
                     >
-                        <div className="flex justify-between items-center mb-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '18px' }}>
+                        <div className="flex justify-between items-center mb-6" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '18px' }}>
                             <div>
                                 <span className="dash-eyebrow" style={{ marginBottom: 8 }}>
                                     <UserCircle size={11} /> Settings

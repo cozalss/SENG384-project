@@ -1,0 +1,702 @@
+/* =====================================================================
+   CinematicVault — NDA-gated trust visualization
+   ---------------------------------------------------------------------
+   See CinematicVault.jsx. Three-pane stage: confidential input → vault →
+   public artifact. The vault is pure SVG/CSS (no images), with rotating
+   tick rings, pulse rings, and an animated ECG trace as a "lock dial."
+   ===================================================================== */
+
+.cvault-section {
+    position: relative;
+    padding: clamp(3.5rem, 7vw, 5.5rem) clamp(1.5rem, 4vw, 3rem);
+    font-family: 'Sora', 'Inter', sans-serif;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, rgba(7, 11, 10, 0.86), rgba(7, 11, 10, 0.54) 46%, rgba(7, 11, 10, 0.88)),
+        radial-gradient(ellipse 72% 62% at 50% 52%, rgba(34, 211, 102, 0.09), transparent 72%);
+}
+
+.cvault-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+/* ---- Eyebrow / heading ---- */
+
+.cvault-eyebrow-row {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.cvault-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(34, 211, 102, 0.08);
+    border: 1px solid rgba(34, 211, 102, 0.22);
+    color: hsl(119 80% 70%);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.cvault-heading {
+    text-align: center;
+    margin: 0 auto 14px;
+    max-width: 22ch;
+    font-size: clamp(1.85rem, 4vw, 3.1rem);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    color: hsl(0 0% 96%);
+}
+
+.cvault-heading em {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    color: hsl(119 99% 56%);
+}
+
+.cvault-sub {
+    text-align: center;
+    margin: 0 auto clamp(2rem, 4vw, 2.75rem);
+    max-width: 64ch;
+    font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+    line-height: 1.6;
+    font-weight: 300;
+    color: hsl(0 0% 76%);
+}
+
+/* ---- Stage layout ---- */
+
+.cvault-stage {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(280px, 360px)
+        minmax(0, 1fr);
+    gap: clamp(1rem, 2.5vw, 2rem);
+    align-items: stretch;
+}
+
+.cvault-stage::before {
+    content: '';
+    position: absolute;
+    inset: -14% -8%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 42% 58% at 50% 48%, rgba(34, 211, 102, 0.20), transparent 70%),
+        radial-gradient(ellipse 34% 45% at 18% 42%, rgba(245, 158, 11, 0.12), transparent 74%),
+        radial-gradient(ellipse 34% 45% at 84% 50%, rgba(34, 211, 238, 0.12), transparent 74%);
+    filter: blur(18px);
+    opacity: 0.9;
+}
+
+.cvault-stage::after {
+    content: '';
+    position: absolute;
+    left: -6%;
+    right: -6%;
+    top: 44%;
+    z-index: 0;
+    height: 2px;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.28), rgba(34, 211, 102, 0.58), rgba(34, 211, 238, 0.24), transparent);
+    filter: drop-shadow(0 0 18px rgba(34, 211, 102, 0.34));
+    opacity: 0.72;
+}
+
+/* ---- Side panes ---- */
+
+.cvault-pane {
+    position: relative;
+    z-index: 2;
+    overflow: hidden;
+    border-radius: 22px;
+    padding: clamp(1.2rem, 2vw, 1.6rem);
+    background:
+        linear-gradient(180deg, rgba(20, 24, 24, 0.92), rgba(7, 11, 10, 0.98)),
+        rgba(7, 11, 10, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(18px) saturate(120%);
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    box-shadow:
+        0 28px 60px -22px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    display: flex;
+    flex-direction: column;
+    min-height: 360px;
+}
+
+.cvault-pane--input {
+    border-color: rgba(245, 158, 11, 0.24);
+    box-shadow:
+        0 28px 60px -22px rgba(0, 0, 0, 0.66),
+        0 0 64px -28px rgba(245, 158, 11, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.cvault-pane--output {
+    border-color: rgba(34, 211, 102, 0.28);
+    box-shadow:
+        0 28px 60px -22px rgba(0, 0, 0, 0.66),
+        0 0 70px -28px rgba(34, 211, 102, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.cvault-pane-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cvault-pane-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.10);
+    border: 1px solid rgba(245, 158, 11, 0.26);
+    color: hsl(38 90% 72%);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+.cvault-pane-tag--public {
+    background: rgba(34, 211, 102, 0.10);
+    border-color: rgba(34, 211, 102, 0.28);
+    color: hsl(119 80% 72%);
+}
+
+.cvault-pane-label {
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.42);
+}
+
+/* ---- Confidential document card ---- */
+
+.cvault-doc {
+    position: relative;
+    flex: 1;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background:
+        linear-gradient(180deg, rgba(245, 158, 11, 0.05), transparent 50%),
+        rgba(3, 7, 6, 0.58);
+    border: 1px solid rgba(245, 158, 11, 0.14);
+    overflow: hidden;
+}
+
+.cvault-doc-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    color: hsl(38 90% 72%);
+}
+
+.cvault-doc-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+.cvault-doc-title span {
+    font-size: 13px;
+    font-weight: 600;
+    color: hsl(0 0% 92%);
+}
+.cvault-doc-title small {
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.45);
+    font-family: 'JetBrains Mono', 'Menlo', monospace;
+}
+
+.cvault-doc-sample {
+    margin: 0 0 12px;
+    font-family: 'JetBrains Mono', 'Menlo', monospace;
+    font-size: 10.5px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.62);
+    background: rgba(0, 0, 0, 0.48);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    padding: 10px 12px;
+    white-space: pre-wrap;
+    overflow: hidden;
+    max-height: 110px;
+}
+
+.cvault-doc-watermark {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.10);
+    border: 1px solid rgba(245, 158, 11, 0.28);
+    color: hsl(38 90% 72%);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+/* ---- Particle streams (input/output) ---- */
+
+.cvault-input-stream,
+.cvault-output-stream {
+    margin-top: 14px;
+    position: relative;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.cvault-input-stream span,
+.cvault-output-stream span {
+    position: absolute;
+    top: 50%;
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    transform: translateY(-50%);
+    background: linear-gradient(
+        90deg,
+        rgba(245, 158, 11, 0) 0%,
+        rgba(245, 158, 11, 0.7) 50%,
+        rgba(245, 158, 11, 0) 100%
+    );
+    animation: cvault-stream-in 2.4s linear infinite;
+}
+
+.cvault-output-stream span {
+    background: linear-gradient(
+        90deg,
+        rgba(34, 211, 102, 0) 0%,
+        rgba(34, 211, 102, 0.85) 50%,
+        rgba(34, 211, 102, 0) 100%
+    );
+    animation-name: cvault-stream-out;
+}
+
+@keyframes cvault-stream-in {
+    0%   { left: -22px;  opacity: 0; }
+    20%  { opacity: 0.85; }
+    80%  { opacity: 0.85; }
+    100% { left: 100%;    opacity: 0; }
+}
+
+@keyframes cvault-stream-out {
+    0%   { left: -22px;  opacity: 0; }
+    25%  { opacity: 1; }
+    100% { left: 100%;    opacity: 0; }
+}
+
+/* ---- The vault ---- */
+
+.cvault-door {
+    position: relative;
+    z-index: 3;
+    aspect-ratio: 1;
+    min-height: 320px;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.cvault-door::before {
+    content: '';
+    position: absolute;
+    inset: -18%;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: 50%;
+    background:
+        conic-gradient(from 210deg, transparent 0deg, rgba(34, 211, 102, 0.18) 42deg, transparent 76deg, rgba(34, 211, 238, 0.11) 138deg, transparent 176deg, rgba(245, 158, 11, 0.13) 256deg, transparent 312deg),
+        radial-gradient(circle, rgba(34, 211, 102, 0.16), transparent 64%);
+    filter: blur(8px);
+    opacity: 0.72;
+    animation: cvault-aura-turn 22s linear infinite;
+}
+
+.cvault-door::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 4%;
+    width: 68%;
+    height: 1px;
+    z-index: 4;
+    pointer-events: none;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.24), rgba(34, 211, 238, 0.62), transparent);
+    filter: drop-shadow(0 0 14px rgba(34, 211, 238, 0.46));
+    opacity: 0.58;
+    animation: cvault-anamorphic 7.6s var(--ease-smooth, ease) infinite;
+}
+
+.cvault-door-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+@keyframes cvault-rotate {
+    from { transform: rotate(0deg);   }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes cvault-aura-turn {
+    from { transform: rotate(0deg) scale(1); }
+    to   { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes cvault-anamorphic {
+    0%, 100% { opacity: 0.18; transform: translateX(-50%) scaleX(0.82); }
+    42%, 58% { opacity: 0.72; transform: translateX(-50%) scaleX(1.08); }
+}
+
+.cvault-ring--outer {
+    transform-origin: 160px 160px;
+    transform-box: fill-box;
+    animation: cvault-rotate 38s linear infinite;
+}
+
+.cvault-ring--mid {
+    transform-origin: 160px 160px;
+    transform-box: fill-box;
+    animation: cvault-rotate 24s linear infinite reverse;
+}
+
+.cvault-spokes {
+    transform-origin: 160px 160px;
+    transform-box: fill-box;
+    animation: cvault-rotate 18s linear infinite;
+}
+
+.cvault-stamp {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: hsl(119 99% 65%);
+    filter: drop-shadow(0 0 10px hsl(119 99% 56%));
+}
+
+@keyframes cvault-trace-sweep {
+    0%   { stroke-dashoffset: 260; }
+    100% { stroke-dashoffset: -260; }
+}
+
+.cvault-trace {
+    animation: cvault-trace-sweep 3.4s linear infinite;
+}
+
+/* ---- Vault action ticker ---- */
+
+.cvault-actions {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    max-width: 280px;
+}
+
+.cvault-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.45);
+    transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cvault-action.is-on {
+    background: rgba(34, 211, 102, 0.12);
+    border-color: rgba(34, 211, 102, 0.32);
+    color: hsl(119 80% 75%);
+    box-shadow: 0 0 24px rgba(34, 211, 102, 0.18);
+}
+
+.cvault-action--in.is-on {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.32);
+    color: hsl(38 90% 75%);
+    box-shadow: 0 0 24px rgba(245, 158, 11, 0.18);
+}
+
+/* ---- Public handshake card ---- */
+
+.cvault-handshake {
+    flex: 1;
+    display: flex;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 14px;
+    background:
+        linear-gradient(180deg, rgba(34, 211, 102, 0.08), rgba(34, 211, 102, 0.02)),
+        rgba(3, 7, 6, 0.58);
+    border: 1px solid rgba(34, 211, 102, 0.22);
+    box-shadow: 0 0 30px rgba(34, 211, 102, 0.08);
+}
+
+.cvault-handshake-stamp {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, hsl(119 99% 56%), hsl(155 80% 60%));
+    color: hsl(0 0% 6%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 22px rgba(34, 211, 102, 0.4);
+}
+
+.cvault-handshake-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.cvault-handshake-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: hsl(0 0% 96%);
+    margin-bottom: 8px;
+    letter-spacing: -0.005em;
+}
+
+.cvault-handshake-meta {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.62);
+}
+
+.cvault-handshake-meta li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.cvault-handshake-meta span {
+    font-family: 'JetBrains Mono', 'Menlo', monospace;
+    color: hsl(119 99% 65%);
+    font-size: 10.5px;
+}
+
+.cvault-handshake-foot {
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.45);
+    font-style: italic;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1080px) {
+    .cvault-stage {
+        grid-template-columns: 1fr;
+    }
+    .cvault-pane,
+    .cvault-door {
+        max-width: 540px;
+        margin: 0 auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .cvault-pane {
+        min-height: auto;
+    }
+    .cvault-door {
+        min-height: 260px;
+    }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .cvault-ring--outer,
+    .cvault-ring--mid,
+    .cvault-spokes,
+    .cvault-trace,
+    .cvault-door::before,
+    .cvault-door::after,
+    .cvault-input-stream span,
+    .cvault-output-stream span {
+        animation: none !important;
+    }
+}
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES
+   --------------------------------------------------------------------------
+   The vault section sits on the page background, not on the hero canvas, so
+   its panes/cards/section background ARE UI surfaces — flip them to light.
+   The vault door SVG itself + its conic aura keep their cinematic glow
+   (brand colors, lower alpha) — that's the centerpiece visualization.
+   ========================================================================== */
+
+/* --- Section background: page-level, flip to light --- */
+:root[data-theme="light"] .cvault-section {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.78) 46%, rgba(255, 255, 255, 0.94)),
+        radial-gradient(ellipse 72% 62% at 50% 52%, rgba(34, 211, 102, 0.06), transparent 72%);
+}
+
+/* --- Heading + supporting text --- */
+:root[data-theme="light"] .cvault-heading {
+    color: var(--text-main, #15181d);
+}
+:root[data-theme="light"] .cvault-sub {
+    color: rgba(21, 24, 29, 0.72);
+}
+:root[data-theme="light"] .cvault-pane-label {
+    color: rgba(21, 24, 29, 0.55);
+}
+
+/* --- Side panes: floating UI cards --- */
+:root[data-theme="light"] .cvault-pane {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.86)),
+        rgba(255, 255, 255, 0.86);
+    border-color: rgba(15, 18, 22, 0.10);
+    box-shadow:
+        0 12px 32px -16px rgba(15, 18, 22, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+:root[data-theme="light"] .cvault-pane--input {
+    border-color: rgba(245, 158, 11, 0.32);
+    box-shadow:
+        0 12px 32px -16px rgba(15, 18, 22, 0.14),
+        0 0 40px -22px rgba(245, 158, 11, 0.18);
+}
+:root[data-theme="light"] .cvault-pane--output {
+    border-color: rgba(34, 211, 102, 0.32);
+    box-shadow:
+        0 12px 32px -16px rgba(15, 18, 22, 0.14),
+        0 0 40px -22px rgba(34, 211, 102, 0.20);
+}
+:root[data-theme="light"] .cvault-pane-head {
+    border-bottom-color: rgba(15, 18, 22, 0.08);
+}
+
+/* --- Confidential document card (still distinctly "confidential" amber) --- */
+:root[data-theme="light"] .cvault-doc {
+    background:
+        linear-gradient(180deg, rgba(245, 158, 11, 0.08), transparent 50%),
+        rgba(255, 250, 240, 0.95);
+    border-color: rgba(245, 158, 11, 0.30);
+}
+:root[data-theme="light"] .cvault-doc-head {
+    border-bottom-color: rgba(15, 18, 22, 0.10);
+    color: hsl(38 80% 38%);
+}
+:root[data-theme="light"] .cvault-doc-title span {
+    color: var(--text-main, #15181d);
+}
+:root[data-theme="light"] .cvault-doc-title small {
+    color: rgba(21, 24, 29, 0.55);
+}
+:root[data-theme="light"] .cvault-doc-sample {
+    color: rgba(21, 24, 29, 0.72);
+    background: rgba(15, 18, 22, 0.04);
+    border-color: rgba(15, 18, 22, 0.08);
+}
+:root[data-theme="light"] .cvault-doc-watermark {
+    color: hsl(38 80% 36%);
+}
+
+/* --- Stream channels --- */
+:root[data-theme="light"] .cvault-input-stream,
+:root[data-theme="light"] .cvault-output-stream {
+    background: rgba(15, 18, 22, 0.04);
+}
+
+/* --- Action ticker pills (idle state) --- */
+:root[data-theme="light"] .cvault-action {
+    background: rgba(15, 18, 22, 0.04);
+    border-color: rgba(15, 18, 22, 0.08);
+    color: rgba(21, 24, 29, 0.55);
+}
+:root[data-theme="light"] .cvault-action.is-on {
+    color: hsl(119 70% 28%);
+}
+:root[data-theme="light"] .cvault-action--in.is-on {
+    color: hsl(38 80% 36%);
+}
+
+/* --- Public handshake card (success / output) --- */
+:root[data-theme="light"] .cvault-handshake {
+    background:
+        linear-gradient(180deg, rgba(34, 211, 102, 0.10), rgba(34, 211, 102, 0.03)),
+        rgba(248, 255, 250, 0.96);
+    border-color: rgba(34, 211, 102, 0.32);
+}
+:root[data-theme="light"] .cvault-handshake-title {
+    color: var(--text-main, #15181d);
+}
+:root[data-theme="light"] .cvault-handshake-meta {
+    color: rgba(21, 24, 29, 0.70);
+}
+:root[data-theme="light"] .cvault-handshake-meta span {
+    color: hsl(119 70% 30%);
+}
+:root[data-theme="light"] .cvault-handshake-foot {
+    color: rgba(21, 24, 29, 0.55);
+    border-top-color: rgba(15, 18, 22, 0.10);
+}
+
+/* --- Vault door aura: keep brand glow, soften alpha (centerpiece stays
+       cinematic but doesn't muddy the light page) --- */
+:root[data-theme="light"] .cvault-door::before {
+    opacity: 0.55;
+}

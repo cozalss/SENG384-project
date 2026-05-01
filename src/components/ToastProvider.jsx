@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { CheckCircle2, AlertTriangle, Info, X } from 'lucide-react';
- 
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { ToastContext } from './ToastContext';
 
@@ -12,15 +12,23 @@ const iconMap = {
 };
 
 const colorMap = {
-    success: { border: 'rgba(96, 165, 250, 0.35)', bg: 'rgba(96, 165, 250, 0.08)', accent: '#93c5fd' },
+    success: { border: 'rgba(34, 211, 102, 0.35)', bg: 'rgba(34, 211, 102, 0.08)', accent: 'var(--brand-soft-text, #6ee7b7)' },
     error: { border: 'rgba(239, 68, 68, 0.32)', bg: 'rgba(239, 68, 68, 0.07)', accent: '#fca5a5' },
     info: { border: 'rgba(34, 211, 238, 0.32)', bg: 'rgba(34, 211, 238, 0.07)', accent: '#67e8f9' }
 };
 
 export const ToastProvider = ({ children }) => {
     const [toasts, setToasts] = useState([]);
+    // Track every dismiss timeout so unmount can flush them and prevent a
+    // setState on an unmounted provider (the leak surfaced in the bug audit).
+    const timeoutsRef = useRef(new Map());
 
     const dismiss = useCallback((id) => {
+        const t = timeoutsRef.current.get(id);
+        if (t) {
+            clearTimeout(t);
+            timeoutsRef.current.delete(id);
+        }
         setToasts(prev => prev.filter(t => t.id !== id));
     }, []);
 
@@ -33,10 +41,22 @@ export const ToastProvider = ({ children }) => {
         };
         setToasts(prev => [...prev.slice(-4), toast]); // cap at 5
         if (toast.duration > 0) {
-            setTimeout(() => dismiss(id), toast.duration);
+            const handle = setTimeout(() => {
+                timeoutsRef.current.delete(id);
+                setToasts(prev => prev.filter(t => t.id !== id));
+            }, toast.duration);
+            timeoutsRef.current.set(id, handle);
         }
         return id;
-    }, [dismiss]);
+    }, []);
+
+    useEffect(() => {
+        const map = timeoutsRef.current;
+        return () => {
+            map.forEach((handle) => clearTimeout(handle));
+            map.clear();
+        };
+    }, []);
 
     const api = {
         success: (message, opts) => push('success', message, opts),
@@ -81,11 +101,11 @@ export const ToastProvider = ({ children }) => {
                                         padding: '14px 16px 14px 16px',
                                         width: 'min(380px, calc(100vw - 48px))',
                                         borderRadius: '14px',
-                                        background: `linear-gradient(135deg, ${c.bg}, rgba(7, 11, 10, 0.65))`,
+                                        background: `linear-gradient(135deg, ${c.bg}, var(--toast-bg, rgba(7, 11, 10, 0.65)))`,
                                         border: `1px solid ${c.border}`,
                                         backdropFilter: 'blur(24px) saturate(140%)',
                                         WebkitBackdropFilter: 'blur(24px) saturate(140%)',
-                                        boxShadow: '0 20px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.04)',
+                                        boxShadow: 'var(--toast-shadow, 0 20px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.04))',
                                         color: 'var(--text-main)',
                                         pointerEvents: 'auto',
                                         position: 'relative',

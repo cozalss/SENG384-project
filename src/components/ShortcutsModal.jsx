@@ -41,8 +41,8 @@ const Kbd = ({ children }) => (
         height: '26px',
         padding: '0 8px',
         borderRadius: '7px',
-        background: 'rgba(7, 11, 10, 0.7)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: 'var(--bg-glass-strong, rgba(7, 11, 10, 0.7))',
+        border: '1px solid var(--border)',
         color: 'var(--text-main)',
         fontSize: '11.5px',
         fontWeight: '700',
@@ -87,7 +87,7 @@ const ShortcutsModal = () => {
                         onClick={() => setOpen(false)}
                         style={{
                             position: 'fixed', inset: 0, zIndex: 9998,
-                            background: 'rgba(3, 7, 10, 0.72)',
+                            background: 'var(--bg-glass-strong, rgba(3, 7, 10, 0.72))',
                             backdropFilter: 'blur(12px)',
                             WebkitBackdropFilter: 'blur(12px)'
                         }}
@@ -112,18 +112,18 @@ const ShortcutsModal = () => {
                             zIndex: 9999,
                             overflow: 'hidden',
                             padding: 0,
-                            boxShadow: '0 50px 120px rgba(0, 0, 0, 0.6), 0 0 100px rgba(96, 165, 250, 0.14)'
+                            boxShadow: 'var(--floating-panel-shadow, 0 50px 120px rgba(0, 0, 0, 0.6), 0 0 100px rgba(96, 165, 250, 0.14))'
                         }}
                     >
                         <div style={{
                             display: 'flex', alignItems: 'center',
                             justifyContent: 'space-between',
                             padding: '18px 22px',
-                            borderBottom: '1px solid rgba(255,255,255,0.05)',
-                            background: 'rgba(7, 11, 10, 0.4)'
+                            borderBottom: '1px solid var(--border)',
+                            background: 'var(--bg-overlay)'
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <Keyboard size={17} color="#93c5fd" />
+                                <Keyboard size={17} color="var(--brand-icon, #93c5fd)" />
                                 <h3 style={{
                                     fontSize: '15px', fontWeight: '700',
                                     letterSpacing: '-0.01em', fontFamily: 'var(--font-heading)'
@@ -162,7 +162,7 @@ const ShortcutsModal = () => {
                                             justifyContent: 'space-between',
                                             padding: '8px 0',
                                             borderBottom: i < group.items.length - 1
-                                                ? '1px solid rgba(255, 255, 255, 0.03)'
+                                                ? '1px solid var(--border)'
                                                 : 'none'
                                         }}>
                                             <span style={{
@@ -185,8 +185,8 @@ const ShortcutsModal = () => {
 
                         <div style={{
                             padding: '11px 22px',
-                            borderTop: '1px solid rgba(255,255,255,0.05)',
-                            background: 'rgba(7, 11, 10, 0.4)',
+                            borderTop: '1px solid var(--border)',
+                            background: 'var(--bg-overlay)',
                             textAlign: 'center',
                             fontSize: '11px',
                             color: 'var(--text-subtle)',

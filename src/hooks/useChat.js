@@ -108,20 +108,34 @@ export function useChat(currentUser) {
       }
     });
 
+    // Capture the convo id this effect was bound to. When the user switches
+    // conversations or unmounts mid-typing, clear the OLD convo's typing flag
+    // so the other party doesn't see a phantom "typing…" for ~3s after the
+    // switch (auto-clear delay was the only safety net before).
+    const boundConvoId = activeConvoId;
+    const boundUserId = currentUser?.id;
+
     return () => {
       unsubMsgs();
       unsubConvo();
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      if (boundConvoId && boundUserId) {
+        setTypingStatus(boundConvoId, boundUserId, false).catch(() => {});
+      }
     };
-  }, [activeConvoId]);
+  }, [activeConvoId, currentUser?.id]);
 
   // Typing action
   const setTyping = useCallback((isTyping) => {
     if (!activeConvoId || !currentUser) return;
-    
+
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-    
+
     setTypingStatus(activeConvoId, currentUser.id, isTyping);
-    
+
     if (isTyping) {
       typingTimeoutRef.current = setTimeout(() => {
         setTypingStatus(activeConvoId, currentUser.id, false);
@@ -130,13 +144,19 @@ export function useChat(currentUser) {
   }, [activeConvoId, currentUser]);
 
   const send = useCallback(async (text, metadata = {}) => {
-    if (!activeConvoId || !currentUser || !text.trim()) return;
+    if (!activeConvoId || !currentUser || !text.trim()) return { ok: false, reason: 'invalid' };
 
     try {
       setTyping(false); // Immediate stop typing on send
+      // sendMessage now rolls the message back if the convo summary fails,
+      // so any thrown error here means delivery did NOT succeed and the
+      // caller can show a retry toast instead of leaving the user thinking
+      // their message went through.
       await sendMessage(activeConvoId, currentUser.id, text, currentUser.name, metadata);
+      return { ok: true };
     } catch (error) {
       console.error("Message send error:", error);
+      return { ok: false, reason: 'network' };
     }
   }, [activeConvoId, currentUser, setTyping]);
 
@@ -178,7 +198,7 @@ export function useChat(currentUser) {
 
   const deleteConvo = useCallback(async (convoId) => {
     if (!window.confirm("Are you sure you want to delete this conversation?")) return;
-    
+
     try {
       await deleteConversation(convoId);
       if (activeConvoId === convoId) {

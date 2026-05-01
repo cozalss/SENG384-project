@@ -1,6 +1,106 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { FileText, Search, Lock, Handshake } from 'lucide-react';
+import { useTilt } from '../../hooks/useInteractiveFX';
+
+const FlowCard = ({ step, index }) => {
+    const Icon = step.icon;
+    const tilt = useTilt({ max: 8, scale: 1.025 });
+    return (
+        <motion.div
+            {...tilt}
+            className="px-flow-card premium-card premium-card--halo"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{
+                duration: 0.55,
+                delay: 0.08 * index,
+                ease: [0.22, 1, 0.36, 1],
+            }}
+            style={{
+                position: 'relative',
+                padding: 'clamp(1.5rem, 2.5vw, 2rem)',
+                borderRadius: 18,
+                background: 'rgba(15, 15, 18, 0.55)',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
+                backdropFilter: 'blur(18px) saturate(120%)',
+                WebkitBackdropFilter: 'blur(18px) saturate(120%)',
+                boxShadow:
+                    '0 1px 2px rgba(0, 0, 0, 0.2), 0 18px 36px -18px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04)',
+                overflow: 'hidden',
+                '--pc-glow': 'rgba(34, 211, 102, 0.45)',
+                '--pc-glow-soft': 'rgba(34, 211, 102, 0.18)',
+            }}
+        >
+            <span className="premium-card-halo" aria-hidden="true" />
+            <span style={{
+                position: 'absolute', top: 0, left: 0, right: 0, height: 1,
+                background: 'linear-gradient(90deg, transparent, rgba(34, 211, 102, 0.45), transparent)',
+                zIndex: 4,
+            }} />
+
+            <span style={{
+                position: 'absolute',
+                right: 'clamp(0.75rem, 1.5vw, 1.25rem)',
+                top: 'clamp(0.5rem, 1vw, 0.75rem)',
+                fontFamily: 'Sora, sans-serif',
+                fontSize: 'clamp(2.6rem, 5.2vw, 4rem)',
+                fontWeight: 700,
+                color: 'rgba(255, 255, 255, 0.045)',
+                letterSpacing: '-0.05em',
+                pointerEvents: 'none',
+                userSelect: 'none',
+                zIndex: 4,
+            }}>
+                {step.n}
+            </span>
+
+            <div style={{
+                width: 40,
+                height: 40,
+                borderRadius: 11,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(34, 211, 102, 0.1)',
+                border: '1px solid rgba(34, 211, 102, 0.28)',
+                color: 'hsl(119 99% 56%)',
+                marginBottom: 18,
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+                position: 'relative',
+                zIndex: 4,
+            }}>
+                <Icon size={18} strokeWidth={2} />
+            </div>
+
+            <h3 style={{
+                margin: 0,
+                fontSize: 'clamp(1.05rem, 1.5vw, 1.2rem)',
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.25,
+                color: 'hsl(0 0% 96%)',
+                marginBottom: 8,
+                position: 'relative',
+                zIndex: 4,
+            }}>
+                {step.title}
+            </h3>
+            <p style={{
+                margin: 0,
+                fontSize: '13.5px',
+                fontWeight: 300,
+                lineHeight: 1.6,
+                color: 'hsl(0 0% 68%)',
+                position: 'relative',
+                zIndex: 4,
+            }}>
+                {step.body}
+            </p>
+        </motion.div>
+    );
+};
 
 /**
  * HowItWorks — 4-step workflow with sequential entrance.
@@ -15,26 +115,26 @@ const STEPS = [
     {
         n: '01',
         icon: FileText,
-        title: 'Post a structured announcement',
-        body: 'Describe the problem, the stage, and the expertise you need. Confidential bits stay locked behind an NDA.',
+        title: 'Write a structured brief',
+        body: 'Describe the problem, the stage, and the expertise you need — in five fields, not five paragraphs. Anything confidential stays locked until step three.',
     },
     {
         n: '02',
         icon: Search,
-        title: 'The other side discovers you',
-        body: 'Engineers see clinical posts. Clinicians see engineering posts. City + domain filters surface the matches that fit.',
+        title: 'Filter by domain & city',
+        body: 'Engineers browse clinical posts; clinicians browse engineering posts. City and domain filters surface the half-dozen people who actually fit — usually within the first scroll.',
     },
     {
         n: '03',
         icon: Lock,
-        title: 'NDA before details',
-        body: 'Express interest, both parties accept the NDA, and only then do technical specifics open up. Zero IP storage on the platform.',
+        title: 'Sign the NDA, unlock the specs',
+        body: 'Express interest, both parties countersign the platform NDA in one click, and the protected fields open. We never see what is shared past the gate.',
     },
     {
         n: '04',
         icon: Handshake,
-        title: 'Meet externally, decide',
-        body: 'Propose Zoom or Teams slots, accept, meet. Mark the post Partner Found when the collaboration starts. We facilitate — never record.',
+        title: 'Pick a slot, start the partnership',
+        body: 'Propose three Zoom or Teams slots, accept one, meet. Mark the post Partner Found and the listing closes — leaving a clean audit trail and nothing else.',
     },
 ];
 
@@ -94,13 +194,13 @@ const HowItWorks = () => {
                     <p style={{
                         marginTop: '14px',
                         fontSize: 'clamp(0.95rem, 1.3vw, 1.1rem)',
-                        color: 'hsl(0 0% 70%)',
+                        color: 'hsl(0 0% 76%)',
                         fontWeight: 300,
                         lineHeight: 1.6,
                         maxWidth: '52ch',
                         marginInline: 'auto',
                     }}>
-                        The whole flow is structural. No DMs into a void, no scattered emails — every move has a clear next step.
+                        Every step has a clear next move. No DMs into a void, no scattered email threads, no "let&rsquo;s circle back" — just a checklist that ships.
                     </p>
                 </motion.div>
 
@@ -168,96 +268,9 @@ const HowItWorks = () => {
                         />
                     </svg>
 
-                    {STEPS.map((s, i) => {
-                        const Icon = s.icon;
-                        return (
-                            <motion.div
-                                key={s.n}
-                                className="px-flow-card"
-                                initial={{ opacity: 0, y: 24 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: '-80px' }}
-                                transition={{
-                                    duration: 0.55,
-                                    delay: 0.08 * i,
-                                    ease: [0.22, 1, 0.36, 1],
-                                }}
-                                whileHover={{ y: -3 }}
-                                style={{
-                                    position: 'relative',
-                                    padding: 'clamp(1.5rem, 2.5vw, 2rem)',
-                                    borderRadius: 18,
-                                    background: 'rgba(15, 15, 18, 0.55)',
-                                    border: '1px solid rgba(255, 255, 255, 0.06)',
-                                    backdropFilter: 'blur(18px) saturate(120%)',
-                                    WebkitBackdropFilter: 'blur(18px) saturate(120%)',
-                                    boxShadow:
-                                        '0 1px 2px rgba(0, 0, 0, 0.2), 0 18px 36px -18px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04)',
-                                    overflow: 'hidden',
-                                    transition: 'border-color 240ms cubic-bezier(0.22, 1, 0.36, 1)',
-                                }}
-                            >
-                                {/* Subtle top-edge gradient line — Linear-style accent */}
-                                <span style={{
-                                    position: 'absolute', top: 0, left: 0, right: 0, height: 1,
-                                    background: 'linear-gradient(90deg, transparent, rgba(34, 211, 102, 0.45), transparent)',
-                                }} />
-
-                                {/* Big step number watermark */}
-                                <span style={{
-                                    position: 'absolute',
-                                    right: 'clamp(0.75rem, 1.5vw, 1.25rem)',
-                                    top: 'clamp(0.5rem, 1vw, 0.75rem)',
-                                    fontFamily: 'Sora, sans-serif',
-                                    fontSize: 'clamp(2.6rem, 5.2vw, 4rem)',
-                                    fontWeight: 700,
-                                    color: 'rgba(255, 255, 255, 0.045)',
-                                    letterSpacing: '-0.05em',
-                                    pointerEvents: 'none',
-                                    userSelect: 'none',
-                                }}>
-                                    {s.n}
-                                </span>
-
-                                <div style={{
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: 11,
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    background: 'rgba(34, 211, 102, 0.1)',
-                                    border: '1px solid rgba(34, 211, 102, 0.28)',
-                                    color: 'hsl(119 99% 56%)',
-                                    marginBottom: 18,
-                                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
-                                }}>
-                                    <Icon size={18} strokeWidth={2} />
-                                </div>
-
-                                <h3 style={{
-                                    margin: 0,
-                                    fontSize: 'clamp(1.05rem, 1.5vw, 1.2rem)',
-                                    fontWeight: 600,
-                                    letterSpacing: '-0.02em',
-                                    lineHeight: 1.25,
-                                    color: 'hsl(0 0% 96%)',
-                                    marginBottom: 8,
-                                }}>
-                                    {s.title}
-                                </h3>
-                                <p style={{
-                                    margin: 0,
-                                    fontSize: '13.5px',
-                                    fontWeight: 300,
-                                    lineHeight: 1.6,
-                                    color: 'hsl(0 0% 68%)',
-                                }}>
-                                    {s.body}
-                                </p>
-                            </motion.div>
-                        );
-                    })}
+                    {STEPS.map((s, i) => (
+                        <FlowCard key={s.n} step={s} index={i} />
+                    ))}
                 </div>
             </div>
         </section>

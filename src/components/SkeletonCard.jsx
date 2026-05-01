@@ -6,8 +6,8 @@ const bar = (w = '100%', h = 12) => ({
     width: w,
     height: h,
     borderRadius: '6px',
-    background: 'rgba(255, 255, 255, 0.04)',
-    backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(96, 165, 250, 0.06) 50%, rgba(255,255,255,0.02) 100%)',
+    background: 'var(--hl-faint)',
+    backgroundImage: 'linear-gradient(90deg, var(--hl-faint) 0%, rgba(96, 165, 250, 0.06) 50%, var(--hl-faint) 100%)',
     backgroundSize: '200% 100%',
     ...pulse
 });
@@ -29,7 +29,7 @@ const SkeletonCard = () => {
             <div style={{
                 borderRadius: '18px',
                 minHeight: '160px',
-                background: 'rgba(255, 255, 255, 0.02)',
+                background: 'var(--hl-faint)',
                 backgroundImage: 'linear-gradient(135deg, rgba(96, 165, 250, 0.06), rgba(34, 211, 238, 0.03))',
                 ...pulse
             }} />
@@ -53,14 +53,14 @@ const SkeletonCard = () => {
                 <div style={{
                     marginTop: '10px',
                     paddingTop: '18px',
-                    borderTop: '1px solid rgba(255,255,255,0.04)',
+                    borderTop: '1px solid var(--border)',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
                     <div style={bar('160px', 28)} />
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{ width: '34px', height: '34px', borderRadius: '11px', ...pulse, background: 'rgba(255,255,255,0.04)' }} />
+                        <div style={{ width: '34px', height: '34px', borderRadius: '11px', ...pulse, background: 'var(--hl-faint)' }} />
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             <div style={bar('110px', 11)} />
                             <div style={bar('70px', 9)} />
@@ -72,7 +72,7 @@ const SkeletonCard = () => {
             {/* CTA slot */}
             <div style={{
                 alignSelf: 'stretch',
-                borderLeft: '1px dashed rgba(255,255,255,0.04)',
+                borderLeft: '1px dashed var(--border)',
                 paddingLeft: '12px',
                 display: 'flex',
                 alignItems: 'center'

@@ -1,0 +1,378 @@
+/* AuthBackground — eight-layer atmospheric backdrop, GPU composited only.
+   Designed to feel "alive" without straining the eye on a productivity
+   surface where users spend long sessions reading dense content. Every
+   animation is multi-minute and low-amplitude so peripheral motion never
+   pulls attention from the task. */
+
+.auth-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.4s ease, visibility 0.4s;
+    background: hsl(0 0% 8%);
+    contain: strict;
+}
+
+.auth-bg--hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* 1. Floor — solid charcoal with a hint of warmth at the bottom edge so the
+   page never reads as flat black. */
+.auth-bg-floor {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 110% 70% at 50% 110%, rgba(110, 231, 183, 0.06), transparent 60%),
+        linear-gradient(180deg, hsl(160 30% 4.5%) 0%, hsl(160 30% 3%) 100%);
+}
+
+/* 2/3. Drifting brand glows — opposing Lissajous orbits for ambient motion. */
+.auth-bg-glow {
+    position: absolute;
+    inset: 0;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+}
+
+.auth-bg-glow--green {
+    background: radial-gradient(
+        ellipse 50% 45% at 22% 28%,
+        rgba(34, 211, 102, 0.18),
+        rgba(34, 211, 102, 0.08) 40%,
+        transparent 70%
+    );
+    animation: authBgDriftA 84s ease-in-out infinite;
+}
+
+.auth-bg-glow--teal {
+    background: radial-gradient(
+        ellipse 55% 50% at 78% 72%,
+        rgba(34, 211, 238, 0.14),
+        rgba(34, 211, 238, 0.06) 45%,
+        transparent 72%
+    );
+    animation: authBgDriftB 96s ease-in-out infinite;
+}
+
+/* 4. NEW — amber accent in the upper-right quadrant. Breaks the
+   green/teal symmetry so the eye stops reading the screen as "two walls
+   of brand color" and starts reading depth instead. Very dim (alpha 0.04)
+   and warmer hue is what sells the asymmetry. */
+.auth-bg-glow--amber {
+    background: radial-gradient(
+        ellipse 38% 32% at 86% 18%,
+        rgba(252, 211, 77, 0.06),
+        rgba(252, 211, 77, 0.025) 45%,
+        transparent 75%
+    );
+    animation: authBgDriftC 112s ease-in-out infinite;
+}
+
+/* 5. Aurora — faint conic for a premium "northern lights" rotation. */
+.auth-bg-aurora {
+    position: absolute;
+    inset: -10%;
+    background: conic-gradient(
+        from 220deg at 50% 60%,
+        rgba(34, 211, 102, 0.0) 0deg,
+        rgba(34, 211, 102, 0.04) 60deg,
+        rgba(34, 211, 238, 0.035) 130deg,
+        rgba(110, 231, 183, 0.03) 200deg,
+        rgba(34, 211, 102, 0.0) 360deg
+    );
+    filter: blur(60px) saturate(105%);
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    animation: authBgRotate 180s linear infinite;
+    opacity: 0.85;
+}
+
+/* 6. NEW — center pulse. A very dim radial in the middle that fades up
+   and back down on a slow ~14 s cycle. Reads as a subtle heartbeat,
+   reinforcing the healthcare context without literally drawing an ECG.
+   Amplitude is intentionally tiny (alpha 0.04 ↔ 0.10) so it lives in
+   peripheral perception only. */
+.auth-bg-pulse {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle 38vmax at 50% 55%,
+        rgba(34, 211, 102, 0.07),
+        rgba(34, 211, 102, 0.03) 35%,
+        transparent 65%
+    );
+    will-change: opacity;
+    animation: authBgPulse 14s ease-in-out infinite;
+    mix-blend-mode: screen;
+}
+
+/* 7. NEW — ECG ghost line. A single near-horizontal stroke with a
+   gradient mask so it fades in/out across the width. Pinned to ~30% from
+   the bottom so it sits below typical content but above the floor. The
+   line slowly drifts horizontally to feel like a continuous reading. */
+.auth-bg-ecg {
+    position: absolute;
+    left: -10%;
+    bottom: 28%;
+    width: 130%;
+    height: 60px;
+    opacity: 0.55;
+    will-change: transform;
+    animation: authBgEcgDrift 32s linear infinite;
+    pointer-events: none;
+}
+
+/* Cursor-reactive halo — dim ambient light that follows the mouse. */
+.auth-bg-cursor-halo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 560px;
+    height: 560px;
+    pointer-events: none;
+    /* Capped green channel so cube-like surfaces would stay safe (matches the
+       landing-halo math). On the dashboard there are no surfaces to compete
+       with, so this is mostly future-proofing if a card has dark gradient
+       backing. Soft teal accent in the outer ring to balance the brand green. */
+    background: radial-gradient(
+        circle at center,
+        rgba(34, 211, 102, 0.10) 0%,
+        rgba(34, 211, 238, 0.05) 28%,
+        rgba(34, 211, 102, 0.02) 52%,
+        transparent 75%
+    );
+    mix-blend-mode: screen;
+    filter: blur(28px);
+    will-change: transform;
+    transform: translate3d(-9999px, -9999px, 0);
+}
+
+/* 8. Vignette — frames content, gives modal/card edges darker negative space. */
+.auth-bg-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse 80% 80% at 50% 50%,
+        transparent 50%,
+        rgba(0, 0, 0, 0.45) 100%
+    );
+    pointer-events: none;
+}
+
+/* ----- Keyframes ----- */
+
+@keyframes authBgDriftA {
+    0%, 100% { transform: translate3d(-3%, -2%, 0) scale(1.04); opacity: 0.92; }
+    50%      { transform: translate3d( 4%,  3%, 0) scale(1.10); opacity: 1; }
+}
+
+@keyframes authBgDriftB {
+    0%, 100% { transform: translate3d( 3%,  2%, 0) scale(1.05); opacity: 0.88; }
+    50%      { transform: translate3d(-4%, -3%, 0) scale(1.10); opacity: 1; }
+}
+
+@keyframes authBgDriftC {
+    0%, 100% { transform: translate3d(-2%,  3%, 0) scale(1.06); opacity: 0.85; }
+    50%      { transform: translate3d( 3%, -2%, 0) scale(1.12); opacity: 1; }
+}
+
+@keyframes authBgRotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes authBgPulse {
+    0%, 100% { opacity: 0.55; transform: scale(1.00); }
+    50%      { opacity: 1.00; transform: scale(1.08); }
+}
+
+@keyframes authBgEcgDrift {
+    0%   { transform: translate3d(0%,  0, 0); }
+    100% { transform: translate3d(-30%, 0, 0); }
+}
+
+/* Reduced-motion: keep the composition, kill all animation. */
+.auth-bg--still .auth-bg-glow--green,
+.auth-bg--still .auth-bg-glow--teal,
+.auth-bg--still .auth-bg-glow--amber,
+.auth-bg--still .auth-bg-aurora,
+.auth-bg--still .auth-bg-pulse,
+.auth-bg--still .auth-bg-ecg {
+    animation: none;
+}
+
+/* Mobile: drop the most expensive layers (large-radius blurs + the
+   ECG SVG which adds an extra paint). Keep the three brand glows so
+   the screen never reads as flat charcoal on small viewports. */
+@media (max-width: 640px) {
+    .auth-bg-aurora,
+    .auth-bg-pulse,
+    .auth-bg-ecg,
+    .auth-bg-cursor-halo {
+        display: none;
+    }
+}
+
+/* ============================================================
+   LIGHT THEME OVERRIDES
+   Atmospheric backdrop becomes a warm off-white floor with
+   softened brand glows. The aurora/pulse/ECG layers stay alive
+   but with gentler alphas and a multiply-friendly vignette so
+   content cards still feel framed against a lighter scrim.
+   ============================================================ */
+
+/* --- Base shell --- */
+:root[data-theme="light"] .auth-bg {
+    background: hsl(48 22% 95%);
+}
+
+/* --- Floor --- */
+:root[data-theme="light"] .auth-bg-floor {
+    background:
+        radial-gradient(ellipse 110% 70% at 50% 110%, rgba(34, 211, 102, 0.05), transparent 60%),
+        linear-gradient(180deg, #f6f5f0 0%, #ecebe4 100%);
+}
+
+/* --- Glows: soften alphas ~30-40% for light backgrounds --- */
+:root[data-theme="light"] .auth-bg-glow--green {
+    background: radial-gradient(
+        ellipse 50% 45% at 22% 28%,
+        rgba(34, 211, 102, 0.12),
+        rgba(34, 211, 102, 0.05) 40%,
+        transparent 70%
+    );
+}
+
+:root[data-theme="light"] .auth-bg-glow--teal {
+    background: radial-gradient(
+        ellipse 55% 50% at 78% 72%,
+        rgba(34, 211, 238, 0.1),
+        rgba(34, 211, 238, 0.04) 45%,
+        transparent 72%
+    );
+}
+
+:root[data-theme="light"] .auth-bg-glow--amber {
+    background: radial-gradient(
+        ellipse 38% 32% at 86% 18%,
+        rgba(252, 211, 77, 0.12),
+        rgba(252, 211, 77, 0.05) 45%,
+        transparent 75%
+    );
+}
+
+/* --- Aurora: lower opacity overall, screen blend lifts on light --- */
+:root[data-theme="light"] .auth-bg-aurora {
+    background: conic-gradient(
+        from 220deg at 50% 60%,
+        rgba(34, 211, 102, 0.0) 0deg,
+        rgba(34, 211, 102, 0.07) 60deg,
+        rgba(34, 211, 238, 0.06) 130deg,
+        rgba(110, 231, 183, 0.05) 200deg,
+        rgba(34, 211, 102, 0.0) 360deg
+    );
+    opacity: 0.55;
+    mix-blend-mode: multiply;
+}
+
+/* --- Pulse: switch to multiply so it darkens slightly on light bg --- */
+:root[data-theme="light"] .auth-bg-pulse {
+    background: radial-gradient(
+        circle 38vmax at 50% 55%,
+        rgba(34, 211, 102, 0.08),
+        rgba(34, 211, 102, 0.03) 35%,
+        transparent 65%
+    );
+    mix-blend-mode: multiply;
+}
+
+/* --- ECG ghost --- */
+:root[data-theme="light"] .auth-bg-ecg {
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+}
+
+/* --- Cursor halo --- */
+:root[data-theme="light"] .auth-bg-cursor-halo {
+    background: radial-gradient(
+        circle at center,
+        rgba(34, 211, 102, 0.08) 0%,
+        rgba(34, 211, 238, 0.04) 28%,
+        rgba(34, 211, 102, 0.02) 52%,
+        transparent 75%
+    );
+    mix-blend-mode: multiply;
+}
+
+/* --- Vignette: invert to a soft warm-cream edge so cards still pop --- */
+:root[data-theme="light"] .auth-bg-vignette {
+    background: radial-gradient(
+        ellipse 80% 80% at 50% 50%,
+        transparent 50%,
+        rgba(20, 30, 40, 0.08) 100%
+    );
+}
+
+/* Porcelain daylight finish for authenticated routes. */
+:root[data-theme="light"] .auth-bg {
+    background: #f7fafb;
+}
+
+:root[data-theme="light"] .auth-bg-floor {
+    background:
+        linear-gradient(118deg, rgba(13, 150, 103, 0.045), transparent 28%, rgba(11, 138, 160, 0.045) 72%, transparent),
+        linear-gradient(180deg, #fbfdfe 0%, #f4faf8 48%, #eef6f4 100%);
+}
+
+:root[data-theme="light"] .auth-bg-glow--green {
+    background: radial-gradient(
+        ellipse 50% 45% at 22% 28%,
+        rgba(13, 150, 103, 0.11),
+        rgba(13, 150, 103, 0.045) 42%,
+        transparent 72%
+    );
+}
+
+:root[data-theme="light"] .auth-bg-glow--teal {
+    background: radial-gradient(
+        ellipse 55% 50% at 78% 72%,
+        rgba(11, 138, 160, 0.1),
+        rgba(11, 138, 160, 0.04) 45%,
+        transparent 72%
+    );
+}
+
+:root[data-theme="light"] .auth-bg-glow--amber {
+    background: radial-gradient(
+        ellipse 38% 32% at 86% 18%,
+        rgba(109, 91, 208, 0.06),
+        rgba(109, 91, 208, 0.024) 45%,
+        transparent 75%
+    );
+}
+
+:root[data-theme="light"] .auth-bg-aurora {
+    background: conic-gradient(
+        from 220deg at 50% 60%,
+        rgba(13, 150, 103, 0) 0deg,
+        rgba(13, 150, 103, 0.055) 60deg,
+        rgba(11, 138, 160, 0.05) 130deg,
+        rgba(109, 91, 208, 0.035) 220deg,
+        rgba(13, 150, 103, 0) 360deg
+    );
+    opacity: 0.42;
+}
+
+:root[data-theme="light"] .auth-bg-vignette {
+    background: radial-gradient(
+        ellipse 82% 82% at 50% 50%,
+        transparent 58%,
+        rgba(18, 45, 48, 0.065) 100%
+    );
+}

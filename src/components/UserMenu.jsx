@@ -35,11 +35,13 @@ const UserMenu = ({ user, logout }) => {
         };
     }, [open, computeCoords]);
 
-    useEffect(() => {
-        if (!open) return;
-        const frame = requestAnimationFrame(() => setOpen(false));
-        return () => cancelAnimationFrame(frame);
-    }, [location.pathname, open]);
+    // Auto-close the menu on route change. setState inside an effect is the
+    // simplest way to react to a derived prop change here — the menu's open
+    // state is genuinely owned by this component, but the *signal* to close
+    // is an external one (the URL changing). The eslint plugin can't tell
+    // the difference, so silence it for this specific line.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    useEffect(() => { setOpen(false); }, [location.pathname]);
 
     // Close on outside click (checks BOTH the trigger wrapper and the portal dropdown)
     useEffect(() => {
@@ -79,7 +81,6 @@ const UserMenu = ({ user, logout }) => {
     const firstName = user.name?.split(' ').slice(0, 2).join(' ');
     const initial = user.name?.charAt(0) || '?';
     const roleLabel = user.role === 'Healthcare Professional' ? 'Doctor' : user.role;
-    const isEngineer = user.role === 'Engineer';
 
     const menuItems = [
         { label: 'Profile', hint: 'Your account & data', icon: <UserCircle size={15} />, path: '/profile' },
@@ -106,8 +107,8 @@ const UserMenu = ({ user, logout }) => {
                     gap: '10px',
                     padding: '4px 12px 4px 4px',
                     borderRadius: '999px',
-                    background: open ? 'rgba(249, 168, 96, 0.08)' : 'rgba(255, 255, 255, 0.035)',
-                    border: `1px solid ${open ? 'rgba(249, 168, 96, 0.28)' : 'rgba(255, 255, 255, 0.08)'}`,
+                    background: open ? 'var(--brand-soft-bg)' : 'var(--hl-faint)',
+                    border: `1px solid ${open ? 'var(--brand-soft-border)' : 'var(--border)'}`,
                     cursor: 'pointer',
                     color: 'var(--text-main)',
                     transition: 'background 180ms cubic-bezier(0.32, 0.72, 0, 1), border-color 180ms cubic-bezier(0.32, 0.72, 0, 1)',
@@ -116,13 +117,13 @@ const UserMenu = ({ user, logout }) => {
                 }}
                 onMouseOver={(e) => {
                     if (open) return;
-                    e.currentTarget.style.background = 'rgba(249, 168, 96, 0.06)';
-                    e.currentTarget.style.borderColor = 'rgba(249, 168, 96, 0.22)';
+                    e.currentTarget.style.background = 'var(--interactive-row-hover-bg)';
+                    e.currentTarget.style.borderColor = 'var(--brand-soft-border)';
                 }}
                 onMouseOut={(e) => {
                     if (open) return;
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.035)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                    e.currentTarget.style.background = 'var(--hl-faint)';
+                    e.currentTarget.style.borderColor = 'var(--border)';
                 }}
             >
                 {/* Avatar — amber for engineer, emerald for clinician (mirrors Profile) */}
@@ -130,16 +131,12 @@ const UserMenu = ({ user, logout }) => {
                     position: 'relative',
                     width: '30px', height: '30px',
                     borderRadius: '999px',
-                    background: isEngineer
-                        ? 'linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%)'
-                        : 'linear-gradient(135deg, #34d399, #6ee7b7)',
+                    background: 'var(--brand-gradient)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '13px', fontWeight: 700, color: '#1a1012',
+                    fontSize: '13px', fontWeight: 700, color: 'var(--fg-on-accent)',
                     fontFamily: 'var(--font-heading)',
                     letterSpacing: '-0.02em',
-                    boxShadow: isEngineer
-                        ? '0 1px 2px rgba(0,0,0,0.22), 0 4px 12px -4px rgba(249, 168, 96, 0.32), inset 0 1px 0 rgba(255,255,255,0.22)'
-                        : '0 1px 2px rgba(0,0,0,0.22), 0 4px 12px -4px rgba(52, 211, 153, 0.3), inset 0 1px 0 rgba(255,255,255,0.22)',
+                    boxShadow: 'var(--brand-avatar-shadow)',
                     flexShrink: 0
                 }}>
                     {initial}
@@ -153,7 +150,7 @@ const UserMenu = ({ user, logout }) => {
                             width: '10px', height: '10px',
                             borderRadius: '50%',
                             background: '#34d399',
-                            border: '2px solid #14111a',
+                            border: '2px solid var(--surface-elevated)',
                             boxShadow: '0 0 8px rgba(52, 211, 153, 0.7)'
                         }}
                     />
@@ -175,7 +172,7 @@ const UserMenu = ({ user, logout }) => {
                     <span style={{
                         fontSize: '9.5px', fontWeight: '700',
                         letterSpacing: '0.13em', textTransform: 'uppercase',
-                        color: isEngineer ? '#f5c48a' : '#6ee7b7',
+                        color: 'var(--brand-soft-text)',
                         marginTop: '2px'
                     }}>
                         {roleLabel}
@@ -210,24 +207,24 @@ const UserMenu = ({ user, logout }) => {
                                 padding: 0,
                                 zIndex: 10000,
                                 overflow: 'hidden',
-                                boxShadow: '0 30px 70px rgba(0, 0, 0, 0.6), 0 0 60px rgba(96, 165, 250, 0.1)'
+                                boxShadow: 'var(--floating-panel-shadow, 0 30px 70px rgba(0, 0, 0, 0.6), 0 0 60px rgba(96, 165, 250, 0.1))'
                             }}
                         >
                         {/* Identity card at top */}
                         <div style={{
                             padding: '18px 20px 16px',
-                            borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                            background: 'rgba(7, 11, 10, 0.4)',
+                            borderBottom: '1px solid var(--border)',
+                            background: 'var(--bg-overlay)',
                             display: 'flex', alignItems: 'center', gap: '12px'
                         }}>
                             <span style={{
                                 width: '40px', height: '40px',
                                 borderRadius: '12px',
-                                background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+                                background: 'var(--brand-gradient, linear-gradient(135deg, var(--primary), var(--accent)))',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '16px', fontWeight: '800', color: '#070b0a',
+                                fontSize: '16px', fontWeight: '800', color: 'var(--fg-on-accent)',
                                 fontFamily: 'var(--font-heading)',
-                                boxShadow: '0 8px 18px rgba(96, 165, 250, 0.32), inset 0 1px 0 rgba(255,255,255,0.2)',
+                                boxShadow: 'var(--brand-avatar-shadow, 0 8px 18px rgba(96, 165, 250, 0.32), inset 0 1px 0 rgba(255,255,255,0.2))',
                                 flexShrink: 0, letterSpacing: '-0.03em'
                             }}>
                                 {initial}
@@ -271,8 +268,8 @@ const UserMenu = ({ user, logout }) => {
                                         fontFamily: 'var(--font-body)'
                                     }}
                                     onMouseOver={(e) => {
-                                        e.currentTarget.style.background = 'rgba(96, 165, 250, 0.06)';
-                                        e.currentTarget.style.color = '#93c5fd';
+                                        e.currentTarget.style.background = 'var(--interactive-row-hover-bg, rgba(96, 165, 250, 0.06))';
+                                        e.currentTarget.style.color = 'var(--interactive-row-hover-color, #93c5fd)';
                                         e.currentTarget.style.transform = 'translateX(2px)';
                                     }}
                                     onMouseOut={(e) => {
@@ -284,8 +281,8 @@ const UserMenu = ({ user, logout }) => {
                                     <span style={{
                                         width: '30px', height: '30px',
                                         borderRadius: '9px',
-                                        background: 'rgba(255,255,255,0.03)',
-                                        border: '1px solid rgba(255,255,255,0.05)',
+                                        background: 'var(--hl-faint)',
+                                        border: '1px solid var(--border)',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         flexShrink: 0
                                     }}>
@@ -309,8 +306,8 @@ const UserMenu = ({ user, logout }) => {
                         {/* Divider + logout */}
                         <div style={{
                             padding: '6px 8px 10px',
-                            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-                            background: 'rgba(7, 11, 10, 0.25)'
+                            borderTop: '1px solid var(--border)',
+                            background: 'var(--bg-overlay)'
                         }}>
                             <button
                                 role="menuitem"

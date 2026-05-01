@@ -137,9 +137,9 @@
     0 72px 128px -28px rgba(0, 0, 0, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
 
-  /* Aurora-tinted glows matching the amber+cyan video palette. */
-  --glow-aurora: 0 0 40px rgba(249, 168, 96, 0.22), 0 0 80px rgba(34, 211, 238, 0.12);
-  --glow-amber: 0 0 30px rgba(249, 168, 96, 0.28);
+  /* Aurora-tinted glows aligned to the brand green + cyan accent system. */
+  --glow-aurora: 0 0 40px rgba(34, 211, 102, 0.22), 0 0 80px rgba(34, 211, 238, 0.12);
+  --glow-amber: 0 0 30px rgba(34, 211, 102, 0.28);
   --glow-cyan: 0 0 30px rgba(34, 211, 238, 0.22);
 
   /* Z-index scale — named, never magic numbers. */
@@ -160,6 +160,149 @@
   --radius-xl: 28px;
   --radius-2xl: 36px;
   --radius-full: 999px;
+
+  /* ============ THEME-AWARE SEMANTIC TOKENS ============
+     New, recommended tokens. They map to the existing --background / --surface
+     / --text-* set by default (= dark) but get overridden by [data-theme="light"]
+     below. Migrate hard-coded colors in component CSS to these names so the
+     theme toggle becomes a one-line swap. */
+  --bg-app: var(--background);
+  --bg-app-alt: var(--background-alt);
+  --bg-surface: var(--surface);
+  --bg-surface-hover: var(--surface-hover);
+  --bg-elevated: var(--surface-elevated);
+  --bg-glass: var(--glass-bg);
+  --bg-glass-strong: rgba(22, 22, 28, 0.86);
+  --bg-overlay: rgba(7, 11, 10, 0.6);
+
+  --fg-main: var(--text-main);
+  --fg-muted: var(--text-muted);
+  --fg-subtle: var(--text-subtle);
+  --fg-on-accent: #1a1012;     /* warm dark text used on amber/green pills */
+
+  --line-subtle: var(--border);
+  --line-base: var(--border-light);
+  --line-strong: rgba(255, 255, 255, 0.18);
+
+  --hl-faint: rgba(255, 255, 255, 0.03);
+  --hl-soft: rgba(255, 255, 255, 0.05);
+  --hl-medium: rgba(255, 255, 255, 0.08);
+
+  --shade-faint: rgba(0, 0, 0, 0.18);
+  --shade-soft: rgba(0, 0, 0, 0.32);
+  --shade-strong: rgba(0, 0, 0, 0.55);
+
+  --backdrop-blur: blur(24px) saturate(140%);
+  --backdrop-blur-soft: blur(14px) saturate(160%);
+
+  /* Accent intensity for glows — light theme dials this down to ~40% so the
+     site reads as a refined day theme rather than a glow-heavy night theme. */
+  --accent-glow-strength: 1;
+}
+
+/* ============ LIGHT THEME OVERRIDES ============
+   Activated by setting `data-theme="light"` on <html> (see useTheme hook).
+   Only the variables that need to flip are listed — brand greens, status
+   colors and structural radii / type scales stay the same across themes. */
+:root[data-theme="light"] {
+  --background: #f6f5f0;
+  --background-alt: #ecebe4;
+
+  --surface: rgba(255, 255, 255, 0.86);
+  --surface-hover: rgba(255, 255, 255, 0.96);
+  --surface-elevated: rgba(255, 255, 255, 0.78);
+
+  --panel-light: rgba(15, 18, 22, 0.025);
+  --panel-lighter: rgba(15, 18, 22, 0.045);
+  --panel-base: rgba(255, 255, 255, 0.86);
+
+  --text-main: #15181d;
+  --text-muted: #444b56;
+  --text-subtle: #6b7484;
+
+  --border: rgba(15, 18, 22, 0.08);
+  --border-light: rgba(15, 18, 22, 0.14);
+
+  --glass-bg: rgba(255, 255, 255, 0.78);
+  --glass-border: rgba(15, 18, 22, 0.08);
+  --glass-shadow: 0 8px 32px 0 rgba(20, 30, 40, 0.10);
+
+  --glow-primary: 0 0 32px rgba(96, 165, 250, 0.18);
+  --glow-accent: 0 0 32px rgba(34, 211, 238, 0.16);
+  --glow-success: 0 0 32px rgba(20, 184, 166, 0.14);
+
+  --badge-primary-text: #1d4ed8;
+  --badge-success-text: #065f46;
+  --badge-warning-text: #92400e;
+  --badge-accent-text: #0e7490;
+  --badge-error-text: #b91c1c;
+
+  --input-bg-focus: #ffffff;
+  --input-placeholder: rgba(60, 70, 84, 0.5);
+
+  --inset-glass:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 1px rgba(15, 18, 22, 0.04);
+  --inset-glass-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+  --hover-shadow: 0 22px 48px rgba(20, 30, 40, 0.16);
+
+  /* Semantic tokens that remap on light */
+  --bg-glass-strong: rgba(255, 255, 255, 0.94);
+  --bg-overlay: rgba(20, 22, 28, 0.42);
+
+  --fg-on-accent: #14110f;
+
+  --line-strong: rgba(15, 18, 22, 0.22);
+
+  --hl-faint: rgba(15, 18, 22, 0.025);
+  --hl-soft: rgba(15, 18, 22, 0.045);
+  --hl-medium: rgba(15, 18, 22, 0.08);
+
+  --shade-faint: rgba(20, 30, 40, 0.06);
+  --shade-soft: rgba(20, 30, 40, 0.10);
+  --shade-strong: rgba(20, 30, 40, 0.18);
+
+  --shadow-xs:
+    0 1px 2px rgba(20, 30, 40, 0.05),
+    0 0 0 0.5px rgba(20, 30, 40, 0.04);
+  --shadow-sm:
+    0 1px 2px rgba(20, 30, 40, 0.05),
+    0 4px 10px -2px rgba(20, 30, 40, 0.07),
+    0 0 0 0.5px rgba(20, 30, 40, 0.04);
+  --shadow-md:
+    0 4px 12px -2px rgba(20, 30, 40, 0.08),
+    0 16px 32px -8px rgba(20, 30, 40, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --shadow-lg:
+    0 12px 32px -6px rgba(20, 30, 40, 0.12),
+    0 40px 72px -16px rgba(20, 30, 40, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --shadow-xl:
+    0 28px 60px -12px rgba(20, 30, 40, 0.16),
+    0 72px 128px -28px rgba(20, 30, 40, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+
+  --glow-aurora: 0 0 28px rgba(34, 200, 102, 0.18), 0 0 56px rgba(34, 200, 238, 0.10);
+  --glow-amber: 0 0 22px rgba(34, 200, 102, 0.20);
+  --glow-cyan: 0 0 22px rgba(34, 200, 238, 0.16);
+
+  --accent-glow-strength: 0.55;
+}
+
+/* Smooth color transition during theme swap. The class is added on <html> by
+   useTheme for ~280ms, then removed — we don't want global transitions on
+   every hover. */
+:root.theme-transitioning,
+:root.theme-transitioning *,
+:root.theme-transitioning *::before,
+:root.theme-transitioning *::after {
+  transition:
+    background-color 240ms cubic-bezier(0.32, 0.72, 0, 1),
+    color 240ms cubic-bezier(0.32, 0.72, 0, 1),
+    border-color 240ms cubic-bezier(0.32, 0.72, 0, 1),
+    fill 240ms cubic-bezier(0.32, 0.72, 0, 1),
+    stroke 240ms cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 240ms cubic-bezier(0.32, 0.72, 0, 1) !important;
 }
 
 * {
@@ -208,7 +351,7 @@ html {
 /* ===== GLOBAL KEYBOARD FOCUS (a11y + premium look) ===== */
 /* Only show for keyboard users (tabs, arrows), not for mouse clicks */
 :focus-visible {
-  outline: 2px solid rgba(249, 168, 96, 0.55);
+  outline: 2px solid rgba(34, 211, 102, 0.6);
   outline-offset: 2px;
   border-radius: 8px;
 }
@@ -217,9 +360,9 @@ button:focus-visible,
 a:focus-visible,
 [role="button"]:focus-visible,
 [role="menuitem"]:focus-visible {
-  outline: 2px solid rgba(249, 168, 96, 0.6);
+  outline: 2px solid rgba(34, 211, 102, 0.65);
   outline-offset: 3px;
-  box-shadow: 0 0 0 4px rgba(249, 168, 96, 0.14);
+  box-shadow: 0 0 0 4px rgba(34, 211, 102, 0.16);
 }
 
 /* ===== SENTINEL-STYLE LANDING HERO ANIMATIONS ===== */
@@ -293,7 +436,7 @@ a:focus-visible,
       100deg,
       rgba(255, 255, 255, 0.04) 0%,
       rgba(255, 255, 255, 0.04) 40%,
-      rgba(249, 168, 96, 0.09) 50%,
+      rgba(34, 211, 102, 0.10) 50%,
       rgba(255, 255, 255, 0.04) 60%,
       rgba(255, 255, 255, 0.04) 100%
     ) 0 0 / 220% 100% no-repeat,
@@ -397,27 +540,26 @@ button.px-btn,
 .px-btn.sm { height: 32px; padding: 6px 12px; font-size: var(--text-xs); border-radius: 9px; }
 .px-btn.lg { height: 48px; padding: 12px 24px; font-size: var(--text-md); border-radius: 13px; }
 
-/* Intent variants */
+/* Intent variants — primary now matches the green brand accent used in
+   the Hero CTA and FinalCTA. Orange tones were retired to eliminate the
+   orange/green double-brand problem the redesign caught. */
 .px-btn.primary {
-  --px-btn-bg: linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%);
-  --px-btn-bg-hover: linear-gradient(135deg, #f6bc86 0%, #f5a35f 55%, #ef8654 100%);
-  --px-btn-border: rgba(249, 168, 96, 0.4);
-  --px-btn-border-hover: rgba(249, 168, 96, 0.55);
-  --px-btn-text: #1a1012;
-  /* Tight, tactile shadows. Previous version had a 0.22 white inset that read
-     as a soft fuzzy edge ("üst taraf blurlu") — dropped to 0.12 so the top
-     edge looks crisp instead of glossy/washed. */
+  --px-btn-bg: linear-gradient(135deg, hsl(119 99% 50%) 0%, hsl(119 99% 44%) 100%);
+  --px-btn-bg-hover: linear-gradient(135deg, hsl(119 99% 56%) 0%, hsl(119 99% 48%) 100%);
+  --px-btn-border: rgba(34, 211, 102, 0.4);
+  --px-btn-border-hover: rgba(34, 211, 102, 0.55);
+  --px-btn-text: hsl(0 0% 4%);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.22),
-    0 5px 14px -8px rgba(249, 168, 96, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 5px 14px -8px rgba(34, 211, 102, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 .px-btn.primary:hover {
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.24),
-    0 8px 18px -8px rgba(249, 168, 96, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
-  filter: brightness(1.03);
+    0 10px 24px -8px rgba(34, 211, 102, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  filter: brightness(1.04);
 }
 
 .px-btn.ghost {
@@ -466,12 +608,12 @@ button.px-btn,
 }
 .px-select:hover {
   background-color: rgba(255, 255, 255, 0.055);
-  border-color: rgba(249, 168, 96, 0.3);
+  border-color: rgba(34, 211, 102, 0.32);
 }
 .px-select:focus-visible {
   outline: none;
-  border-color: rgba(249, 168, 96, 0.55);
-  box-shadow: 0 0 0 3px rgba(249, 168, 96, 0.14);
+  border-color: rgba(34, 211, 102, 0.55);
+  box-shadow: 0 0 0 3px rgba(34, 211, 102, 0.16);
 }
 .px-select option {
   background: #12121a;
@@ -505,9 +647,9 @@ button.px-btn,
 }
 .px-input:focus,
 .px-input:focus-visible {
-  border-color: rgba(249, 168, 96, 0.55);
+  border-color: rgba(34, 211, 102, 0.55);
   background: rgba(255, 255, 255, 0.055);
-  box-shadow: 0 0 0 3px rgba(249, 168, 96, 0.12);
+  box-shadow: 0 0 0 3px rgba(34, 211, 102, 0.14);
 }
 .px-input.is-error {
   border-color: rgba(251, 113, 133, 0.55);
@@ -536,9 +678,9 @@ button.px-btn,
 
 .px-wizard-fill {
   height: 100%;
-  background: linear-gradient(90deg, #f5b37a 0%, #f39a54 55%, #34d399 100%);
+  background: linear-gradient(90deg, hsl(119 99% 50%) 0%, hsl(155 80% 60%) 55%, hsl(180 75% 65%) 100%);
   border-radius: 2px;
-  box-shadow: 0 0 14px rgba(249, 168, 96, 0.35);
+  box-shadow: 0 0 14px rgba(34, 211, 102, 0.42);
 }
 
 .px-wizard-steps {
@@ -568,7 +710,7 @@ button.px-btn,
 }
 
 .px-wizard-step.is-clickable { cursor: pointer; }
-.px-wizard-step.is-clickable:hover .px-wizard-step-num { border-color: rgba(249, 168, 96, 0.4); }
+.px-wizard-step.is-clickable:hover .px-wizard-step-num { border-color: rgba(34, 211, 102, 0.45); }
 
 .px-wizard-step-num {
   display: inline-flex;
@@ -593,12 +735,12 @@ button.px-btn,
 }
 
 .px-wizard-step.active .px-wizard-step-num {
-  background: linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%);
-  color: #1a1012;
-  border-color: rgba(249, 168, 96, 0.45);
+  background: linear-gradient(135deg, hsl(119 99% 50%) 0%, hsl(119 99% 44%) 100%);
+  color: hsl(0 0% 6%);
+  border-color: rgba(34, 211, 102, 0.5);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.25),
-    0 12px 28px -6px rgba(249, 168, 96, 0.45),
+    0 12px 28px -6px rgba(34, 211, 102, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.28);
   transform: translateY(-1px);
 }
@@ -712,17 +854,18 @@ button.px-btn,
 .dash-hero::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(249, 168, 96, 0.32) 28%, rgba(34, 211, 238, 0.28) 72%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(34, 211, 102, 0.4) 28%, rgba(34, 211, 238, 0.28) 72%, transparent);
   pointer-events: none;
 }
 
 .dash-hero::after {
   content: '';
   position: absolute; inset: 0; pointer-events: none;
-  /* Corner washes dialed down — the previous 0.09 amber + 0.07 cyan was strong
-     enough to look like a deliberate gradient, not a subtle ambient hint. */
+  /* Brand-green ambient corner washes — replaces the prior amber + cyan
+     pair that gave the hero an orange cast inconsistent with the rest of
+     the green-branded UI. */
   background:
-    radial-gradient(ellipse 38% 60% at 0% 0%, rgba(249, 168, 96, 0.05), transparent 65%),
+    radial-gradient(ellipse 38% 60% at 0% 0%, rgba(34, 211, 102, 0.07), transparent 65%),
     radial-gradient(ellipse 38% 60% at 100% 100%, rgba(34, 211, 238, 0.04), transparent 65%);
 }
 
@@ -746,9 +889,9 @@ button.px-btn,
   gap: 6px;
   padding: 4px 11px;
   border-radius: 999px;
-  background: rgba(249, 168, 96, 0.08);
-  color: #f5c48a;
-  border: 1px solid rgba(249, 168, 96, 0.18);
+  background: rgba(34, 211, 102, 0.08);
+  color: hsl(119 80% 72%);
+  border: 1px solid rgba(34, 211, 102, 0.22);
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -770,7 +913,7 @@ button.px-btn,
   font-family: 'Instrument Serif', 'Tiempos Headline', Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  background: linear-gradient(135deg, #f5c48a 0%, #f39a54 55%, #67e8f9 100%);
+  background: linear-gradient(135deg, hsl(119 99% 56%) 0%, hsl(155 80% 65%) 55%, hsl(180 75% 70%) 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -850,17 +993,20 @@ button.px-btn,
   text-overflow: ellipsis;
 }
 
-.dash-stat-card.tone-amber .dash-stat-icon   { background: rgba(249, 168, 96, 0.14); color: #f5c48a; }
+/* The "amber" tone is kept as a class name to avoid renaming usages, but
+   the visual is now brand green so the stat strip stays cohesive with
+   the rest of the green-themed app. */
+.dash-stat-card.tone-amber .dash-stat-icon   { background: rgba(34, 211, 102, 0.14); color: hsl(119 80% 72%); }
 .dash-stat-card.tone-cyan .dash-stat-icon    { background: rgba(34, 211, 238, 0.14); color: #67e8f9; }
 .dash-stat-card.tone-emerald .dash-stat-icon { background: rgba(52, 211, 153, 0.14); color: #6ee7b7; }
 .dash-stat-card.tone-violet .dash-stat-icon  { background: rgba(167, 139, 250, 0.14); color: #c4b5fd; }
 
 .dash-stat-card:hover {
-  border-color: rgba(249, 168, 96, 0.22);
+  border-color: rgba(34, 211, 102, 0.26);
   background: rgba(255, 255, 255, 0.05);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 6px 14px -8px rgba(249, 168, 96, 0.12);
+    0 6px 14px -8px rgba(34, 211, 102, 0.18);
 }
 
 /* Controls row — search + tabs + filters */
@@ -889,9 +1035,9 @@ button.px-btn,
   gap: 6px;
   padding: 5px 11px;
   border-radius: 8px;
-  background: rgba(249, 168, 96, 0.08);
-  border: 1px solid rgba(249, 168, 96, 0.16);
-  color: #f5c48a;
+  background: rgba(34, 211, 102, 0.10);
+  border: 1px solid rgba(34, 211, 102, 0.22);
+  color: hsl(119 80% 72%);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -901,10 +1047,10 @@ button.px-btn,
 .dash-segmented-fill {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%);
+  background: linear-gradient(135deg, hsl(119 99% 50%) 0%, hsl(119 99% 44%) 100%);
   border-radius: 10px;
   z-index: -1;
-  box-shadow: 0 4px 12px -4px rgba(249, 168, 96, 0.26);
+  box-shadow: 0 4px 12px -4px rgba(34, 211, 102, 0.34);
 }
 
 .dash-tab-count {
@@ -915,8 +1061,8 @@ button.px-btn,
   height: 18px;
   padding: 0 5px;
   border-radius: 999px;
-  background: rgba(249, 168, 96, 0.18);
-  color: #f5c48a;
+  background: rgba(34, 211, 102, 0.18);
+  color: hsl(119 80% 75%);
   font-size: 10px;
   font-weight: 800;
   margin-left: 2px;
@@ -1021,7 +1167,7 @@ button.px-btn,
 }
 
 .dash-rail-row:hover { background: rgba(255, 255, 255, 0.05); }
-.dash-rail-row.is-active { background: rgba(249, 168, 96, 0.12); color: #f5c48a; }
+.dash-rail-row.is-active { background: rgba(34, 211, 102, 0.12); color: hsl(119 80% 72%); }
 
 .dash-rail-rank {
   display: inline-flex;
@@ -1120,14 +1266,14 @@ button.px-btn,
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 60% 60% at 80% 110%, rgba(249, 168, 96, 0.08), transparent 70%),
+    radial-gradient(ellipse 60% 60% at 80% 110%, rgba(34, 211, 102, 0.08), transparent 70%),
     radial-gradient(ellipse 55% 55% at 20% -10%, rgba(34, 211, 238, 0.05), transparent 70%);
 }
 
 .dash-rail-cta-body { position: relative; z-index: 1; }
 
 .dash-rail-cta-icon {
-  color: #f5c48a;
+  color: hsl(119 80% 72%);
   margin-bottom: 10px;
 }
 
@@ -1182,18 +1328,18 @@ button.px-btn,
 }
 
 .px-stat-card:hover {
-  border-color: rgba(249, 168, 96, 0.22);
+  border-color: rgba(34, 211, 102, 0.22);
   background: rgba(255, 255, 255, 0.05);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 8px 20px -8px rgba(249, 168, 96, 0.14);
+    0 8px 20px -8px rgba(34, 211, 102, 0.14);
 }
 
 .px-stat-card-glow {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse 70% 60% at 50% 110%, rgba(249, 168, 96, 0.1), transparent 70%);
+  background: radial-gradient(ellipse 70% 60% at 50% 110%, rgba(34, 211, 102, 0.1), transparent 70%);
   opacity: 0;
   transition: opacity 220ms var(--ease-smooth, cubic-bezier(0.32, 0.72, 0, 1));
 }
@@ -1238,7 +1384,7 @@ button.px-btn,
 .px-hairline.aurora {
   background: linear-gradient(90deg,
     transparent,
-    rgba(249, 168, 96, 0.4) 30%,
+    rgba(34, 211, 102, 0.4) 30%,
     rgba(34, 211, 238, 0.4) 70%,
     transparent);
 }
@@ -1258,12 +1404,12 @@ html.no-anim-initial *::after {
 }
 
 html.no-anim-initial body {
-  opacity: 0 !important;
+  opacity: 1 !important;
 }
 
 body {
   font-family: var(--font-body);
-  background-color: #070b0a;
+  background-color: var(--background);
   color: var(--text-main);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -1364,10 +1510,12 @@ body::after { content: none; }
   color: #67e8f9;
 }
 
+/* Class name kept for compatibility but visual is now brand green so the
+   eyebrow stays cohesive across the green-themed app shell. */
 .editorial-eyebrow.amber {
-  background: rgba(245, 158, 11, 0.06);
-  border-color: rgba(245, 158, 11, 0.18);
-  color: #fcd34d;
+  background: rgba(34, 211, 102, 0.07);
+  border-color: rgba(34, 211, 102, 0.22);
+  color: hsl(119 80% 72%);
 }
 
 /* Editorial page header — large display title */
@@ -1389,7 +1537,7 @@ body::after { content: none; }
   position: absolute; inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 55% 80% at 0% 0%, rgba(249, 168, 96, 0.10), transparent 60%),
+    radial-gradient(ellipse 55% 80% at 0% 0%, rgba(34, 211, 102, 0.10), transparent 60%),
     radial-gradient(ellipse 55% 80% at 100% 100%, rgba(34, 211, 238, 0.08), transparent 60%);
 }
 
@@ -1469,12 +1617,12 @@ body::after { content: none; }
   position: absolute; inset: 0;
   border-radius: 22px;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(249, 168, 96, 0.18), transparent 40%, transparent 60%, rgba(34, 211, 238, 0.14));
+  background: linear-gradient(135deg, rgba(34, 211, 102, 0.22), transparent 40%, transparent 60%, rgba(34, 211, 238, 0.14));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.6;
 }
 
 .editorial-panel-hover:hover {
@@ -1512,9 +1660,9 @@ body::after { content: none; }
 }
 
 .input-lux:focus {
-  border-color: rgba(96, 165, 250, 0.45);
+  border-color: rgba(34, 211, 102, 0.45);
   background: rgba(7, 11, 10, 0.7);
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1), 0 10px 30px rgba(96, 165, 250, 0.08);
+  box-shadow: 0 0 0 3px rgba(34, 211, 102, 0.12), 0 10px 30px rgba(34, 211, 102, 0.10);
   transform: translateY(-1px);
 }
 
@@ -1647,10 +1795,10 @@ body::after { content: none; }
   align-items: center;
   justify-content: center;
   border-radius: 11px;
-  background: linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%);
+  background: linear-gradient(135deg, hsl(119 99% 56%) 0%, hsl(119 99% 50%) 55%, hsl(119 99% 44%) 100%);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.22),
-    0 6px 16px -6px rgba(249, 168, 96, 0.32),
+    0 6px 16px -6px rgba(34, 211, 102, 0.32),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
   flex-shrink: 0;
 }
@@ -1665,7 +1813,7 @@ body::after { content: none; }
 }
 
 .px-nav-wordmark-accent {
-  background: linear-gradient(135deg, #f5c48a 0%, #67e8f9 100%);
+  background: linear-gradient(135deg, hsl(119 80% 72%) 0%, #67e8f9 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1715,7 +1863,7 @@ body::after { content: none; }
 }
 
 .px-nav-link:focus-visible {
-  outline: 2px solid rgba(249, 168, 96, 0.55);
+  outline: 2px solid rgba(34, 211, 102, 0.55);
   outline-offset: 2px;
 }
 
@@ -1730,11 +1878,11 @@ body::after { content: none; }
   position: absolute;
   inset: 0;
   border-radius: 9px;
-  background: linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%);
+  background: linear-gradient(135deg, hsl(119 99% 56%) 0%, hsl(119 99% 50%) 55%, hsl(119 99% 44%) 100%);
   z-index: -1;
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.22),
-    0 5px 14px -6px rgba(249, 168, 96, 0.32),
+    0 5px 14px -6px rgba(34, 211, 102, 0.32),
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
@@ -1781,7 +1929,7 @@ body::after { content: none; }
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(249, 168, 96, 0.4) 28%, rgba(34, 211, 238, 0.35) 72%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(34, 211, 102, 0.4) 28%, rgba(34, 211, 238, 0.35) 72%, transparent);
   pointer-events: none;
 }
 
@@ -1812,7 +1960,7 @@ body::after { content: none; }
   /* Aurora-paired corner glows: warm ember at top-left echoes the video's
      sunrise palette, cool teal at bottom-right matches its cold half. */
   background:
-    radial-gradient(ellipse 50% 80% at 0% 0%, rgba(249, 168, 96, 0.11), transparent 60%),
+    radial-gradient(ellipse 50% 80% at 0% 0%, rgba(34, 211, 102, 0.11), transparent 60%),
     radial-gradient(ellipse 50% 80% at 100% 100%, rgba(34, 211, 238, 0.10), transparent 60%);
 }
 
@@ -1821,7 +1969,7 @@ body::after { content: none; }
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(249, 168, 96, 0.32), rgba(34, 211, 238, 0.32), transparent);
+  background: linear-gradient(90deg, transparent, rgba(34, 211, 102, 0.32), rgba(34, 211, 238, 0.32), transparent);
 }
 
 @media (max-width: 768px) {
@@ -1918,6 +2066,11 @@ body::after { content: none; }
   background: transparent;
   transition: color 0.3s ease;
   position: relative;
+  /* Establish a clean stacking context so the absolute fill (z-index: -1) can
+     sit behind the label without bleeding outside the tab box during the
+     framer-motion layoutId transition. Also clips any rounded-corner overshoot. */
+  isolation: isolate;
+  overflow: hidden;
 }
 
 .segmented-tab.active {
@@ -1960,7 +2113,7 @@ body::after { content: none; }
 }
 
 .filter-chip:hover {
-  border-color: rgba(249, 168, 96, 0.32);
+  border-color: rgba(34, 211, 102, 0.32);
   color: var(--text-main);
   background-color: rgba(255, 255, 255, 0.055);
   transform: translateY(-1px);
@@ -1969,8 +2122,8 @@ body::after { content: none; }
 .filter-chip:focus,
 .filter-chip:focus-visible {
   outline: none;
-  border-color: rgba(249, 168, 96, 0.55);
-  box-shadow: 0 0 0 3px rgba(249, 168, 96, 0.14);
+  border-color: rgba(34, 211, 102, 0.55);
+  box-shadow: 0 0 0 3px rgba(34, 211, 102, 0.14);
 }
 
 /* ===== EDITORIAL PROJECT CARD ===== */
@@ -2006,7 +2159,7 @@ body::after { content: none; }
   inset: 0;
   border-radius: 22px;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(249, 168, 96, 0.22), transparent 40%, transparent 60%, rgba(34, 211, 238, 0.18));
+  background: linear-gradient(135deg, rgba(34, 211, 102, 0.22), transparent 40%, transparent 60%, rgba(34, 211, 238, 0.18));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -2023,19 +2176,19 @@ body::after { content: none; }
   opacity: 0;
   transition: opacity 0.5s;
   background:
-    radial-gradient(ellipse 50% 80% at 10% 50%, rgba(249, 168, 96, 0.12), transparent 60%),
+    radial-gradient(ellipse 50% 80% at 10% 50%, rgba(34, 211, 102, 0.12), transparent 60%),
     radial-gradient(ellipse 50% 80% at 95% 50%, rgba(34, 211, 238, 0.10), transparent 60%);
 }
 
 .editorial-card:hover {
-  border-color: rgba(249, 168, 96, 0.22);
+  border-color: rgba(34, 211, 102, 0.22);
   transform: translateY(-2px);
   /* 3-layer shadow: contact (1px sharp) + key (mid blur) + ambient (large soft).
      Lift dialed back from -4px to -2px (premium uses subtle, ≤2-3px). */
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.22),
     0 18px 36px -12px rgba(0, 0, 0, 0.42),
-    0 32px 60px -20px rgba(249, 168, 96, 0.12);
+    0 32px 60px -20px rgba(34, 211, 102, 0.12);
 }
 
 .editorial-card:hover::before { opacity: 1; }
@@ -2123,10 +2276,11 @@ body::after { content: none; }
   border-color: rgba(34, 211, 238, 0.22);
 }
 
+/* Class kept for compatibility; visual rebranded to green. */
 .pill-amber {
-  background: rgba(245, 158, 11, 0.05);
-  color: #fcd34d;
-  border-color: rgba(245, 158, 11, 0.20);
+  background: rgba(34, 211, 102, 0.06);
+  color: hsl(119 80% 72%);
+  border-color: rgba(34, 211, 102, 0.22);
 }
 
 .pill-dim {
@@ -2142,9 +2296,9 @@ body::after { content: none; }
   gap: 8px;
   padding: 11px 20px 11px 22px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(249, 168, 96, 0.14), rgba(34, 211, 238, 0.08));
-  color: #f5c48a;
-  border: 1px solid rgba(249, 168, 96, 0.26);
+  background: linear-gradient(135deg, rgba(34, 211, 102, 0.14), rgba(34, 211, 238, 0.08));
+  color: hsl(119 80% 72%);
+  border: 1px solid rgba(34, 211, 102, 0.26);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -2158,10 +2312,10 @@ body::after { content: none; }
 }
 
 .editorial-card:hover .card-cta {
-  background: linear-gradient(135deg, rgba(249, 168, 96, 0.25), rgba(34, 211, 238, 0.14));
-  border-color: rgba(249, 168, 96, 0.45);
+  background: linear-gradient(135deg, rgba(34, 211, 102, 0.25), rgba(34, 211, 238, 0.14));
+  border-color: rgba(34, 211, 102, 0.45);
   color: #fff;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.22), 0 8px 20px -6px rgba(249, 168, 96, 0.22);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.22), 0 8px 20px -6px rgba(34, 211, 102, 0.22);
 }
 
 .card-cta svg {
@@ -2194,14 +2348,14 @@ body::after { content: none; }
 
 .bookmark-float:hover {
   transform: scale(1.06);
-  color: #f5c48a;
-  border-color: rgba(249, 168, 96, 0.35);
+  color: hsl(119 80% 72%);
+  border-color: rgba(34, 211, 102, 0.35);
 }
 
 .bookmark-float.saved {
-  color: #f5c48a;
-  background: rgba(249, 168, 96, 0.1);
-  border-color: rgba(249, 168, 96, 0.3);
+  color: hsl(119 80% 72%);
+  background: rgba(34, 211, 102, 0.1);
+  border-color: rgba(34, 211, 102, 0.3);
 }
 
 /* Required expertise block */
@@ -2344,19 +2498,27 @@ a:hover {
 }
 
 .text-gradient-aurora {
-  background: linear-gradient(135deg, var(--primary-light), var(--accent-light), var(--cyan), var(--primary-light));
-  background-size: 300% auto;
+  background: linear-gradient(
+    100deg,
+    hsl(119 99% 56%) 0%,
+    hsl(155 80% 65%) 30%,
+    hsl(180 75% 70%) 50%,
+    hsl(155 80% 65%) 70%,
+    hsl(119 99% 56%) 100%
+  );
+  background-size: 280% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: auroraText 6s linear infinite;
+  animation: auroraText 7s linear infinite;
   display: inline-block;
   padding-right: 0.08em;
+  filter: drop-shadow(0 0 24px rgba(34, 211, 102, 0.18));
 }
 
 @keyframes auroraText {
   0% { background-position: 0% center; }
-  100% { background-position: 300% center; }
+  100% { background-position: 280% center; }
 }
 
 .hero-gradient-text {
@@ -2501,11 +2663,11 @@ a:hover {
 
 .input-field:focus,
 .input-field:focus-visible {
-  border-color: rgba(249, 168, 96, 0.55);
+  border-color: rgba(34, 211, 102, 0.55);
   background: rgba(255, 255, 255, 0.055);
   box-shadow:
-    0 0 0 3px rgba(249, 168, 96, 0.12),
-    0 0 24px rgba(249, 168, 96, 0.06);
+    0 0 0 3px rgba(34, 211, 102, 0.12),
+    0 0 24px rgba(34, 211, 102, 0.06);
 }
 
 .input-field::placeholder {
@@ -2891,7 +3053,7 @@ a:hover {
 
 /* ===== TIME SLOTS ===== */
 .time-slot:focus-visible {
-  outline: 2px solid rgba(249, 168, 96, 0.55);
+  outline: 2px solid rgba(34, 211, 102, 0.55);
   outline-offset: 2px;
 }
 
@@ -3058,11 +3220,11 @@ a:hover {
 }
 
 .step-dot-active {
-  background: linear-gradient(135deg, #f5b37a 0%, #f39a54 55%, #ec7b48 100%);
+  background: linear-gradient(135deg, hsl(119 99% 56%) 0%, hsl(119 99% 50%) 55%, hsl(119 99% 44%) 100%);
   color: #1a1012;
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.2),
-    0 10px 24px -6px rgba(249, 168, 96, 0.4),
+    0 10px 24px -6px rgba(34, 211, 102, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.28);
   transform: translateY(-1px);
 }
@@ -3091,8 +3253,8 @@ a:hover {
 }
 
 .step-line-active {
-  background: linear-gradient(90deg, rgba(249, 168, 96, 0.7), rgba(52, 211, 153, 0.55));
-  box-shadow: 0 0 12px rgba(249, 168, 96, 0.18);
+  background: linear-gradient(90deg, rgba(34, 211, 102, 0.7), rgba(52, 211, 153, 0.55));
+  box-shadow: 0 0 12px rgba(34, 211, 102, 0.18);
 }
 
 /* ===== NOTIFICATION BADGE ===== */
@@ -3187,7 +3349,7 @@ a:hover {
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.22),
     0 18px 36px -12px rgba(0, 0, 0, 0.42),
-    0 32px 60px -20px rgba(249, 168, 96, 0.1);
+    0 32px 60px -20px rgba(34, 211, 102, 0.1);
 }
 
 /* Corner decorative brackets for bento cards */
@@ -3423,15 +3585,303 @@ a:hover {
 }
 
 .landing-hero-vignette {
+  display: none !important;
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: none;
+  background: transparent !important;
+}
+
+.landing-hero-cinema-chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.landing-hero-letterbox {
+  display: none !important;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: clamp(38px, 7vh, 72px);
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.58) 72%, transparent),
+    linear-gradient(90deg, rgba(34, 211, 102, 0.16), transparent 35%, rgba(34, 211, 238, 0.10));
+  opacity: 0.88;
+}
+
+.landing-hero-letterbox--top { top: 0; }
+.landing-hero-letterbox--bottom {
+  bottom: 0;
+  transform: rotate(180deg);
+}
+
+.landing-hero-lightleak {
+  position: absolute;
+  height: 2px;
+  width: min(78vw, 1120px);
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(34, 211, 102, 0.16), rgba(34, 211, 238, 0.62), rgba(245, 158, 11, 0.35), transparent);
+  filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.48));
+  opacity: 0.48;
+  transform-origin: center;
+  animation: landing-lightleak 8s var(--ease-smooth, ease) infinite;
+}
+
+.landing-hero-lightleak--a {
+  top: 21%;
+  right: -10%;
+  transform: rotate(-9deg);
+}
+
+.landing-hero-lightleak--b {
+  bottom: 26%;
+  left: 26%;
+  opacity: 0.45;
+  transform: rotate(5deg);
+  animation-delay: -3.4s;
+}
+
+.landing-hero-lightleak--c {
+  top: 47%;
+  left: 48%;
+  width: min(42vw, 620px);
+  height: 1px;
+  opacity: 0.3;
+  transform: rotate(-2deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), rgba(245, 158, 11, 0.46), rgba(34, 211, 238, 0.2), transparent);
+  filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.34));
+  animation-duration: 11s;
+  animation-delay: -6s;
+}
+
+.landing-hero-sweep {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 38%;
+  width: 16%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  transform: skewX(-18deg) translateX(-80vw);
+  animation: landing-sweep 9s var(--ease-out-expo, ease-out) infinite;
+  mix-blend-mode: screen;
+}
+
+.landing-hero-volumetrics {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.76;
+  filter: saturate(116%);
+}
+
+.landing-hero-beam {
+  position: absolute;
+  top: -18%;
+  height: 138%;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.20), rgba(34, 211, 102, 0.10) 32%, rgba(34, 211, 238, 0.04) 60%, transparent 86%);
+  filter: blur(18px);
+  transform-origin: top center;
+  opacity: 0.22;
+  animation: landing-beam-breathe 8.5s var(--ease-smooth, ease) infinite;
+}
+
+.landing-hero-beam--1 {
+  left: 46%;
+  width: 8vw;
+  max-width: 108px;
+  transform: rotate(19deg);
+}
+
+.landing-hero-beam--2 {
+  left: 56%;
+  width: 13vw;
+  max-width: 170px;
+  transform: rotate(9deg);
+  opacity: 0.16;
+  animation-delay: -1.6s;
+}
+
+.landing-hero-beam--3 {
+  right: 6%;
+  width: 10vw;
+  max-width: 140px;
+  transform: rotate(-12deg);
+  background:
+    linear-gradient(180deg, rgba(245, 158, 11, 0.22), rgba(34, 211, 238, 0.09) 36%, rgba(34, 211, 102, 0.04) 68%, transparent 88%);
+  animation-delay: -3.4s;
+}
+
+.landing-hero-beam--4 {
+  left: 72%;
+  width: 5vw;
+  max-width: 72px;
+  transform: rotate(-4deg);
+  opacity: 0.28;
+  filter: blur(11px);
+  animation-delay: -5.2s;
+}
+
+.landing-hero-beam--5 {
+  left: 36%;
+  width: 6vw;
+  max-width: 82px;
+  transform: rotate(28deg);
+  opacity: 0.12;
+  animation-delay: -6.4s;
+}
+
+.landing-hero-depth-grid {
+  position: absolute;
+  top: -8%;
+  right: -12%;
+  width: min(72vw, 1120px);
+  height: 96%;
+  opacity: 0.16;
+  transform: perspective(900px) rotateX(58deg) rotateZ(-12deg);
+  transform-origin: 50% 50%;
+  background-image:
+    linear-gradient(rgba(34, 211, 102, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.14) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at 58% 48%, black 0 34%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at 58% 48%, black 0 34%, transparent 70%);
+}
+
+.landing-hero-foreground-fins {
+  position: absolute;
+  inset: -4% 0 -8%;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.5;
+  mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+}
+
+.landing-hero-foreground-fins span {
+  position: absolute;
+  left: var(--x);
+  top: 4%;
+  width: var(--w);
+  height: 106%;
+  transform: skewX(-11deg);
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.055), transparent 72%),
+    linear-gradient(180deg, transparent, rgba(34, 211, 238, 0.11) 44%, rgba(245, 158, 11, 0.05), transparent);
+  border-left: 1px solid rgba(255, 255, 255, 0.055);
+  filter: blur(0.2px);
+  animation: landing-fins-drift 10s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+.landing-hero-scan-stack {
+  position: absolute;
+  inset: 0;
+}
+
+.landing-hero-scan-stack span {
+  position: absolute;
+  left: 42%;
+  right: 4%;
+  top: var(--top);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(34, 211, 102, 0.10), rgba(34, 211, 238, 0.34), transparent);
+  opacity: 0;
+  transform: translateX(-14%);
+  animation: landing-scanline 5.8s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+.landing-hero-frame {
+  display: none;
+}
+
+.landing-hero-proofdeck {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -6px 0 clamp(1.25rem, 2.2vw, 1.7rem);
+  max-width: 48rem;
+  pointer-events: none;
+}
+
+.landing-hero-proof {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  min-width: min(100%, 168px);
+  padding: 10px 12px;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)),
+    rgba(7, 11, 10, 0.30);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.landing-hero-proof strong {
+  color: rgba(241, 245, 249, 0.94);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.landing-hero-proof small {
+  color: rgba(226, 232, 240, 0.64);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+@keyframes landing-lightleak {
+  0%, 100% { opacity: 0.18; filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.24)); }
+  45%, 58% { opacity: 0.78; filter: drop-shadow(0 0 22px rgba(34, 211, 238, 0.5)); }
+}
+
+@keyframes landing-sweep {
+  0% { transform: skewX(-18deg) translateX(-90vw); opacity: 0; }
+  12% { opacity: 0.45; }
+  34% { transform: skewX(-18deg) translateX(100vw); opacity: 0; }
+  100% { transform: skewX(-18deg) translateX(100vw); opacity: 0; }
+}
+
+@keyframes landing-scanline {
+  0%, 100% { opacity: 0; transform: translateX(-14%); }
+  30% { opacity: 0.58; }
+  54% { opacity: 0; transform: translateX(12%); }
+}
+
+@keyframes landing-beam-breathe {
+  0%, 100% { opacity: 0.12; transform: translateY(0) rotate(var(--beam-rot, 0deg)); }
+  44% { opacity: 0.32; transform: translateY(1.8%) rotate(var(--beam-rot, 0deg)); }
+}
+
+.landing-hero-beam--1 { --beam-rot: 19deg; }
+.landing-hero-beam--2 { --beam-rot: 9deg; }
+.landing-hero-beam--3 { --beam-rot: -12deg; }
+.landing-hero-beam--4 { --beam-rot: -4deg; }
+.landing-hero-beam--5 { --beam-rot: 28deg; }
+
+@keyframes landing-fins-drift {
+  0%, 100% { opacity: 0.22; transform: translate3d(-8px, 0, 0) skewX(-11deg); }
+  50% { opacity: 0.58; transform: translate3d(10px, 0, 0) skewX(-11deg); }
 }
 
 .landing-hero-content {
-  filter: drop-shadow(0 18px 52px rgba(0, 0, 0, 0.48));
+  filter:
+    drop-shadow(0 10px 24px rgba(0, 0, 0, 0.30))
+    drop-shadow(0 0 18px rgba(0, 0, 0, 0.18));
 }
 
 .landing-hero-actions a {
@@ -3587,14 +4037,37 @@ a:hover {
   }
 
   .landing-hero-vignette {
-    background: none;
+    background:
+      linear-gradient(90deg, rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.15) 48%, rgba(0, 0, 0, 0.04)),
+      linear-gradient(0deg, rgba(0, 0, 0, 0.16), transparent 42%);
+  }
+
+  .landing-hero-depth-grid {
+    opacity: 0.14;
+  }
+
+  .landing-hero-lightleak--b {
+    display: none;
+  }
+
+  .landing-hero-foreground-fins {
+    opacity: 0.32;
+  }
+
+  .landing-hero-volumetrics {
+    opacity: 0.58;
   }
 }
 
 @media (max-width: 560px) {
+  .landing-hero {
+    align-items: center !important;
+    min-height: 94svh !important;
+  }
+
   .landing-hero-content {
     max-width: 100% !important;
-    padding: 6rem 1rem 1.5rem !important;
+    padding: 3.75rem 1rem 1.5rem !important;
   }
 
   .landing-hero-actions {
@@ -3607,6 +4080,38 @@ a:hover {
 
   .landing-hero-trust svg {
     width: 96px !important;
+  }
+
+  .landing-hero-proofdeck {
+    display: none;
+  }
+
+  .landing-hero-cinema-chrome {
+    opacity: 0.72;
+  }
+
+  .landing-hero-depth-grid {
+    top: 5%;
+    right: -58%;
+    width: 150%;
+    height: 45%;
+    opacity: 0.18;
+  }
+
+  .landing-hero-lightleak--a {
+    top: 20%;
+    right: -72%;
+    width: 170vw;
+  }
+
+  .landing-hero-lightleak--c,
+  .landing-hero-foreground-fins {
+    display: none;
+  }
+
+  .landing-hero-beam {
+    filter: blur(22px);
+    opacity: 0.13;
   }
 }
 
@@ -3623,6 +4128,14 @@ a:hover {
 
   .bento-card {
     will-change: auto;
+  }
+
+  .landing-hero-lightleak,
+  .landing-hero-sweep,
+  .landing-hero-beam,
+  .landing-hero-foreground-fins span,
+  .landing-hero-scan-stack span {
+    animation: none !important;
   }
 }
 
@@ -3877,9 +4390,1228 @@ a:hover {
   border-radius: inherit;
 }
 
+/* ============ HERO CTA HOVER STATES — premium interaction polish ============
+   Adds the standard translateY(-1px) lift + brightness bump to hero CTAs.
+   Without these the hero buttons read static, which undercuts the rest of
+   the page where every card / control has a hover signal. */
+.hero-cta-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow:
+    0 22px 56px rgba(34, 211, 102, 0.42),
+    0 0 0 1px rgba(34, 211, 102, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32) !important;
+}
+.hero-cta-primary:active {
+  transform: translateY(0) scale(0.985);
+  transition-duration: 90ms;
+}
+
+.hero-cta-secondary:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(34, 211, 102, 0.35) !important;
+}
+.hero-cta-secondary:active {
+  transform: translateY(0) scale(0.985);
+  transition-duration: 90ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-cta-primary:hover,
+  .hero-cta-secondary:hover { transform: none; }
+}
+
 .font-poppins {
   font-family: "Poppins", sans-serif;
 }
 .font-serif {
   font-family: "Source Serif 4", serif;
+}
+
+/* ============================================================================
+   LIGHT THEME — index.css surface overrides
+   ============================================================================
+   Activated by `<html data-theme="light">`. Re-themes all the foundation
+   surface classes (cards, panels, banners, navbar, inputs) so the page reads
+   as a deliberate light theme rather than dark surfaces on a pale page.
+   The dark CSS above stays untouched — defaults to dark.
+
+   Design intent for light:
+   - App bg: warm off-white (var(--background) = #f6f5f0)
+   - Cards / panels: white-ish (rgba(255,255,255,0.86–0.94)) with subtle dark border
+   - Glass: still feels glassy via blur + dark hairline + soft shadow
+   - Brand green / cyan accents stay; glow alphas dial back ~30–40%
+   - Shadows: warm-slate alphas in 0.05–0.18 range (not 0.4–0.6 black)
+   ============================================================================ */
+
+/* ---- Navbar shell ---- */
+:root[data-theme="light"] .nav-premium {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.86) 0%, rgba(248, 248, 244, 0.78) 100%) !important;
+  border: 1px solid rgba(15, 18, 22, 0.08) !important;
+  box-shadow:
+    0 18px 44px rgba(20, 30, 40, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+}
+
+:root[data-theme="light"] .nav-premium::after {
+  background: linear-gradient(90deg, transparent, rgba(34, 200, 102, 0.32) 28%, rgba(34, 200, 238, 0.26) 72%, transparent);
+}
+
+:root[data-theme="light"] .px-nav-pill-group {
+  background: rgba(15, 18, 22, 0.04);
+  border: 1px solid rgba(15, 18, 22, 0.08);
+  box-shadow: inset 0 1px 0 rgba(15, 18, 22, 0.04);
+}
+
+:root[data-theme="light"] .px-nav-link:hover:not(.is-active) {
+  background: rgba(15, 18, 22, 0.05);
+  color: var(--text-main);
+}
+
+:root[data-theme="light"] .px-nav-divider {
+  background: rgba(15, 18, 22, 0.12);
+}
+
+/* The active nav pill keeps brand green; warm-dark text reads on it. */
+
+/* ---- Dashboard hero banner ---- */
+:root[data-theme="light"] .dash-hero {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(252, 252, 248, 0.82) 100%);
+  border: 1px solid rgba(15, 18, 22, 0.08);
+  box-shadow:
+    0 1px 2px rgba(20, 30, 40, 0.05),
+    0 18px 40px -16px rgba(20, 30, 40, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+:root[data-theme="light"] .dash-hero::after {
+  background:
+    radial-gradient(ellipse 38% 60% at 0% 0%, rgba(34, 200, 102, 0.06), transparent 65%),
+    radial-gradient(ellipse 38% 60% at 100% 100%, rgba(34, 200, 238, 0.04), transparent 65%);
+}
+
+/* ---- Discovery portal banner ---- */
+:root[data-theme="light"] .discovery-portal {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 248, 244, 0.82) 100%);
+  border: 1px solid rgba(15, 18, 22, 0.08);
+  box-shadow:
+    0 28px 60px rgba(20, 30, 40, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* ---- Stat strip cards ---- */
+:root[data-theme="light"] .dash-stat-card {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(15, 18, 22, 0.08);
+  box-shadow:
+    0 1px 2px rgba(20, 30, 40, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+:root[data-theme="light"] .dash-stat-card:hover {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(15, 18, 22, 0.14);
+  box-shadow:
+    0 1px 2px rgba(20, 30, 40, 0.05),
+    0 12px 28px -8px rgba(20, 30, 40, 0.10);
+}
+
+/* ---- Right rail cards & rows ---- */
+:root[data-theme="light"] .dash-rail-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(250, 250, 247, 0.82) 100%);
+  border: 1px solid rgba(15, 18, 22, 0.08);
+  box-shadow:
+    0 1px 2px rgba(20, 30, 40, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+:root[data-theme="light"] .dash-rail-row:hover {
+  background: rgba(15, 18, 22, 0.05);
+}
+
+:root[data-theme="light"] .dash-rail-row.is-active {
+  background: rgba(34, 200, 102, 0.10);
+  color: hsl(142 65% 32%);
+}
+
+/* ---- Editorial card (the big feed cards) ---- */
+:root[data-theme="light"] .editorial-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(250, 250, 247, 0.82) 100%);
+  border: 1px solid rgba(15, 18, 22, 0.08);
+  box-shadow:
+    0 1px 2px rgba(20, 30, 40, 0.05),
+    0 12px 28px -10px rgba(20, 30, 40, 0.08);
+}
+
+:root[data-theme="light"] .editorial-card::after {
+  background:
+    radial-gradient(ellipse 50% 80% at 10% 50%, rgba(34, 200, 102, 0.08), transparent 60%),
+    radial-gradient(ellipse 50% 80% at 95% 50%, rgba(34, 200, 238, 0.06), transparent 60%);
+}
+
+:root[data-theme="light"] .editorial-card:hover {
+  border-color: rgba(34, 200, 102, 0.32);
+  box-shadow:
+    0 1px 2px rgba(20, 30, 40, 0.06),
+    0 18px 36px -12px rgba(20, 30, 40, 0.14),
+    0 32px 60px -20px rgba(34, 200, 102, 0.10);
+}
+
+/* The card-visual (illustration slot) keeps a slight tinted bg so the icon
+   reads with depth, but flips from dark navy to a soft greyscale wash. */
+:root[data-theme="light"] .card-visual {
+  background:
+    radial-gradient(ellipse 70% 90% at 50% 50%, rgba(34, 200, 102, 0.08), transparent 70%),
+    linear-gradient(135deg, rgba(240, 242, 246, 0.95), rgba(228, 232, 240, 0.78));
+  border: 1px solid rgba(15, 18, 22, 0.08);
+}
+
+:root[data-theme="light"] .card-visual::before {
+  background: radial-gradient(circle at 70% 30%, rgba(34, 200, 238, 0.08), transparent 50%);
+}
+
+:root[data-theme="light"] .card-visual svg {
+  filter: drop-shadow(0 0 12px rgba(34, 200, 102, 0.28));
+}
+
+/* ---- Editorial panel (used across many pages) ---- */
+:root[data-theme="light"] .editorial-panel {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 248, 244, 0.78) 100%);
+  border: 1px solid rgba(15, 18, 22, 0.08);
+  box-shadow:
+    0 1px 2px rgba(20, 30, 40, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+:root[data-theme="light"] .editorial-panel-hover:hover {
+  border-color: rgba(34, 200, 102, 0.32);
+  box-shadow:
+    0 22px 48px -16px rgba(20, 30, 40, 0.14),
+    0 0 40px -12px rgba(34, 200, 102, 0.10);
+}
+
+/* ---- Inputs ---- */
+:root[data-theme="light"] .input-lux,
+:root[data-theme="light"] .px-input {
+  background: #ffffff;
+  border: 1px solid rgba(15, 18, 22, 0.10);
+}
+
+:root[data-theme="light"] .input-lux:focus,
+:root[data-theme="light"] .px-input:focus,
+:root[data-theme="light"] .px-input:focus-visible {
+  background: #ffffff;
+  border-color: rgba(34, 200, 102, 0.45);
+  box-shadow: 0 0 0 3px rgba(34, 200, 102, 0.10), 0 6px 16px rgba(20, 30, 40, 0.06);
+}
+
+:root[data-theme="light"] .input-lux::placeholder,
+:root[data-theme="light"] .px-input::placeholder {
+  color: rgba(60, 70, 84, 0.5);
+}
+
+/* ---- Portal search ---- */
+:root[data-theme="light"] .portal-search {
+  background: #ffffff;
+  border: 1px solid rgba(15, 18, 22, 0.10);
+  box-shadow: 0 1px 2px rgba(20, 30, 40, 0.04);
+}
+
+:root[data-theme="light"] .portal-search:focus-within {
+  background: #ffffff;
+  border-color: rgba(34, 200, 102, 0.45);
+  box-shadow: 0 0 0 3px rgba(34, 200, 102, 0.10), 0 8px 20px rgba(20, 30, 40, 0.08);
+}
+
+:root[data-theme="light"] .portal-search input::placeholder {
+  color: rgba(60, 70, 84, 0.55);
+}
+
+/* ---- Segmented control ---- */
+:root[data-theme="light"] .segmented-control {
+  background: rgba(15, 18, 22, 0.05);
+  border: 1px solid rgba(15, 18, 22, 0.08);
+}
+
+:root[data-theme="light"] .segmented-tab {
+  color: rgba(60, 70, 84, 0.7);
+}
+
+:root[data-theme="light"] .segmented-tab.active {
+  /* Warm-dark text on the green pill — same contrast on both themes. */
+  color: #14110f;
+}
+
+:root[data-theme="light"] .segmented-tab:hover:not(.active) {
+  color: var(--text-main);
+}
+
+/* ---- Filter chips ---- */
+:root[data-theme="light"] .filter-chip {
+  background-color: #ffffff;
+  border: 1px solid rgba(15, 18, 22, 0.10);
+  color: var(--text-main);
+  /* Re-tint the chevron icon to dark for visibility on white. */
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2344515c' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+:root[data-theme="light"] .filter-chip:hover {
+  background-color: #ffffff;
+  border-color: rgba(34, 200, 102, 0.42);
+  box-shadow: 0 4px 12px rgba(20, 30, 40, 0.06);
+}
+
+:root[data-theme="light"] .filter-chip:focus,
+:root[data-theme="light"] .filter-chip:focus-visible {
+  border-color: rgba(34, 200, 102, 0.55);
+  box-shadow: 0 0 0 3px rgba(34, 200, 102, 0.10);
+}
+
+/* ---- Pills ---- */
+:root[data-theme="light"] .pill-neon {
+  background: rgba(34, 200, 102, 0.10);
+  color: hsl(142 65% 32%);
+  border-color: rgba(34, 200, 102, 0.32);
+}
+
+:root[data-theme="light"] .pill-cyan {
+  background: rgba(34, 200, 238, 0.10);
+  color: hsl(186 75% 32%);
+  border-color: rgba(34, 200, 238, 0.32);
+}
+
+:root[data-theme="light"] .pill-amber {
+  background: rgba(34, 200, 102, 0.10);
+  color: hsl(142 65% 32%);
+  border-color: rgba(34, 200, 102, 0.32);
+}
+
+:root[data-theme="light"] .pill-dim {
+  background: rgba(15, 18, 22, 0.04);
+  color: var(--text-muted);
+  border-color: rgba(15, 18, 22, 0.10);
+}
+
+/* ---- Buttons (lux + ghost) ---- */
+:root[data-theme="light"] .btn-lux-ghost {
+  background: #ffffff;
+  border: 1px solid rgba(15, 18, 22, 0.10);
+  color: var(--text-main);
+  box-shadow: 0 1px 2px rgba(20, 30, 40, 0.04);
+}
+
+:root[data-theme="light"] .btn-lux-ghost:hover {
+  background: rgba(34, 200, 102, 0.06);
+  border-color: rgba(34, 200, 102, 0.32);
+  color: hsl(142 65% 32%);
+}
+
+:root[data-theme="light"] .px-btn:not(.primary):not(.danger) {
+  /* The default ghost-style px-btn — light surface, dark text, subtle border. */
+  background: #ffffff;
+  border-color: rgba(15, 18, 22, 0.10);
+  color: var(--text-main);
+}
+
+:root[data-theme="light"] .px-btn:not(.primary):not(.danger):hover {
+  background: rgba(34, 200, 102, 0.05);
+  border-color: rgba(34, 200, 102, 0.32);
+}
+
+/* ---- Card CTA ---- */
+:root[data-theme="light"] .card-cta {
+  background: rgba(34, 200, 102, 0.10);
+  color: hsl(142 65% 32%);
+  border-color: rgba(34, 200, 102, 0.32);
+}
+
+:root[data-theme="light"] .editorial-card:hover .card-cta {
+  background: linear-gradient(135deg, rgba(34, 200, 102, 0.20), rgba(34, 200, 238, 0.12));
+  border-color: rgba(34, 200, 102, 0.50);
+  color: hsl(142 65% 28%);
+  box-shadow: 0 1px 2px rgba(20, 30, 40, 0.06), 0 6px 16px -4px rgba(34, 200, 102, 0.20);
+}
+
+/* ---- Dashboard tab count badge ---- */
+:root[data-theme="light"] .dash-tab-count {
+  background: rgba(34, 200, 102, 0.14);
+  color: hsl(142 65% 32%);
+}
+
+/* ---- Result pill in search row ---- */
+:root[data-theme="light"] .dash-result-pill {
+  background: rgba(34, 200, 102, 0.08);
+  border-color: rgba(34, 200, 102, 0.26);
+  color: hsl(142 65% 32%);
+}
+
+/* ---- Dashboard eyebrow chip ---- */
+:root[data-theme="light"] .dash-eyebrow {
+  background: rgba(34, 200, 102, 0.08);
+  color: hsl(142 65% 32%);
+  border-color: rgba(34, 200, 102, 0.26);
+}
+
+/* ---- Editorial eyebrow chips ---- */
+:root[data-theme="light"] .editorial-eyebrow {
+  background: rgba(34, 200, 102, 0.08);
+  color: hsl(142 65% 32%);
+  border-color: rgba(34, 200, 102, 0.26);
+}
+
+:root[data-theme="light"] .editorial-eyebrow.cyan {
+  background: rgba(34, 200, 238, 0.08);
+  color: hsl(186 75% 32%);
+  border-color: rgba(34, 200, 238, 0.28);
+}
+
+:root[data-theme="light"] .editorial-eyebrow.amber {
+  background: rgba(34, 200, 102, 0.08);
+  color: hsl(142 65% 32%);
+  border-color: rgba(34, 200, 102, 0.26);
+}
+
+/* ---- Bookmark float ---- */
+:root[data-theme="light"] .bookmark-float {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(15, 18, 22, 0.10);
+  color: var(--text-muted);
+}
+
+:root[data-theme="light"] .bookmark-float:hover,
+:root[data-theme="light"] .bookmark-float.saved {
+  background: rgba(34, 200, 102, 0.10);
+  border-color: rgba(34, 200, 102, 0.45);
+  color: hsl(142 65% 32%);
+}
+
+/* ---- Subtle global selectors ---- */
+:root[data-theme="light"] .skip-to-content {
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(20, 30, 40, 0.16);
+}
+
+/* Scrollbar — light-mode track + thumb */
+:root[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(15, 18, 22, 0.18);
+}
+:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 18, 22, 0.32);
+}
+
+/* ============================================================================
+   LIGHT THEME — premium refinement layer
+   ============================================================================
+   The override block above gets the structural colors right, but light mode
+   needs its OWN visual language to stand on equal footing with dark. This
+   second layer adds:
+
+   1. Atmosphere — warm cream body with subtle gradient + faint medical grid
+      pattern overlay so the page feels like a deliberate "day mode" canvas
+      rather than a flat off-white sheet.
+   2. Refined accent palette — the dark-mode neon green (hsl 119 99% 50) reads
+      as garish on a light backdrop. Light mode uses a deeper professional
+      forest green (hsl 142 65–75% 30–38%) for solid fills and a sage tint
+      for ambient washes. The 119° hue stays for animation continuity but
+      saturation/lightness are dialed for daylight legibility.
+   3. Multi-layer warm shadows — replaces the cool blue-grey ambient with
+      a 2-stop soft warm slate (sage + warm grey) so cards "lift" off the
+      cream paper instead of stamping into it.
+   4. Strong typography hierarchy — body text uses near-black (#0f1419), heads
+      drop to true black (#0a0e10) with tighter tracking. Reads more
+      editorial-print than washed-out grey-on-grey.
+   5. Decorative chrome — banners and the Login cinematic side gain warm-cream
+      gradient overlays and a soft sage corner glow so they don't feel empty.
+   ============================================================================ */
+
+/* ---- Atmosphere: body background with warm gradient + faint medical grid ---- */
+:root[data-theme="light"] body {
+  background:
+    /* Faint medical EKG-grid pattern (3% opacity) */
+    repeating-linear-gradient(0deg,
+      transparent, transparent 39px,
+      rgba(34, 200, 102, 0.025) 39px, rgba(34, 200, 102, 0.025) 40px),
+    repeating-linear-gradient(90deg,
+      transparent, transparent 39px,
+      rgba(34, 200, 102, 0.025) 39px, rgba(34, 200, 102, 0.025) 40px),
+    /* Warm cream gradient with sage corners */
+    radial-gradient(ellipse 80% 60% at 0% 0%, rgba(34, 200, 102, 0.06), transparent 55%),
+    radial-gradient(ellipse 70% 60% at 100% 100%, rgba(34, 200, 238, 0.04), transparent 60%),
+    linear-gradient(180deg, #f7f5ee 0%, #f4f3ec 50%, #f0eee5 100%);
+  background-attachment: fixed;
+}
+
+/* ---- Refined accent palette for light mode ---- */
+:root[data-theme="light"] {
+  /* Solid-fill green for buttons / pills — deep professional forest green
+     instead of the dark-mode neon. Reads on white without burning the retina. */
+  --light-green-primary: hsl(142 70% 34%);
+  --light-green-primary-hover: hsl(142 75% 28%);
+  --light-green-text: hsl(142 65% 26%);
+  --light-cyan-text: hsl(186 75% 28%);
+  --light-paper: #ffffff;
+  --light-paper-soft: #fbfaf6;
+
+  /* Warm shadow stack — sage + warm slate alphas, not cool blue-grey */
+  --shadow-warm-sm:
+    0 1px 2px rgba(80, 70, 60, 0.06),
+    0 4px 12px -4px rgba(80, 70, 60, 0.10);
+  --shadow-warm-md:
+    0 1px 2px rgba(80, 70, 60, 0.06),
+    0 12px 28px -10px rgba(80, 70, 60, 0.12),
+    0 24px 48px -16px rgba(34, 200, 102, 0.06);
+  --shadow-warm-lg:
+    0 1px 2px rgba(80, 70, 60, 0.07),
+    0 20px 40px -12px rgba(80, 70, 60, 0.14),
+    0 36px 64px -20px rgba(34, 200, 102, 0.08);
+
+  /* Sharper typography hierarchy in light mode */
+  --text-main: #0f1419;
+  --text-muted: #3d4651;
+  --text-subtle: #6b7484;
+}
+
+/* ---- Strong typographic hierarchy ---- */
+:root[data-theme="light"] h1,
+:root[data-theme="light"] h2,
+:root[data-theme="light"] h3 {
+  color: #0a0e10;
+}
+
+/* ---- Primary button — deep professional green gradient (replaces neon) ---- */
+:root[data-theme="light"] .px-btn.primary {
+  --px-btn-bg: linear-gradient(135deg, hsl(142 70% 36%) 0%, hsl(142 75% 30%) 100%);
+  --px-btn-color: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(20, 60, 40, 0.18),
+    0 8px 20px -6px rgba(34, 200, 102, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+:root[data-theme="light"] .px-btn.primary:hover {
+  --px-btn-bg: linear-gradient(135deg, hsl(142 75% 32%) 0%, hsl(142 80% 26%) 100%);
+  box-shadow:
+    0 1px 2px rgba(20, 60, 40, 0.22),
+    0 12px 28px -8px rgba(34, 200, 102, 0.40),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* Skip link gets a deep-green gradient too for visibility on cream */
+:root[data-theme="light"] .skip-to-content {
+  background: linear-gradient(135deg, hsl(142 70% 36%), hsl(186 75% 36%));
+}
+
+/* ---- Navbar logo mark (the activity icon pill) — keep gradient but darken ---- */
+:root[data-theme="light"] .px-nav-mark {
+  background: linear-gradient(135deg, hsl(142 70% 38%) 0%, hsl(142 75% 32%) 55%, hsl(142 80% 26%) 100%);
+  box-shadow:
+    0 1px 2px rgba(20, 60, 40, 0.18),
+    0 6px 16px -6px rgba(34, 200, 102, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* The active nav pill — same deep green */
+:root[data-theme="light"] .px-nav-indicator {
+  background: linear-gradient(135deg, hsl(142 70% 38%) 0%, hsl(142 75% 32%) 55%, hsl(142 80% 26%) 100%);
+  box-shadow:
+    0 1px 2px rgba(20, 60, 40, 0.18),
+    0 5px 14px -6px rgba(34, 200, 102, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+:root[data-theme="light"] .px-nav-link.is-active,
+:root[data-theme="light"] .px-nav-link.is-active .px-nav-link-icon {
+  color: #ffffff !important;
+}
+
+/* Wordmark accent — deeper green-cyan instead of pale */
+:root[data-theme="light"] .px-nav-wordmark-accent {
+  background: linear-gradient(135deg, hsl(142 70% 32%) 0%, hsl(186 75% 36%) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ---- Cards: replace cool ambient shadows with the warm stack ---- */
+:root[data-theme="light"] .editorial-card,
+:root[data-theme="light"] .editorial-panel,
+:root[data-theme="light"] .dash-stat-card,
+:root[data-theme="light"] .dash-rail-card,
+:root[data-theme="light"] .dash-hero {
+  background: var(--light-paper);
+  border: 1px solid rgba(34, 60, 50, 0.08);
+  box-shadow: var(--shadow-warm-sm);
+}
+
+:root[data-theme="light"] .editorial-card:hover,
+:root[data-theme="light"] .editorial-panel.editorial-panel-hover:hover,
+:root[data-theme="light"] .dash-stat-card:hover {
+  border-color: rgba(34, 200, 102, 0.32);
+  box-shadow: var(--shadow-warm-md);
+}
+
+/* Discovery portal — the search-row container — gets the soft paper treatment
+   plus a warm sage glow at top-right for atmosphere. */
+:root[data-theme="light"] .discovery-portal {
+  background:
+    radial-gradient(ellipse 60% 50% at 100% 0%, rgba(34, 200, 102, 0.05), transparent 60%),
+    var(--light-paper);
+  border: 1px solid rgba(34, 60, 50, 0.08);
+  box-shadow: var(--shadow-warm-md);
+}
+
+/* Hero banner needs a touch more atmosphere — sage corner + cream center */
+:root[data-theme="light"] .dash-hero {
+  background:
+    radial-gradient(ellipse 50% 70% at 0% 0%, rgba(34, 200, 102, 0.06), transparent 60%),
+    radial-gradient(ellipse 50% 70% at 100% 100%, rgba(34, 200, 238, 0.04), transparent 60%),
+    var(--light-paper);
+  box-shadow: var(--shadow-warm-md);
+}
+
+/* ---- Card visual slot (the illustration tile) — soft cream with sage glow ---- */
+:root[data-theme="light"] .card-visual {
+  background:
+    radial-gradient(ellipse 70% 90% at 50% 50%, rgba(34, 200, 102, 0.10), transparent 70%),
+    linear-gradient(135deg, #f3f5ee 0%, #ebeee3 100%);
+  border: 1px solid rgba(34, 60, 50, 0.08);
+}
+
+:root[data-theme="light"] .card-visual svg {
+  color: hsl(142 50% 38%);
+  opacity: 1;
+  filter: drop-shadow(0 4px 12px rgba(34, 200, 102, 0.22));
+}
+
+/* ---- Pills with deeper accents ---- */
+:root[data-theme="light"] .pill-neon {
+  background: rgba(34, 200, 102, 0.10);
+  color: var(--light-green-text);
+  border-color: rgba(34, 200, 102, 0.32);
+}
+:root[data-theme="light"] .pill-cyan {
+  background: rgba(34, 200, 238, 0.10);
+  color: var(--light-cyan-text);
+  border-color: rgba(34, 200, 238, 0.32);
+}
+:root[data-theme="light"] .pill-amber {
+  background: rgba(34, 200, 102, 0.10);
+  color: var(--light-green-text);
+  border-color: rgba(34, 200, 102, 0.32);
+}
+
+:root[data-theme="light"] .dash-eyebrow,
+:root[data-theme="light"] .editorial-eyebrow {
+  color: var(--light-green-text);
+}
+
+/* ---- Card CTA — solid deep green pill instead of washed-out tint ---- */
+:root[data-theme="light"] .card-cta {
+  background: linear-gradient(135deg, rgba(34, 200, 102, 0.12), rgba(34, 200, 238, 0.08));
+  color: var(--light-green-text);
+  border-color: rgba(34, 200, 102, 0.32);
+}
+
+:root[data-theme="light"] .editorial-card:hover .card-cta {
+  background: linear-gradient(135deg, hsl(142 70% 36%), hsl(142 75% 30%));
+  color: #ffffff;
+  border-color: hsl(142 75% 30%);
+}
+
+/* ---- Segmented control active pill — deep green ---- */
+:root[data-theme="light"] .dash-segmented-fill {
+  background: linear-gradient(135deg, hsl(142 70% 36%) 0%, hsl(142 75% 30%) 100%);
+  box-shadow: 0 4px 12px -4px rgba(34, 200, 102, 0.40);
+}
+
+:root[data-theme="light"] .segmented-tab.active {
+  color: #ffffff;
+}
+
+:root[data-theme="light"] .dash-tab-count.active {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+/* ---- Title accent (the italic Instrument Serif inflection) — deeper sage ---- */
+:root[data-theme="light"] .dash-title-accent,
+:root[data-theme="light"] .editorial-display .accent {
+  background: linear-gradient(135deg, hsl(142 70% 30%) 0%, hsl(155 60% 36%) 55%, hsl(180 65% 38%) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ---- Login cinematic side — atmospheric overlay so it isn't empty ---- */
+:root[data-theme="light"] .login-cinematic-side,
+:root[data-theme="light"] .login-cinematic-stage {
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 30%, rgba(34, 200, 102, 0.08), transparent 65%),
+    radial-gradient(ellipse 70% 50% at 30% 90%, rgba(34, 200, 238, 0.05), transparent 60%),
+    linear-gradient(180deg, #f9f7f0 0%, #f2efe6 100%);
+}
+
+/* The mini status cards on the login left side */
+:root[data-theme="light"] .login-cinematic-stage .editorial-eyebrow,
+:root[data-theme="light"] .login-cinematic-side .editorial-eyebrow {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(34, 200, 102, 0.28);
+  box-shadow: var(--shadow-warm-sm);
+}
+
+/* ---- Scrolled nav tints to a slightly more opaque cream ---- */
+:root[data-theme="light"] .nav-premium {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(252, 250, 244, 0.85) 100%) !important;
+  border: 1px solid rgba(34, 60, 50, 0.08) !important;
+  box-shadow:
+    var(--shadow-warm-md),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+:root[data-theme="light"] .px-nav-frame.is-scrolled .px-nav-shell {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(252, 250, 244, 0.92) 100%) !important;
+}
+
+/* ---- Inputs gain a clear inner ring on focus instead of just border color ---- */
+:root[data-theme="light"] .input-lux:focus,
+:root[data-theme="light"] .px-input:focus,
+:root[data-theme="light"] .px-input:focus-visible,
+:root[data-theme="light"] .portal-search:focus-within {
+  box-shadow:
+    0 0 0 3px rgba(34, 200, 102, 0.14),
+    0 8px 20px rgba(80, 70, 60, 0.08);
+}
+
+/* ---- Right-rail "is-active" row gets a soft sage wash ---- */
+:root[data-theme="light"] .dash-rail-row.is-active {
+  background: linear-gradient(90deg, rgba(34, 200, 102, 0.10), rgba(34, 200, 102, 0.04));
+  color: var(--light-green-text);
+  border-left: 2px solid hsl(142 70% 36%);
+  padding-left: 8px;
+}
+
+/* ---- Ambient page-level decoration — subtle green vignette in corners ---- */
+:root[data-theme="light"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 35% 25% at 0% 0%, rgba(34, 200, 102, 0.04), transparent 60%),
+    radial-gradient(ellipse 35% 25% at 100% 100%, rgba(34, 200, 238, 0.03), transparent 60%);
+}
+
+/* ---- Toasts and modals: deeper paper background ---- */
+:root[data-theme="light"] .editorial-panel {
+  background: var(--light-paper);
+  box-shadow: var(--shadow-warm-md);
+}
+
+/* ---- Bookmark icon button on cards — deeper green when saved ---- */
+:root[data-theme="light"] .bookmark-float.saved {
+  background: hsl(142 70% 36%);
+  color: #ffffff;
+  border-color: hsl(142 75% 30%);
+  box-shadow: 0 4px 12px -4px rgba(34, 200, 102, 0.40);
+}
+
+/* ---- Pill default text on light: stronger contrast ---- */
+:root[data-theme="light"] .pill-dim {
+  background: #f0eee6;
+  color: #3d4651;
+  border-color: rgba(34, 60, 50, 0.10);
+}
+
+/* ---- Loading skeleton — light shimmer ---- */
+:root[data-theme="light"] .shimmer {
+  background:
+    linear-gradient(100deg,
+      rgba(34, 60, 50, 0.04) 0%,
+      rgba(34, 60, 50, 0.04) 40%,
+      rgba(34, 200, 102, 0.10) 50%,
+      rgba(34, 60, 50, 0.04) 60%,
+      rgba(34, 60, 50, 0.04) 100%
+    ) 0 0 / 220% 100% no-repeat,
+    rgba(34, 60, 50, 0.04);
+}
+
+/* Reduce-motion users still get the body bg, just no animated overlays */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme="light"] body { background-attachment: scroll; }
+}
+
+/* ============================================================================
+   LIGHT THEME - porcelain daylight finish
+   ============================================================================
+   Final cascade layer for the app shell. The earlier light theme made the
+   structure readable, but several surfaces still felt flat or too neon. This
+   layer gives light mode its own calmer product-grade palette: porcelain base,
+   inkier type, clinical teal/emerald accents, and restrained elevation.
+   ============================================================================ */
+
+:root[data-theme="light"] {
+  --primary: #0d9667;
+  --primary-hover: #08784f;
+  --primary-light: #10b981;
+  --accent: #0b8aa0;
+  --accent-hover: #087c91;
+  --accent-light: #22b8cf;
+  --secondary: #10a36d;
+  --secondary-hover: #08784f;
+  --background: #f7fafb;
+  --background-alt: #eef6f4;
+  --surface: rgba(255, 255, 255, 0.9);
+  --surface-hover: rgba(255, 255, 255, 0.98);
+  --surface-elevated: rgba(255, 255, 255, 0.94);
+  --glass-bg: rgba(255, 255, 255, 0.78);
+  --glass-border: rgba(18, 45, 48, 0.1);
+  --text-main: #0c1417;
+  --text-muted: #41515a;
+  --text-subtle: #74818a;
+  --border: rgba(18, 45, 48, 0.09);
+  --border-light: rgba(18, 45, 48, 0.14);
+  --line-subtle: rgba(18, 45, 48, 0.09);
+  --line-base: rgba(18, 45, 48, 0.14);
+  --line-strong: rgba(18, 45, 48, 0.24);
+  --light-paper: rgba(255, 255, 255, 0.92);
+  --light-paper-solid: #ffffff;
+  --light-paper-soft: #f8fbfb;
+  --light-accent: #0d9667;
+  --light-accent-strong: #08784f;
+  --light-teal: #0b8aa0;
+  --light-ink: #0c1417;
+  --light-muted-ink: #41515a;
+  --light-violet: #6d5bd0;
+  --panel-light: rgba(18, 45, 48, 0.035);
+  --panel-lighter: rgba(18, 45, 48, 0.055);
+  --panel-base: rgba(255, 255, 255, 0.72);
+  --bg-overlay: rgba(255, 255, 255, 0.74);
+  --hl-faint: rgba(18, 45, 48, 0.04);
+  --hl-soft: rgba(18, 45, 48, 0.065);
+  --hl-medium: rgba(18, 45, 48, 0.09);
+  --fg-on-accent: #ffffff;
+  --brand-gradient: linear-gradient(135deg, #10a36d 0%, #08784f 58%, #076b75 100%);
+  --brand-gradient-soft: linear-gradient(135deg, rgba(13, 150, 103, 0.14), rgba(11, 138, 160, 0.09));
+  --brand-soft-bg: rgba(13, 150, 103, 0.1);
+  --brand-soft-border: rgba(13, 150, 103, 0.26);
+  --brand-soft-text: #08784f;
+  --brand-icon: #0d9667;
+  --brand-avatar-shadow: 0 10px 24px -14px rgba(8, 120, 79, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  --floating-panel-shadow:
+    0 1px 2px rgba(18, 45, 48, 0.08),
+    0 28px 70px -34px rgba(18, 45, 48, 0.34),
+    0 56px 120px -62px rgba(11, 138, 160, 0.24);
+  --toast-bg: rgba(255, 255, 255, 0.96);
+  --toast-shadow:
+    0 1px 2px rgba(18, 45, 48, 0.08),
+    0 24px 58px -30px rgba(18, 45, 48, 0.34);
+  --selected-bg: rgba(13, 150, 103, 0.1);
+  --selected-border: rgba(13, 150, 103, 0.3);
+  --selected-text: #08784f;
+  --primary-light-alpha: rgba(13, 150, 103, 0.1);
+  --interactive-row-hover-bg: rgba(13, 150, 103, 0.07);
+  --interactive-row-hover-color: #08784f;
+  --detail-info-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(248, 252, 251, 0.76));
+  --detail-info-border: rgba(18, 45, 48, 0.1);
+  --shadow-warm-sm:
+    0 1px 2px rgba(18, 45, 48, 0.05),
+    0 8px 22px -16px rgba(18, 45, 48, 0.18);
+  --shadow-warm-md:
+    0 1px 2px rgba(18, 45, 48, 0.06),
+    0 18px 42px -22px rgba(18, 45, 48, 0.22),
+    0 28px 70px -34px rgba(13, 150, 103, 0.22);
+  --shadow-warm-lg:
+    0 1px 2px rgba(18, 45, 48, 0.07),
+    0 28px 68px -28px rgba(18, 45, 48, 0.24),
+    0 44px 110px -48px rgba(11, 138, 160, 0.2);
+}
+
+:root[data-theme="light"] body {
+  background:
+    linear-gradient(118deg, rgba(13, 150, 103, 0.045), transparent 28%, rgba(11, 138, 160, 0.045) 72%, transparent),
+    linear-gradient(180deg, #fbfdfe 0%, #f4faf8 46%, #eef6f4 100%);
+  background-attachment: fixed;
+}
+
+:root[data-theme="light"] body::before {
+  background:
+    linear-gradient(90deg, rgba(18, 45, 48, 0.018) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(18, 45, 48, 0.014) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 72%);
+}
+
+:root[data-theme="light"] .fx-grain-global {
+  opacity: 0.026;
+  mix-blend-mode: multiply;
+}
+
+/* Navigation */
+:root[data-theme="light"] .nav-premium {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(246, 251, 250, 0.72)) !important;
+  border: 1px solid rgba(18, 45, 48, 0.1) !important;
+  box-shadow:
+    0 18px 44px -26px rgba(18, 45, 48, 0.32),
+    0 1px 0 rgba(255, 255, 255, 0.95) inset !important;
+}
+
+:root[data-theme="light"] .px-nav-frame.is-scrolled .px-nav-shell {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(248, 252, 251, 0.86)) !important;
+}
+
+:root[data-theme="light"] .px-nav-pill-group {
+  background: rgba(18, 45, 48, 0.045);
+  border-color: rgba(18, 45, 48, 0.095);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+:root[data-theme="light"] .px-nav-link {
+  color: #4a5962;
+}
+
+:root[data-theme="light"] .px-nav-link:hover:not(.is-active) {
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text-main);
+}
+
+:root[data-theme="light"] .px-nav-mark,
+:root[data-theme="light"] .px-nav-indicator,
+:root[data-theme="light"] .dash-segmented-fill {
+  background: linear-gradient(135deg, #10a36d 0%, #08784f 58%, #076b75 100%);
+  box-shadow:
+    0 1px 2px rgba(6, 78, 59, 0.18),
+    0 10px 24px -12px rgba(13, 150, 103, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+:root[data-theme="light"] .px-nav-wordmark-accent,
+:root[data-theme="light"] .dash-title-accent,
+:root[data-theme="light"] .editorial-display .accent,
+:root[data-theme="light"] .editorial-title .accent {
+  background: linear-gradient(135deg, #08784f 0%, #0b8aa0 55%, #6d5bd0 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Buttons and controls */
+:root[data-theme="light"] .px-btn.primary {
+  --px-btn-bg: linear-gradient(135deg, #10a36d 0%, #08784f 58%, #076b75 100%);
+  --px-btn-bg-hover: linear-gradient(135deg, #13b77a 0%, #08784f 52%, #075c66 100%);
+  --px-btn-border: rgba(8, 120, 79, 0.45);
+  --px-btn-border-hover: rgba(8, 120, 79, 0.62);
+  --px-btn-text: #ffffff;
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(4, 45, 34, 0.22);
+  box-shadow:
+    0 1px 2px rgba(6, 78, 59, 0.18),
+    0 14px 30px -16px rgba(8, 120, 79, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+:root[data-theme="light"] .px-btn.primary:hover {
+  box-shadow:
+    0 1px 2px rgba(6, 78, 59, 0.22),
+    0 18px 38px -16px rgba(8, 120, 79, 0.62),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26);
+}
+
+:root[data-theme="light"] .px-btn:not(.primary):not(.danger),
+:root[data-theme="light"] .btn-lux-ghost {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 252, 251, 0.9));
+  border-color: rgba(18, 45, 48, 0.11);
+  color: var(--text-main) !important;
+  box-shadow:
+    0 1px 2px rgba(18, 45, 48, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+:root[data-theme="light"] .px-btn:not(.primary):not(.danger):hover,
+:root[data-theme="light"] .btn-lux-ghost:hover {
+  background: linear-gradient(180deg, #ffffff, #f1faf6);
+  border-color: rgba(13, 150, 103, 0.28);
+  color: var(--light-accent-strong) !important;
+}
+
+/* Dashboard shell */
+:root[data-theme="light"] .dash-hero,
+:root[data-theme="light"] .editorial-header {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(247, 252, 251, 0.86)),
+    linear-gradient(90deg, rgba(13, 150, 103, 0.08), transparent 48%, rgba(11, 138, 160, 0.08));
+  border-color: rgba(18, 45, 48, 0.1);
+  box-shadow: var(--shadow-warm-md);
+}
+
+:root[data-theme="light"] .dash-hero::after,
+:root[data-theme="light"] .editorial-header::before {
+  background:
+    linear-gradient(118deg, rgba(13, 150, 103, 0.09), transparent 34%, rgba(11, 138, 160, 0.07) 78%, transparent),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), transparent);
+}
+
+:root[data-theme="light"] .dash-controls {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(243, 250, 249, 0.76));
+  border: 1px solid rgba(18, 45, 48, 0.1);
+  box-shadow:
+    0 18px 46px -28px rgba(18, 45, 48, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+:root[data-theme="light"] .portal-search,
+:root[data-theme="light"] .input-lux,
+:root[data-theme="light"] .px-input {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 252, 252, 0.94));
+  border-color: rgba(18, 45, 48, 0.11);
+  color: var(--text-main);
+  box-shadow:
+    0 1px 2px rgba(18, 45, 48, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+:root[data-theme="light"] .portal-search:focus-within,
+:root[data-theme="light"] .input-lux:focus,
+:root[data-theme="light"] .px-input:focus,
+:root[data-theme="light"] .px-input:focus-visible {
+  background: #ffffff;
+  border-color: rgba(13, 150, 103, 0.5);
+  box-shadow:
+    0 0 0 3px rgba(13, 150, 103, 0.12),
+    0 12px 28px -18px rgba(8, 120, 79, 0.35);
+}
+
+:root[data-theme="light"] .segmented-control {
+  background: rgba(18, 45, 48, 0.055);
+  border-color: rgba(18, 45, 48, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
+}
+
+:root[data-theme="light"] .segmented-tab {
+  color: #53616a;
+}
+
+:root[data-theme="light"] .segmented-tab.active {
+  color: #ffffff;
+}
+
+:root[data-theme="light"] .dash-result-pill {
+  background: #e7f7ef;
+  border-color: rgba(13, 150, 103, 0.22);
+  color: #08784f;
+}
+
+/* Cards and tiles */
+:root[data-theme="light"] .editorial-card,
+:root[data-theme="light"] .editorial-panel,
+:root[data-theme="light"] .dash-stat-card,
+:root[data-theme="light"] .dash-rail-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 252, 251, 0.9));
+  border-color: rgba(18, 45, 48, 0.095);
+  box-shadow: var(--shadow-warm-sm);
+}
+
+:root[data-theme="light"] .editorial-card:hover,
+:root[data-theme="light"] .editorial-panel.editorial-panel-hover:hover,
+:root[data-theme="light"] .dash-stat-card:hover,
+:root[data-theme="light"] .dash-rail-card:hover {
+  border-color: rgba(13, 150, 103, 0.26);
+  box-shadow: var(--shadow-warm-md);
+}
+
+:root[data-theme="light"] .editorial-card::before,
+:root[data-theme="light"] .editorial-panel::before {
+  background: linear-gradient(135deg, rgba(13, 150, 103, 0.22), transparent 42%, transparent 62%, rgba(11, 138, 160, 0.18));
+}
+
+:root[data-theme="light"] .editorial-card::after {
+  background:
+    linear-gradient(118deg, rgba(13, 150, 103, 0.07), transparent 34%, rgba(109, 91, 208, 0.055) 74%, transparent),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent);
+}
+
+:root[data-theme="light"] .dash-feed-card .card-visual {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.62), rgba(237, 247, 249, 0.5)),
+    radial-gradient(ellipse 72% 80% at 44% 35%, var(--card-accent-wash, rgba(13, 150, 103, 0.12)), transparent 66%),
+    linear-gradient(135deg, #edf7f3 0%, #e9f4fb 52%, #f2effc 100%) !important;
+  border-color: rgba(18, 45, 48, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.84),
+    inset 0 -24px 50px rgba(18, 45, 48, 0.035);
+}
+
+:root[data-theme="light"] .dash-feed-card .card-visual::before {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.44), transparent 42%),
+    radial-gradient(circle at 72% 28%, rgba(11, 138, 160, 0.11), transparent 50%);
+}
+
+:root[data-theme="light"] .dash-feed-card .card-visual .visual-glow {
+  opacity: 0.55;
+  filter: blur(18px) saturate(115%);
+}
+
+:root[data-theme="light"] .dash-feed-card .card-visual svg {
+  color: color-mix(in srgb, var(--card-accent-ink, #0d9667) 70%, #0c1417 30%) !important;
+  opacity: 0.92;
+  filter: drop-shadow(0 10px 18px rgba(18, 45, 48, 0.1));
+}
+
+:root[data-theme="light"] .dash-stat-card.tone-amber .dash-stat-icon {
+  background: #e6f7ef;
+  color: #08784f;
+}
+
+:root[data-theme="light"] .dash-stat-card.tone-cyan .dash-stat-icon {
+  background: #e2f6fa;
+  color: #087c91;
+}
+
+:root[data-theme="light"] .dash-stat-card.tone-emerald .dash-stat-icon {
+  background: #e5f8ed;
+  color: #0a7c59;
+}
+
+:root[data-theme="light"] .dash-stat-card.tone-violet .dash-stat-icon {
+  background: #efedff;
+  color: #5d52b5;
+}
+
+:root[data-theme="light"] .dash-rail-row:hover {
+  background: rgba(18, 45, 48, 0.045);
+}
+
+:root[data-theme="light"] .dash-rail-row.is-active {
+  background: linear-gradient(90deg, rgba(13, 150, 103, 0.12), rgba(13, 150, 103, 0.035));
+  border-left-color: #0d9667;
+  color: #08784f;
+}
+
+/* Badges */
+:root[data-theme="light"] .dash-eyebrow,
+:root[data-theme="light"] .editorial-eyebrow,
+:root[data-theme="light"] .pill-neon,
+:root[data-theme="light"] .pill-amber {
+  background: #e8f7ef;
+  border-color: rgba(13, 150, 103, 0.24);
+  color: #08784f;
+}
+
+:root[data-theme="light"] .editorial-eyebrow.cyan,
+:root[data-theme="light"] .pill-cyan {
+  background: #e4f6fa;
+  border-color: rgba(11, 138, 160, 0.24);
+  color: #087c91;
+}
+
+:root[data-theme="light"] .pill-dim {
+  background: rgba(18, 45, 48, 0.045);
+  border-color: rgba(18, 45, 48, 0.1);
+  color: #53616a;
+}
+
+:root[data-theme="light"] .card-cta {
+  background: linear-gradient(135deg, rgba(13, 150, 103, 0.12), rgba(11, 138, 160, 0.08));
+  border-color: rgba(13, 150, 103, 0.24);
+  color: #08784f;
+}
+
+:root[data-theme="light"] .editorial-card:hover .card-cta {
+  background: linear-gradient(135deg, #10a36d, #08784f 62%, #076b75);
+  border-color: rgba(8, 120, 79, 0.5);
+  color: #ffffff;
+  box-shadow: 0 12px 28px -16px rgba(8, 120, 79, 0.5);
+}
+
+:root[data-theme="light"] .bookmark-float {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(18, 45, 48, 0.11);
+  box-shadow:
+    0 8px 20px -14px rgba(18, 45, 48, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+:root[data-theme="light"] .bookmark-float:hover {
+  background: #eefaf4;
+  border-color: rgba(13, 150, 103, 0.34);
+  color: #08784f;
+}
+
+:root[data-theme="light"] .bookmark-float.saved {
+  background: linear-gradient(135deg, #10a36d, #08784f);
+  color: #ffffff;
+  border-color: rgba(8, 120, 79, 0.54);
+}
+
+:root[data-theme="light"] .glass-panel,
+:root[data-theme="light"] .modal-content {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 252, 251, 0.94));
+  border-color: rgba(18, 45, 48, 0.11);
+  box-shadow: var(--floating-panel-shadow);
+}
+
+:root[data-theme="light"] .modal-overlay {
+  background: rgba(234, 244, 242, 0.64);
+  backdrop-filter: blur(18px) saturate(125%);
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+}
+
+:root[data-theme="light"] .px-modal-footer {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(248, 252, 251, 0.96) 32%);
+  border-top-color: rgba(18, 45, 48, 0.1);
+}
+
+:root[data-theme="light"] .input-field {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 252, 251, 0.92));
+  border-color: rgba(18, 45, 48, 0.11);
+}
+
+:root[data-theme="light"] .input-field:hover:not(:focus) {
+  border-color: rgba(13, 150, 103, 0.28);
+}
+
+:root[data-theme="light"] .input-field:focus,
+:root[data-theme="light"] .input-field:focus-visible {
+  background: #ffffff;
+  border-color: rgba(13, 150, 103, 0.5);
+  box-shadow:
+    0 0 0 3px rgba(13, 150, 103, 0.12),
+    0 12px 28px -18px rgba(8, 120, 79, 0.32);
+}
+
+:root[data-theme="light"] .time-slot {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(18, 45, 48, 0.1);
+  color: var(--text-muted);
+}
+
+:root[data-theme="light"] .time-slot:hover,
+:root[data-theme="light"] .time-slot-selected {
+  background: var(--selected-bg);
+  border-color: var(--selected-border);
+  color: var(--selected-text);
+  box-shadow: 0 16px 34px -28px rgba(8, 120, 79, 0.42);
+}
+
+:root[data-theme="light"] .expertise-badge-role {
+  background: #e4f6fa;
+  border-color: rgba(11, 138, 160, 0.22);
+  color: #087c91;
+}
+
+@media (max-width: 540px) {
+  :root[data-theme="light"] .dash-controls {
+    border-radius: 16px;
+  }
 }

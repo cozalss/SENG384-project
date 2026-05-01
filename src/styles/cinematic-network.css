@@ -1,0 +1,502 @@
+/* =====================================================================
+   CinematicNetwork — pan-European node graph
+   ---------------------------------------------------------------------
+   See CinematicNetwork.jsx. The whole stage is one SVG with overlaid
+   side feed. Numbers are deliberately absent (cf. earlier rollback).
+   ===================================================================== */
+
+.cnet-section {
+    position: relative;
+    padding: clamp(3.5rem, 7vw, 5.5rem) clamp(1.5rem, 4vw, 3rem);
+    font-family: 'Sora', 'Inter', sans-serif;
+    overflow: hidden;
+}
+
+.cnet-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+/* ---- Eyebrow / heading ---- */
+
+.cnet-eyebrow-row {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.cnet-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(34, 211, 102, 0.08);
+    border: 1px solid rgba(34, 211, 102, 0.22);
+    color: hsl(119 80% 70%);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.cnet-eyebrow-flag {
+    margin-left: 4px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+}
+
+.cnet-heading {
+    text-align: center;
+    margin: 0 auto 14px;
+    max-width: 22ch;
+    font-size: clamp(1.85rem, 4vw, 3.1rem);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    color: hsl(0 0% 96%);
+}
+
+.cnet-heading em {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    color: hsl(119 99% 56%);
+}
+
+.cnet-sub {
+    text-align: center;
+    margin: 0 auto clamp(2rem, 4vw, 2.75rem);
+    max-width: 60ch;
+    font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+    line-height: 1.6;
+    font-weight: 300;
+    color: hsl(0 0% 76%);
+}
+
+/* ---- Stage layout ---- */
+
+.cnet-stage {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: stretch;
+}
+
+.cnet-stage::before {
+    content: '';
+    position: absolute;
+    inset: -12% -8%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 42% 62% at 30% 42%, rgba(34, 211, 102, 0.16), transparent 68%),
+        radial-gradient(ellipse 42% 56% at 80% 58%, rgba(34, 211, 238, 0.12), transparent 70%),
+        linear-gradient(110deg, transparent 18%, rgba(245, 158, 11, 0.05) 48%, transparent 78%);
+    filter: blur(18px);
+    opacity: 0.86;
+}
+
+/* ---- Map frame ---- */
+
+.cnet-map-wrap {
+    position: relative;
+    border-radius: 22px;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse 60% 50% at 50% 50%, rgba(34, 211, 102, 0.05), transparent 70%),
+        linear-gradient(180deg, rgba(10, 14, 12, 0.85), rgba(6, 10, 9, 0.95));
+    border: 1px solid rgba(34, 211, 102, 0.10);
+    box-shadow:
+        0 40px 100px -28px rgba(0, 0, 0, 0.65),
+        0 0 90px -20px rgba(34, 211, 102, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    aspect-ratio: 8 / 5;
+}
+
+.cnet-map-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -18% -8%;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        linear-gradient(112deg, transparent 0 34%, rgba(255, 255, 255, 0.09) 43%, rgba(34, 211, 238, 0.11) 50%, transparent 63%),
+        radial-gradient(ellipse 36% 42% at 62% 36%, rgba(245, 158, 11, 0.08), transparent 72%);
+    mix-blend-mode: screen;
+    opacity: 0.54;
+    animation: cnet-light-sweep 8.5s var(--ease-smooth, ease) infinite;
+}
+
+.cnet-map-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 72% 70% at 50% 48%, transparent 40%, rgba(0, 0, 0, 0.34) 100%),
+        repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 7px);
+    opacity: 0.46;
+}
+
+.cnet-map-svg {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* Film-style corner marks at the map's bezel */
+.cnet-map-corner {
+    position: absolute;
+    z-index: 4;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+    border: 1.5px solid hsl(119 99% 56%);
+    opacity: 0.55;
+}
+.cnet-map-corner--tl { top: 14px; left: 14px;  border-right: 0; border-bottom: 0; }
+.cnet-map-corner--tr { top: 14px; right: 14px; border-left: 0;  border-bottom: 0; }
+.cnet-map-corner--bl { bottom: 14px; left: 14px;  border-right: 0; border-top: 0; }
+.cnet-map-corner--br { bottom: 14px; right: 14px; border-left: 0;  border-top: 0; }
+
+.cnet-map-readout {
+    position: absolute;
+    z-index: 5;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: hsl(119 99% 65%);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(34, 211, 102, 0.5);
+}
+
+@keyframes cnet-light-sweep {
+    0%, 100% { opacity: 0.16; transform: translateX(-8%) skewX(-8deg); }
+    42%, 56% { opacity: 0.62; transform: translateX(4%) skewX(-8deg); }
+}
+
+/* ---- Idle particles ---- */
+
+@keyframes cnet-particle-drift {
+    0%, 100% { opacity: 0.2; transform: translateY(0); }
+    50%      { opacity: 0.7; transform: translateY(-3px); }
+}
+
+.cnet-particles circle {
+    animation: cnet-particle-drift 4.6s ease-in-out infinite;
+    filter: drop-shadow(0 0 4px hsl(119 99% 56%));
+}
+
+/* ---- Connection arcs ---- */
+
+.cnet-arc {
+    transition: opacity 0.4s ease;
+}
+.cnet-arc.is-active path {
+    filter: drop-shadow(0 0 8px hsl(119 99% 56%));
+}
+
+/* ---- Cities ---- */
+
+.cnet-city circle:first-child {
+    transition: opacity 0.4s ease;
+}
+
+.cnet-city.is-endpoint .cnet-city-glow {
+    animation: cnet-city-glow 2.2s ease-in-out infinite;
+}
+
+@keyframes cnet-city-glow {
+    0%, 100% { opacity: 0.3; }
+    50%      { opacity: 0.7; }
+}
+
+.cnet-city circle:not(.cnet-city-glow) {
+    filter: drop-shadow(0 0 4px hsl(119 99% 56%));
+}
+
+.cnet-city.is-endpoint circle:not(.cnet-city-glow) {
+    filter: drop-shadow(0 0 10px hsl(119 99% 65%));
+}
+
+/* ---- Side feed ---- */
+
+.cnet-feed {
+    position: relative;
+    padding: clamp(1.25rem, 2vw, 1.6rem);
+    border-radius: 22px;
+    background:
+        linear-gradient(180deg, rgba(20, 22, 28, 0.78), rgba(10, 14, 12, 0.95));
+    border: 1px solid rgba(34, 211, 102, 0.10);
+    backdrop-filter: blur(18px) saturate(120%);
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    box-shadow:
+        0 28px 60px -22px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    display: flex;
+    flex-direction: column;
+}
+
+.cnet-feed-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.cnet-feed-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: hsl(119 99% 56%);
+    box-shadow: 0 0 10px hsl(119 99% 56%);
+    animation: cnet-feed-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes cnet-feed-pulse {
+    0%, 100% { transform: scale(1);   opacity: 1;   }
+    50%      { transform: scale(1.3); opacity: 0.55; }
+}
+
+.cnet-feed-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.cnet-feed-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 12px 14px 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    opacity: calc(1 - (var(--feed-rank, 0) * 0.15));
+    transform: translateY(0);
+    transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cnet-feed-item.is-primary {
+    background: linear-gradient(135deg, rgba(34, 211, 102, 0.10), rgba(34, 211, 102, 0.02));
+    border-color: rgba(34, 211, 102, 0.32);
+    box-shadow: 0 0 24px rgba(34, 211, 102, 0.15);
+    opacity: 1;
+}
+
+.cnet-feed-route {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: hsl(0 0% 86%);
+    font-weight: 500;
+}
+.cnet-feed-route svg {
+    color: hsl(119 99% 60%);
+    flex-shrink: 0;
+}
+.cnet-feed-route--engineer svg {
+    color: hsl(180 75% 65%);
+}
+.cnet-feed-route em {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 11.5px;
+}
+
+.cnet-feed-arrow {
+    display: flex;
+    align-items: center;
+    padding-left: 4px;
+}
+.cnet-feed-arrow span {
+    width: 1px;
+    height: 10px;
+    background: linear-gradient(180deg, hsl(119 99% 56%), hsl(180 75% 65%));
+    margin-left: 5px;
+    opacity: 0.5;
+}
+
+.cnet-feed-tag {
+    margin-top: 4px;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: rgba(34, 211, 102, 0.10);
+    border: 1px solid rgba(34, 211, 102, 0.28);
+    color: hsl(119 80% 72%);
+}
+.cnet-feed-tag--interest {
+    background: rgba(34, 211, 238, 0.10);
+    border-color: rgba(34, 211, 238, 0.28);
+    color: hsl(180 75% 75%);
+}
+.cnet-feed-tag--meet-booked {
+    background: rgba(245, 158, 11, 0.10);
+    border-color: rgba(245, 158, 11, 0.28);
+    color: hsl(38 90% 72%);
+}
+.cnet-feed-tag--partner-found {
+    background: rgba(110, 231, 183, 0.12);
+    border-color: rgba(110, 231, 183, 0.32);
+    color: hsl(155 80% 75%);
+}
+
+.cnet-feed-foot {
+    margin: 16px 0 0;
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.42);
+    font-style: italic;
+    line-height: 1.45;
+    text-align: center;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 980px) {
+    .cnet-stage {
+        grid-template-columns: 1fr;
+    }
+    .cnet-feed-list {
+        max-height: 340px;
+        overflow: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .cnet-map-corner {
+        width: 14px;
+        height: 14px;
+    }
+    .cnet-map-readout {
+        font-size: 8px;
+    }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .cnet-particles circle,
+    .cnet-feed-pulse,
+    .cnet-city.is-endpoint .cnet-city-glow,
+    .cnet-map-wrap::before {
+        animation: none !important;
+    }
+    .cnet-arc.is-active path {
+        filter: drop-shadow(0 0 4px hsl(119 99% 56%));
+    }
+}
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES
+   --------------------------------------------------------------------------
+   The map frame (.cnet-map-wrap) IS the cinematic dark stage where the SVG
+   network of nodes/arcs is rendered — it stays dark like a radar screen
+   in any theme (movie cockpit). Keep map, corner marks, particles, arcs
+   intentionally dark.
+   The side feed (.cnet-feed) and the section heading text are page-level
+   UI — flip them to light surfaces with dark text.
+   ========================================================================== */
+
+/* --- Heading + supporting text (page-level) --- */
+:root[data-theme="light"] .cnet-heading {
+    color: var(--text-main, #15181d);
+}
+:root[data-theme="light"] .cnet-sub {
+    color: rgba(21, 24, 29, 0.72);
+}
+:root[data-theme="light"] .cnet-eyebrow-flag {
+    background: rgba(15, 18, 22, 0.06);
+    border-color: rgba(15, 18, 22, 0.12);
+    color: rgba(21, 24, 29, 0.65);
+}
+
+/* --- Side feed: floating UI card --- */
+:root[data-theme="light"] .cnet-feed {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.86));
+    border-color: rgba(15, 18, 22, 0.10);
+    box-shadow:
+        0 12px 32px -16px rgba(15, 18, 22, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+:root[data-theme="light"] .cnet-feed-head {
+    color: rgba(21, 24, 29, 0.55);
+    border-bottom-color: rgba(15, 18, 22, 0.10);
+}
+
+/* --- Feed list items --- */
+:root[data-theme="light"] .cnet-feed-item {
+    background: rgba(15, 18, 22, 0.03);
+    border-color: rgba(15, 18, 22, 0.08);
+}
+:root[data-theme="light"] .cnet-feed-item.is-primary {
+    background: linear-gradient(135deg, rgba(34, 211, 102, 0.12), rgba(34, 211, 102, 0.03));
+    border-color: rgba(34, 211, 102, 0.40);
+}
+:root[data-theme="light"] .cnet-feed-route {
+    color: var(--text-main, #15181d);
+}
+:root[data-theme="light"] .cnet-feed-route em {
+    color: rgba(21, 24, 29, 0.62);
+}
+
+/* --- Feed tags: keep colored variants (status-meaning), darken default text --- */
+:root[data-theme="light"] .cnet-feed-tag {
+    color: hsl(119 70% 26%);
+}
+:root[data-theme="light"] .cnet-feed-tag--interest {
+    color: hsl(180 65% 28%);
+}
+:root[data-theme="light"] .cnet-feed-tag--meet-booked {
+    color: hsl(38 80% 36%);
+}
+:root[data-theme="light"] .cnet-feed-tag--partner-found {
+    color: hsl(155 70% 28%);
+}
+
+:root[data-theme="light"] .cnet-feed-foot {
+    color: rgba(21, 24, 29, 0.55);
+}

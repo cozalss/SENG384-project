@@ -1,0 +1,201 @@
+/* =====================================================================
+   Cinematic effects — top-layer chrome that survived the cleanup.
+   ---------------------------------------------------------------------
+   Removed (mouse-tracking distractions): custom cursor, magnetic CTAs,
+   mouse parallax. Surviving layers don't watch the cursor; they react
+   to scroll position and first-paint state instead.
+   ===================================================================== */
+
+/* ============================================================
+   1. CINEMATIC PRELOADER (first-paint brand intro)
+   ============================================================ */
+
+.cpl-root {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(ellipse 60% 60% at 50% 50%, rgba(34, 211, 102, 0.10), transparent 70%),
+        linear-gradient(180deg, hsl(160 30% 4%), hsl(160 30% 6%));
+    cursor: pointer;
+}
+
+.cpl-stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+}
+
+.cpl-mono {
+    width: clamp(180px, 22vw, 240px);
+    height: clamp(180px, 22vw, 240px);
+    overflow: visible;
+}
+
+.cpl-lockup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.cpl-wordmark {
+    font-family: 'Sora', 'Inter', sans-serif;
+    font-size: clamp(1.4rem, 3.2vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: hsl(0 0% 96%);
+    text-transform: uppercase;
+}
+.cpl-wordmark span {
+    color: hsl(119 99% 56%);
+    text-shadow: 0 0 14px rgba(34, 211, 102, 0.5);
+}
+.cpl-tagline {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+    color: rgba(255, 255, 255, 0.55);
+    letter-spacing: -0.005em;
+}
+
+.cpl-bar {
+    margin-top: 18px;
+    width: 200px;
+    height: 1px;
+    background: hsl(119 99% 56%);
+    transform-origin: left center;
+    box-shadow: 0 0 6px hsl(119 99% 56%);
+}
+
+/* ============================================================
+   2. SCROLL PROGRESS BAR
+   ============================================================ */
+
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: linear-gradient(90deg, hsl(119 99% 56%), hsl(155 80% 65%) 50%, hsl(180 75% 70%));
+    transform-origin: 0% 50%;
+    z-index: 10000;
+    box-shadow: 0 0 8px rgba(34, 211, 102, 0.55);
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+}
+.scroll-progress.is-shown { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+    .scroll-progress { transition: none; }
+}
+
+/* ============================================================
+   3. SECTION TRANSITION (light-leak between sections)
+   ============================================================ */
+
+.section-transition {
+    position: relative;
+    height: 1px;
+    width: 100%;
+    margin: 0;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 5;
+}
+.section-transition-leak {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    max-width: 1600px;
+    height: 1.5px;
+    border-radius: 999px;
+    filter: drop-shadow(0 0 10px rgba(34, 211, 102, 0.45));
+}
+.section-transition-wash {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 80px;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .section-transition-leak,
+    .section-transition-wash { transform: translate(-50%, -50%) !important; }
+}
+
+/* =========================================================================
+   landing-pulse-alive — extremely subtle brand-green glow pulse.
+   Applied to .hero-cta-primary, the hero h1, and the trust-line ECG SVG.
+   Uses drop-shadow on a keyframe instead of box-shadow because the elements
+   it lands on are mixed (text + SVG + button), and drop-shadow respects the
+   actual non-rectangular shape. 4.2 s cycle so it feels like a heartbeat,
+   not a marketing pulse. Reduced-motion silences it without hiding it.
+   ========================================================================= */
+@keyframes landingPulseAlive {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(34, 211, 102, 0)); }
+    50%      { filter: drop-shadow(0 0 14px rgba(34, 211, 102, 0.55)); }
+}
+
+.landing-pulse-alive {
+    animation: landingPulseAlive 4.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .landing-pulse-alive { animation: none; }
+}
+
+/* =========================================================================
+   landing-snap-letterbox — two thin black bars that scaleY in/out during the
+   SNAP_LOCK_MS window of LandingPage's wheel/key snap navigation. Pure CSS;
+   the parent toggles a `data-snap-locked="true"` attribute on <html> at the
+   start of each jumpTo() and clears it after SNAP_LOCK_MS. Bars are 16 vh
+   each, fixed top + bottom, aria-hidden. They never appear on mobile (snap
+   is already disabled there) or under reduced-motion.
+   ========================================================================= */
+.landing-snap-letterbox {
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 14vh;
+    background: hsl(0 0% 4%);
+    pointer-events: none;
+    z-index: 80;
+    transform: scaleY(0);
+    transition: transform 360ms cubic-bezier(0.83, 0, 0.17, 1);
+    will-change: transform;
+}
+.landing-snap-letterbox--top    { top: 0;    transform-origin: top center; }
+.landing-snap-letterbox--bottom { bottom: 0; transform-origin: bottom center; }
+
+html[data-snap-locked="true"] .landing-snap-letterbox { transform: scaleY(1); }
+
+@media (max-width: 900px), (prefers-reduced-motion: reduce) {
+    .landing-snap-letterbox { display: none; }
+}
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES
+   --------------------------------------------------------------------------
+   - Preloader (.cpl-root) is a brand intro stage; it stays dark even in
+     light mode (movie studio idents are dark).
+   - Snap letterbox bars stay black — they're cinematic letterboxing, the
+     whole point is dark frame edges.
+   - Scroll progress bar keeps brand-green gradient — already neutral.
+   - Section transitions are pure brand-color drop-shadows — fine on either
+     background, no override needed.
+   ========================================================================== */
+/* Intentionally minimal: every effect here is brand-colored decoration or
+   intentional cinematic letterboxing. No dark UI surfaces to flip. */
