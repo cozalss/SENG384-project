@@ -5615,3 +5615,233 @@ a:hover {
     border-radius: 16px;
   }
 }
+
+/* =====================================================================
+   LANDING — CINEMATIC HERO POLISH
+   Headline reveal, volumetric haze, light-leak seams, magnetic CTAs.
+   All animations are transform/opacity/clip-path only (no layout thrash).
+   Reduced-motion users get a static, dignified fallback at the bottom.
+   ===================================================================== */
+
+/* Volumetric haze layer — sits between Spline and content, in front of cubes
+   but behind text. Gives the type something to push against. */
+.landing-hero-haze {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 18% 88%, rgba(0, 0, 0, 0.55), transparent 65%),
+    radial-gradient(ellipse 110% 40% at 50% 100%, rgba(0, 0, 0, 0.35), transparent 70%),
+    radial-gradient(ellipse 50% 35% at 22% 62%, rgba(34, 211, 102, 0.05), transparent 70%);
+  opacity: 0;
+  animation: hero-haze-in 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
+}
+@keyframes hero-haze-in {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Light-leak seam — bottom edge of hero blends into next section with a
+   thin neon-tinted bloom. Helps the section transition feel orchestrated
+   rather than stacked. */
+.landing-hero-leak {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 96px;
+  z-index: 4;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.45) 100%),
+    radial-gradient(ellipse 40% 100% at 16% 100%, rgba(34, 211, 102, 0.13), transparent 70%);
+  opacity: 0;
+  animation: hero-haze-in 1.4s cubic-bezier(0.22, 1, 0.36, 1) 1.0s forwards;
+}
+
+/* HEADLINE — clip-path mask shift-in reveal, word by word.
+   Each .hero-word is a fixed-height clip; .hero-word-inner is the actual
+   glyph row that translates up from below the clip. Two words ("HEALTH"
+   and "AI") stagger on a beat — AI lands a tick later and pulses. */
+.landing-hero-heading {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  position: relative;
+}
+
+.hero-word {
+  display: inline-block;
+  overflow: hidden;
+  /* generous vertical padding so descenders/ascenders aren't clipped */
+  padding: 0.05em 0;
+  line-height: 1.05;
+  vertical-align: baseline;
+}
+
+.hero-word-inner {
+  display: inline-block;
+  transform: translate3d(0, 110%, 0);
+  will-change: transform;
+}
+
+.hero-word-health .hero-word-inner {
+  animation: hero-word-rise 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.25s forwards;
+}
+
+.hero-word-ai .hero-word-inner {
+  color: hsl(119 99% 46%);
+  animation:
+    hero-word-rise 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.42s forwards,
+    hero-ai-pulse 2.6s cubic-bezier(0.45, 0, 0.55, 1) 1.55s 1;
+  text-shadow: 0 0 0 hsl(119 99% 46% / 0);
+}
+
+@keyframes hero-word-rise {
+  0%   { transform: translate3d(0, 110%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* The "beat" — AI breathes once after the wordmark settles. Subtle.
+   We pulse text-shadow + a tiny scale for a held-note feel, not a flash. */
+@keyframes hero-ai-pulse {
+  0%   { text-shadow: 0 0 0 hsl(119 99% 46% / 0); transform: scale(1); }
+  35%  { text-shadow: 0 0 28px hsl(119 99% 46% / 0.55), 0 0 60px hsl(119 99% 46% / 0.25); transform: scale(1.012); }
+  100% { text-shadow: 0 0 0 hsl(119 99% 46% / 0); transform: scale(1); }
+}
+
+/* Magnetic primary CTA: lift on hover, intensify the green halo.
+   The translate3d is set inline by useMagnetic — we layer a y-offset and
+   shadow change on top of whatever transform the hook wrote. */
+.landing-hero-cta-primary:hover {
+  filter: brightness(1.06) saturate(1.06);
+  box-shadow:
+    0 22px 56px rgba(34, 211, 102, 0.42),
+    0 0 0 1px rgba(34, 211, 102, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+}
+
+.landing-hero-cta-primary:active {
+  filter: brightness(0.98);
+}
+
+/* Reduced-motion fallback — kill the rise/pulse, show a static heading. */
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero-haze,
+  .landing-hero-leak {
+    animation: none;
+    opacity: 1;
+  }
+  .hero-word-inner {
+    transform: translate3d(0, 0, 0) !important;
+    animation: none !important;
+  }
+}
+
+/* =====================================================================
+   LANDING — SECTION SEAM LIGHT LEAKS
+   Subtle horizontal bloom across SectionLabel hairlines so each numbered
+   section feels handed off rather than abutted. Pure decoration; pointer
+   events off; no JS.
+   ===================================================================== */
+.landing-page-shell > section + .px-secn,
+.landing-page-shell > div + .px-secn {
+  /* placeholder — actual seam handled inline by SectionLabel motion */
+}
+
+/* =====================================================================
+   LANDING — FINAL CTA AURA
+   Pulsing breath behind the FinalCTA card so it feels held, not stacked.
+   ===================================================================== */
+.landing-final-cta-aura {
+  position: absolute;
+  inset: -8% -6%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 50%, rgba(34, 211, 102, 0.14), transparent 65%),
+    radial-gradient(ellipse 80% 60% at 50% 60%, rgba(96, 165, 250, 0.10), transparent 70%);
+  filter: blur(28px);
+  opacity: 0.85;
+  animation: final-cta-breathe 7.5s ease-in-out infinite;
+}
+
+@keyframes final-cta-breathe {
+  0%, 100% { opacity: 0.62; transform: scale(1); }
+  50%      { opacity: 0.95; transform: scale(1.02); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-final-cta-aura {
+    animation: none;
+    opacity: 0.55;
+  }
+}
+
+/* =====================================================================
+   LANDING — FOOTER FINAL HUSH
+   Drop the brightness on the footer, end on a held note. The footer is the
+   exhale of the page — should not compete with the FinalCTA above it.
+   ===================================================================== */
+.landing-page-shell > footer {
+  position: relative;
+  filter: brightness(0.86) saturate(0.92);
+  transition: filter 0.4s ease;
+}
+
+.landing-page-shell > footer::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(34, 211, 102, 0.18) 50%,
+    transparent);
+  pointer-events: none;
+}
+
+/* =====================================================================
+   LANDING — BIG TEXT REVEAL: GLYPH STAGGER
+   Slightly tighter rise + subtle glyph-level breath. The motion variants
+   in BigTextReveal control the line-level reveal; this CSS adds a soft
+   variable-font weight tween for the higher-class feel.
+   ===================================================================== */
+@keyframes glyph-settle {
+  0%   { font-variation-settings: "wght" 540; letter-spacing: -0.02em; }
+  100% { font-variation-settings: "wght" 600; letter-spacing: -0.035em; }
+}
+
+/* =====================================================================
+   LANDING — BENTO CARDS: CURSOR-AWARE CONIC BORDER
+   On hover, a thin conic-gradient border traces around the card following
+   the cursor. The base .bento-card already has tilt; this layers an
+   extra hairline that brightens on the side closest to the cursor.
+   ===================================================================== */
+.bento-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  padding: 1px;
+  background: radial-gradient(
+    circle 240px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(34, 211, 102, 0.34),
+    rgba(96, 165, 250, 0.10) 35%,
+    transparent 60%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.bento-card:hover::after,
+.bento-card.is-tilting::after {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bento-card::after { display: none; }
+}

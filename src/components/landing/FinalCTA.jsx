@@ -1,37 +1,35 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Cpu, Stethoscope, Rocket, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Cpu, Stethoscope, Activity, Rocket, ArrowRight, CheckCircle2 } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
-import { useTilt } from '../../hooks/useInteractiveFX';
+import { useMagnetic } from '../../hooks/useInteractiveFX';
 
 const FinalCTA = ({ isMobile }) => {
-    const tilt = useTilt({ max: 4, scale: 1.008 });
+    const magnetic = useMagnetic({ strength: 0.3, max: 10 });
+
     return (
-        <section className="container px-cta-section landing-cinema-section" style={{
+        <section id="final-cta" className="container px-cta-section" style={{
             maxWidth: '1000px',
             // Match the unified landing rhythm.
             marginTop: isMobile ? '40px' : '64px',
             marginBottom: isMobile ? '64px' : '88px',
             padding: isMobile ? '0 16px' : '0 24px',
+            position: 'relative',
         }}>
+            {/* Pulsing aura — sits behind the card and breathes. Held note. */}
+            <div className="landing-final-cta-aura" aria-hidden="true" />
             <ScrollReveal direction="scale">
-                <div
-                    {...tilt}
-                    className="premium-card premium-card--strong premium-card--halo"
-                    style={{
+                <div style={{
                     position: 'relative',
                     padding: isMobile ? '60px 28px' : '100px 60px',
                     borderRadius: '32px',
                     overflow: 'hidden',
-                    background: 'linear-gradient(135deg, rgba(34, 211, 102, 0.12), rgba(16, 185, 129, 0.06), rgba(10, 18, 16, 0.72))',
-                    border: '1px solid rgba(34, 211, 102, 0.10)',
+                    background: 'linear-gradient(135deg, rgba(96, 165, 250, 0.12), rgba(34, 211, 238, 0.08), rgba(15, 23, 42, 0.7))',
+                    border: '1px solid rgba(255,255,255,0.08)',
                     backdropFilter: 'blur(24px)',
                     WebkitBackdropFilter: 'blur(24px)',
-                    boxShadow: '0 40px 80px rgba(0, 0, 0, 0.42), 0 0 90px -20px rgba(34, 211, 102, 0.18), inset 0 1px 0 rgba(255,255,255,0.05)',
-                    '--pc-glow': 'rgba(34, 211, 102, 0.55)',
-                    '--pc-glow-soft': 'rgba(34, 211, 102, 0.18)',
+                    boxShadow: '0 40px 80px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.05)'
                 }}>
-                    <span className="premium-card-halo" aria-hidden="true" />
                     <div className="spotlight-bg" />
 
                     {/* Animated top shimmer line */}
@@ -54,7 +52,7 @@ const FinalCTA = ({ isMobile }) => {
                                 animate={{ y: [0, -10, 0] }}
                                 transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
                                 className="floating-badge"
-                                style={{ position: 'absolute', top: '16%', left: '7%', color: 'hsl(119 99% 60%)' }}
+                                style={{ position: 'absolute', top: '16%', left: '7%', color: 'var(--primary-light)' }}
                             >
                                 <Cpu size={12} /> Engineering
                             </motion.div>
@@ -62,7 +60,7 @@ const FinalCTA = ({ isMobile }) => {
                                 animate={{ y: [0, 10, 0] }}
                                 transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
                                 className="floating-badge"
-                                style={{ position: 'absolute', bottom: '18%', right: '9%', color: 'hsl(180 75% 65%)' }}
+                                style={{ position: 'absolute', bottom: '18%', right: '9%', color: 'var(--secondary)' }}
                             >
                                 <Stethoscope size={12} /> Clinical
                             </motion.div>
@@ -70,140 +68,81 @@ const FinalCTA = ({ isMobile }) => {
                     )}
 
                     <div style={{ textAlign: 'center', position: 'relative', zIndex: 3 }}>
-                        {/* Refined brand monogram — concentric green pulse rings.
-                            Replaces the prior conic-gradient orb that read as
-                            generic 2022-SaaS. Pure SVG, GPU-cheap, brand-locked. */}
-                        <div style={{
-                            width: isMobile ? 88 : 120,
-                            height: isMobile ? 88 : 120,
-                            margin: '0 auto 28px',
-                            position: 'relative',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
-                            <svg viewBox="0 0 120 120" style={{ width: '100%', height: '100%', overflow: 'visible' }} aria-hidden="true">
-                                <defs>
-                                    <radialGradient id="cta-mono-glow" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stopColor="hsl(119 99% 56%)" stopOpacity="0.55" />
-                                        <stop offset="60%" stopColor="hsl(119 99% 56%)" stopOpacity="0.12" />
-                                        <stop offset="100%" stopColor="hsl(119 99% 56%)" stopOpacity="0" />
-                                    </radialGradient>
-                                    <linearGradient id="cta-mono-stroke" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stopColor="hsl(119 99% 62%)" />
-                                        <stop offset="100%" stopColor="hsl(155 80% 65%)" />
-                                    </linearGradient>
-                                </defs>
-                                {/* outer glow disc */}
-                                <circle cx="60" cy="60" r="58" fill="url(#cta-mono-glow)" />
-                                {/* expanding pulse ring */}
-                                <motion.circle
-                                    cx="60" cy="60" r="32"
-                                    fill="none"
-                                    stroke="hsl(119 99% 56%)"
-                                    strokeWidth="1"
-                                    animate={{ scale: [1, 1.6], opacity: [0.55, 0] }}
-                                    transition={{ duration: 2.4, repeat: Infinity, ease: 'easeOut' }}
-                                    style={{ transformOrigin: '60px 60px' }}
-                                />
-                                <motion.circle
-                                    cx="60" cy="60" r="32"
-                                    fill="none"
-                                    stroke="hsl(119 99% 56%)"
-                                    strokeWidth="1"
-                                    animate={{ scale: [1, 1.6], opacity: [0.55, 0] }}
-                                    transition={{ duration: 2.4, repeat: Infinity, ease: 'easeOut', delay: 1.2 }}
-                                    style={{ transformOrigin: '60px 60px' }}
-                                />
-                                {/* static rings */}
-                                <circle cx="60" cy="60" r="42" fill="none" stroke="rgba(34, 211, 102, 0.15)" strokeWidth="1" strokeDasharray="2 4" />
-                                <circle cx="60" cy="60" r="32" fill="none" stroke="rgba(34, 211, 102, 0.32)" strokeWidth="1" />
-                                {/* inner monogram disc */}
-                                <circle cx="60" cy="60" r="22" fill="hsl(0 0% 8%)" stroke="url(#cta-mono-stroke)" strokeWidth="1.5" />
-                                {/* ECG glyph centered inside */}
-                                <path
-                                    d="M 44 60 L 53 60 L 56 52 L 60 70 L 64 56 L 67 60 L 76 60"
-                                    fill="none"
-                                    stroke="hsl(119 99% 56%)"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    style={{ filter: 'drop-shadow(0 0 6px hsl(119 99% 56%))' }}
-                                />
-                            </svg>
-                        </div>
+                        <motion.div
+                            animate={{ rotate: [0, 360] }}
+                            transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
+                            style={{
+                                width: isMobile ? '64px' : '84px', height: isMobile ? '64px' : '84px',
+                                borderRadius: '24px',
+                                background: 'conic-gradient(from 0deg, var(--primary), var(--accent), var(--cyan), var(--secondary), var(--primary))',
+                                padding: '2px',
+                                margin: '0 auto 28px',
+                                boxShadow: '0 20px 60px rgba(96, 165, 250, 0.5), 0 0 80px rgba(34, 211, 238, 0.3)'
+                            }}
+                        >
+                            <div
+                                style={{
+                                    width: '100%', height: '100%', borderRadius: '22px',
+                                    background: 'var(--background)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}
+                            >
+                                <span className="spin-reverse-slow" style={{ display: 'inline-flex' }}>
+                                    <Activity size={isMobile ? 28 : 36} color="var(--primary-light)" />
+                                </span>
+                            </div>
+                        </motion.div>
 
                         <h2 style={{
-                            fontSize: isMobile ? '34px' : '54px',
-                            marginBottom: '18px', letterSpacing: 0,
-                            lineHeight: '1.05', fontWeight: 700,
-                            color: 'hsl(0 0% 96%)',
+                            fontSize: isMobile ? '32px' : '52px',
+                            marginBottom: '18px', letterSpacing: '-0.04em',
+                            lineHeight: '1.05', fontWeight: '800'
                         }}>
-                            Ready to show the <span className="text-gradient-aurora">full demo flow.</span>
+                            Ready to <span className="text-gradient-aurora">Innovate?</span>
                         </h2>
-                        <p style={{
+                        <p className="text-muted" style={{
                             fontSize: isMobile ? '15px' : '18px', lineHeight: '1.7',
-                            maxWidth: '540px', margin: '0 auto 40px',
-                            color: 'hsl(0 0% 78%)', fontWeight: 300,
+                            maxWidth: '540px', margin: '0 auto 40px'
                         }}>
-                            Start from registration, then demonstrate the dashboard, post creation, NDA-protected details, meeting requests, real-time chat, profile controls, and admin oversight.
+                            Create an institutional account and post your first cross-disciplinary collaboration request.
                         </p>
 
-                        <div className="flex gap-3 justify-center items-center" style={{ flexWrap: 'wrap' }}>
+                        <div className="flex gap-3 justify-center" style={{ flexWrap: 'wrap' }}>
                             <Link
                                 to="/login"
+                                className="btn btn-accent"
+                                onMouseMove={magnetic.onMouseMove}
+                                onMouseLeave={magnetic.onMouseLeave}
                                 style={{
-                                    pointerEvents: 'auto',
-                                    background: 'hsl(119 99% 46%)',
-                                    color: 'hsl(0 0% 4%)',
-                                    padding: isMobile ? '16px 30px' : '20px 48px',
-                                    fontSize: isMobile ? '16px' : '18px',
-                                    fontWeight: 700,
-                                    borderRadius: '14px',
-                                    cursor: 'pointer',
-                                    textDecoration: 'none',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.55rem',
-                                    boxShadow: '0 14px 40px rgba(34, 211, 102, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.22)',
-                                    transition: 'filter 0.2s, transform 0.18s',
+                                    padding: isMobile ? '14px 30px' : '18px 48px',
+                                    fontSize: isMobile ? '15px' : '17px', borderRadius: '16px',
+                                    boxShadow: '0 12px 40px rgba(96, 165, 250, 0.45), 0 0 80px rgba(34, 211, 238, 0.2)',
+                                    transition: 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), filter 0.2s, box-shadow 0.25s',
                                 }}
-                                onMouseEnter={(e) => { e.currentTarget.style.filter = 'brightness(1.06)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.filter = 'brightness(1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
                             >
-                                <Rocket size={18} /> Open Login / Register <ArrowRight size={16} />
+                                <Rocket size={20} /> Create Account <ArrowRight size={18} />
                             </Link>
                             <a
-                                href="#product"
+                                href="#how-it-works"
+                                className="btn btn-secondary"
                                 style={{
-                                    background: 'transparent',
-                                    color: 'hsl(0 0% 86%)',
-                                    padding: isMobile ? '12px 18px' : '14px 22px',
-                                    fontSize: isMobile ? '14px' : '15px',
-                                    fontWeight: 500,
-                                    borderRadius: '10px',
-                                    textDecoration: 'underline',
-                                    textDecorationColor: 'rgba(255,255,255,0.18)',
-                                    textUnderlineOffset: '4px',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.4rem',
-                                    transition: 'color 0.2s, text-decoration-color 0.2s',
+                                    padding: isMobile ? '14px 24px' : '18px 36px',
+                                    fontSize: isMobile ? '15px' : '17px', borderRadius: '16px'
                                 }}
-                                onMouseEnter={(e) => { e.currentTarget.style.color = 'hsl(119 99% 70%)'; e.currentTarget.style.textDecorationColor = 'hsl(119 99% 56%)'; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.color = 'hsl(0 0% 86%)'; e.currentTarget.style.textDecorationColor = 'rgba(255,255,255,0.18)'; }}
                             >
-                                review the product flow
+                                Read the Flow
                             </a>
                         </div>
 
-                        {/* Micro trust indicators — kept tight, kept truthful. */}
+                        {/* Micro trust indicators */}
                         <div className="flex gap-3 justify-center items-center" style={{
-                            marginTop: '32px', flexWrap: 'wrap', fontSize: '12px', color: 'hsl(0 0% 65%)'
+                            marginTop: '32px', flexWrap: 'wrap', fontSize: '12px', color: 'var(--text-subtle)'
                         }}>
-                            <span className="flex items-center gap-1"><CheckCircle2 size={12} color="hsl(119 99% 56%)" /> .edu + OTP registration</span>
+                            <span className="flex items-center gap-1"><CheckCircle2 size={12} color="var(--secondary)" /> No credit card</span>
                             <span style={{ opacity: 0.3 }}>•</span>
-                            <span className="flex items-center gap-1"><CheckCircle2 size={12} color="hsl(119 99% 56%)" /> Post, NDA, meeting workflow</span>
+                            <span className="flex items-center gap-1"><CheckCircle2 size={12} color="var(--secondary)" /> .edu verified</span>
                             <span style={{ opacity: 0.3 }}>•</span>
-                            <span className="flex items-center gap-1"><CheckCircle2 size={12} color="hsl(119 99% 56%)" /> Chat, profile, admin modules</span>
+                            <span className="flex items-center gap-1"><CheckCircle2 size={12} color="var(--secondary)" /> NDA gated</span>
                         </div>
                     </div>
                 </div>
