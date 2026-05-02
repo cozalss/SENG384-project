@@ -21,7 +21,7 @@
 
 <br/>
 
-![Landing Page](docs/screenshots/landing_page.png?v=2)
+![Landing Page](https://github.com/user-attachments/assets/b7600797-653f-41d6-8e2c-bf1bb3469ca6)
 
 <br/>
 
